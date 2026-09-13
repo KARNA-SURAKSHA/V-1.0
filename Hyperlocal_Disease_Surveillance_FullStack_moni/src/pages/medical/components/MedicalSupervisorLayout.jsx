@@ -1,8 +1,4 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   Bell,
@@ -92,7 +88,20 @@ export const MEDICAL_NAV = [
 
 
 /* ============================================================
-   LAYOUT
+   HEADER DATE
+   ============================================================ */
+
+function formatHeaderDate(date) {
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
+
+/* ============================================================
+   MEDICAL SUPERVISOR LAYOUT
    ============================================================ */
 
 export default function MedicalSupervisorLayout({
@@ -104,21 +113,26 @@ export default function MedicalSupervisorLayout({
   locationName,
   children,
 }) {
-
   const { session } = useAuth();
 
-  const [
-    profileOpen,
-    setProfileOpen,
-  ] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [now, setNow] = useState(() => new Date());
 
-  const [
-    mobileOpen,
-    setMobileOpen,
-  ] = useState(false);
+  const profileRef = useRef(null);
 
-  const profileRef =
-    useRef(null);
+
+  /* ==========================================================
+     LIVE CLOCK
+     ========================================================== */
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setNow(new Date());
+    }, 60 * 1000);
+
+    return () => window.clearInterval(timer);
+  }, []);
 
 
   /* ==========================================================
@@ -126,33 +140,36 @@ export default function MedicalSupervisorLayout({
      ========================================================== */
 
   useEffect(() => {
-
     const close = (event) => {
-
       if (
         profileRef.current &&
-        !profileRef.current.contains(
-          event.target
-        )
+        !profileRef.current.contains(event.target)
       ) {
         setProfileOpen(false);
       }
-
     };
 
-    document.addEventListener(
-      "mousedown",
-      close
-    );
+    document.addEventListener("mousedown", close);
 
     return () => {
-      document.removeEventListener(
-        "mousedown",
-        close
-      );
+      document.removeEventListener("mousedown", close);
     };
-
   }, []);
+
+
+  /* ==========================================================
+     MOBILE BODY LOCK
+     ========================================================== */
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen
+      ? "hidden"
+      : "";
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
 
 
   /* ==========================================================
@@ -163,8 +180,12 @@ export default function MedicalSupervisorLayout({
     session?.full_name ||
     "Dr. Monish";
 
-  const role =
-    "Medical Supervisor";
+  const role = "Medical Supervisor";
+
+  const dateLabel = useMemo(
+    () => formatHeaderDate(now),
+    [now]
+  );
 
 
   /* ==========================================================
@@ -172,11 +193,15 @@ export default function MedicalSupervisorLayout({
      ========================================================== */
 
   const selectTab = (key) => {
-
     onTabChange(key);
 
     setMobileOpen(false);
+    setProfileOpen(false);
 
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
 
@@ -185,7 +210,6 @@ export default function MedicalSupervisorLayout({
      ========================================================== */
 
   return (
-
     <div
       className="
         medical-shell
@@ -196,7 +220,7 @@ export default function MedicalSupervisorLayout({
     >
 
       {/* ======================================================
-          HEADER
+          TOP HEADER
           ====================================================== */}
 
       <header
@@ -211,14 +235,7 @@ export default function MedicalSupervisorLayout({
           bg-white
         "
       >
-
-        <div
-          className="
-            flex
-            h-full
-            items-center
-          "
-        >
+        <div className="flex h-full items-center">
 
           {/* ==================================================
               LOGO AREA
@@ -237,7 +254,6 @@ export default function MedicalSupervisorLayout({
               px-[20px]
             "
           >
-
             <img
               src={supervisorLogo}
               alt="Medical Supervisor"
@@ -250,7 +266,6 @@ export default function MedicalSupervisorLayout({
             />
 
             <div>
-
               <div
                 className="
                   text-[16px]
@@ -272,9 +287,7 @@ export default function MedicalSupervisorLayout({
               >
                 Surveillance System
               </div>
-
             </div>
-
           </div>
 
 
@@ -298,10 +311,7 @@ export default function MedicalSupervisorLayout({
             <button
               type="button"
               onClick={() =>
-                setMobileOpen(
-                  (value) =>
-                    !value
-                )
+                setMobileOpen((value) => !value)
               }
               aria-label="Toggle navigation"
               className="
@@ -316,16 +326,16 @@ export default function MedicalSupervisorLayout({
                 hover:bg-[#F4F7F5]
               "
             >
-
               <Menu
                 size={23}
                 strokeWidth={1.8}
               />
-
             </button>
 
 
-            {/* RIGHT CONTROLS */}
+            {/* =================================================
+                HEADER CONTROLS
+                ================================================= */}
 
             <div
               className="
@@ -356,7 +366,6 @@ export default function MedicalSupervisorLayout({
                   md:flex
                 "
               >
-
                 <MapPin
                   size={17}
                   className="text-[#087A32]"
@@ -370,13 +379,11 @@ export default function MedicalSupervisorLayout({
                   "
                 >
                   {locationName ||
-                    `${districtName || "Kodagu"}`}
+                    districtName ||
+                    "Kodagu"}
                 </span>
 
-                <ChevronDown
-                  size={14}
-                />
-
+                <ChevronDown size={14} />
               </button>
 
 
@@ -401,10 +408,7 @@ export default function MedicalSupervisorLayout({
                   md:flex
                 "
               >
-
-                <CalendarDays
-                  size={17}
-                />
+                <CalendarDays size={17} />
 
                 <span
                   className="
@@ -412,13 +416,10 @@ export default function MedicalSupervisorLayout({
                     text-left
                   "
                 >
-                  26 August 2026
+                  {dateLabel}
                 </span>
 
-                <ChevronDown
-                  size={14}
-                />
-
+                <ChevronDown size={14} />
               </button>
 
 
@@ -426,9 +427,7 @@ export default function MedicalSupervisorLayout({
 
               <button
                 type="button"
-                onClick={() =>
-                  selectTab("alerts")
-                }
+                onClick={() => selectTab("alerts")}
                 aria-label="Alerts"
                 className="
                   relative
@@ -442,16 +441,12 @@ export default function MedicalSupervisorLayout({
                   hover:bg-[#F4F7F5]
                 "
               >
-
                 <Bell
                   size={21}
                   strokeWidth={1.8}
                 />
 
-                {Number(
-                  alertCount || 0
-                ) > 0 && (
-
+                {Number(alertCount || 0) > 0 && (
                   <span
                     className="
                       absolute
@@ -474,9 +469,7 @@ export default function MedicalSupervisorLayout({
                       ? "99+"
                       : alertCount}
                   </span>
-
                 )}
-
               </button>
 
 
@@ -490,10 +483,7 @@ export default function MedicalSupervisorLayout({
                 <button
                   type="button"
                   onClick={() =>
-                    setProfileOpen(
-                      (value) =>
-                        !value
-                    )
+                    setProfileOpen((value) => !value)
                   }
                   className="
                     flex
@@ -528,7 +518,6 @@ export default function MedicalSupervisorLayout({
                       sm:block
                     "
                   >
-
                     <div
                       className="
                         text-[12px]
@@ -549,7 +538,6 @@ export default function MedicalSupervisorLayout({
                     >
                       {role}
                     </div>
-
                   </div>
 
                   <ChevronDown
@@ -560,14 +548,12 @@ export default function MedicalSupervisorLayout({
                         : "transition-transform"
                     }
                   />
-
                 </button>
 
 
                 {/* PROFILE DROPDOWN */}
 
                 {profileOpen && (
-
                   <div
                     className="
                       absolute
@@ -583,8 +569,6 @@ export default function MedicalSupervisorLayout({
                     "
                   >
 
-                    {/* PROFILE HEADER */}
-
                     <div
                       className="
                         border-b
@@ -593,14 +577,7 @@ export default function MedicalSupervisorLayout({
                         p-[16px]
                       "
                     >
-
-                      <div
-                        className="
-                          flex
-                          items-center
-                          gap-[12px]
-                        "
-                      >
+                      <div className="flex items-center gap-[12px]">
 
                         <img
                           src={medicalDoctor}
@@ -615,11 +592,7 @@ export default function MedicalSupervisorLayout({
                           "
                         />
 
-                        <div
-                          className="
-                            min-w-0
-                          "
-                        >
+                        <div className="min-w-0">
 
                           <div
                             className="
@@ -644,11 +617,8 @@ export default function MedicalSupervisorLayout({
                         </div>
 
                       </div>
-
                     </div>
 
-
-                    {/* DETAILS */}
 
                     <div className="p-[12px]">
 
@@ -661,14 +631,12 @@ export default function MedicalSupervisorLayout({
                           p-[10px]
                         "
                       >
-
                         <UserRoundCog
                           size={17}
                           className="text-[#087A32]"
                         />
 
                         <div>
-
                           <div
                             className="
                               text-[9px]
@@ -689,9 +657,7 @@ export default function MedicalSupervisorLayout({
                           >
                             {role}
                           </div>
-
                         </div>
-
                       </div>
 
 
@@ -704,14 +670,12 @@ export default function MedicalSupervisorLayout({
                           p-[10px]
                         "
                       >
-
                         <MapPin
                           size={17}
                           className="text-[#315C88]"
                         />
 
                         <div>
-
                           <div
                             className="
                               text-[9px]
@@ -730,12 +694,9 @@ export default function MedicalSupervisorLayout({
                               font-medium
                             "
                           >
-                            {districtName ||
-                              "Kodagu"}
+                            {districtName || "Kodagu"}
                           </div>
-
                         </div>
-
                       </div>
 
 
@@ -748,14 +709,12 @@ export default function MedicalSupervisorLayout({
                           p-[10px]
                         "
                       >
-
                         <Bell
                           size={17}
                           className="text-[#315C88]"
                         />
 
                         <div>
-
                           <div
                             className="
                               text-[9px]
@@ -776,15 +735,11 @@ export default function MedicalSupervisorLayout({
                           >
                             {alertCount || 0} active
                           </div>
-
                         </div>
-
                       </div>
 
                     </div>
 
-
-                    {/* LOGOUT */}
 
                     <div
                       className="
@@ -793,7 +748,6 @@ export default function MedicalSupervisorLayout({
                         p-[12px]
                       "
                     >
-
                       <button
                         type="button"
                         onClick={onExit}
@@ -813,19 +767,12 @@ export default function MedicalSupervisorLayout({
                           hover:bg-[#FFF4F4]
                         "
                       >
-
-                        <LogOut
-                          size={16}
-                        />
-
+                        <LogOut size={16} />
                         Logout
-
                       </button>
-
                     </div>
 
                   </div>
-
                 )}
 
               </div>
@@ -835,12 +782,12 @@ export default function MedicalSupervisorLayout({
           </div>
 
         </div>
-
       </header>
 
 
       {/* ======================================================
-          SIDEBAR
+          MEDICAL SUPERVISOR SIDEBAR
+          COMPACT SPACING
           ====================================================== */}
 
       <aside
@@ -856,6 +803,7 @@ export default function MedicalSupervisorLayout({
           bg-white
           transition-transform
           duration-200
+
           ${
             mobileOpen
               ? "translate-x-0"
@@ -870,7 +818,7 @@ export default function MedicalSupervisorLayout({
             h-full
             flex-col
             px-[15px]
-            py-[18px]
+            py-[9px]
           "
         >
 
@@ -882,142 +830,125 @@ export default function MedicalSupervisorLayout({
             "
           >
 
-            {MEDICAL_NAV.map(
-              (item) => {
+            {MEDICAL_NAV.map((item) => {
 
-                const Icon =
-                  item.icon;
+              const Icon = item.icon;
 
-                const active =
-                  activeTab ===
-                  item.key;
+              const active =
+                activeTab === item.key;
 
-                return (
+              return (
+                <div key={item.key}>
 
-                  <div
-                    key={item.key}
-                  >
+                  {/* SECTION TITLE */}
 
-                    {/* SECTION TITLE */}
-
-                    {item.section && (
-
-                      <div
-                        className={`
-                          px-[10px]
-                          pb-[10px]
-                          text-[11px]
-                          font-bold
-                          uppercase
-                          tracking-[.075em]
-                          text-[#087A32]
-                          ${
-                            item.section ===
-                            "OVERVIEW"
-                              ? "pt-[13px]"
-                              : "pt-[22px]"
-                          }
-                        `}
-                      >
-                        {item.section}
-                      </div>
-
-                    )}
-
-
-                    {/* NAV BUTTON */}
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        selectTab(
-                          item.key
-                        )
-                      }
+                  {item.section && (
+                    <div
                       className={`
-                        flex
-                        h-[54px]
-                        w-full
-                        items-center
-                        gap-[17px]
-                        rounded-[9px]
-                        px-[14px]
-                        text-left
-                        transition
+                        px-[10px]
+                        text-[11px]
+                        font-bold
+                        uppercase
+                        tracking-[.075em]
+                        text-[#087A32]
+
                         ${
-                          active
-                            ? "bg-[#E8F4EA] text-[#087A32]"
-                            : "text-[#17233D] hover:bg-[#F6F9F7]"
+                          item.section === "OVERVIEW"
+                            ? "pt-[7px] pb-[5px]"
+                            : "pt-[15px] pb-[5px]"
                         }
                       `}
                     >
-
-                      <Icon
-                        size={20}
-                        strokeWidth={1.7}
-                      />
-
-                      <span
-                        className="
-                          text-[13px]
-                          font-medium
-                        "
-                      >
-                        {item.label}
-                      </span>
+                      {item.section}
+                    </div>
+                  )}
 
 
-                      {/* ALERT COUNT */}
+                  {/* NAV BUTTON */}
 
-                      {item.key ===
-                        "alerts" &&
-                        Number(
-                          alertCount || 0
-                        ) > 0 && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      selectTab(item.key)
+                    }
+                    className={`
+                      flex
+                      h-[53px]
+                      w-full
+                      items-center
+                      gap-[14px]
+                      rounded-[9px]
+                      px-[14px]
+                      text-left
+                      transition
 
-                          <span
-                            className="
-                              ml-auto
-                              rounded-[6px]
-                              bg-[#E8F4EA]
-                              px-[9px]
-                              py-[4px]
-                              text-[10px]
-                              font-bold
-                              text-[#087A32]
-                            "
-                          >
-                            {alertCount}
-                          </span>
+                      ${
+                        active
+                          ? "bg-[#E8F4EA] text-[#087A32]"
+                          : "text-[#17233D] hover:bg-[#F6F9F7]"
+                      }
+                    `}
+                  >
 
-                        )}
+                    <Icon
+                      size={19}
+                      strokeWidth={1.7}
+                      className="shrink-0"
+                    />
 
-                    </button>
+                    <span
+                      className="
+                        text-[13px]
+                        font-medium
+                        leading-none
+                      "
+                    >
+                      {item.label}
+                    </span>
 
-                  </div>
 
-                );
+                    {/* ALERT BADGE */}
 
-              }
-            )}
+                    {item.key === "alerts" &&
+                      Number(alertCount || 0) > 0 && (
+                        <span
+                          className="
+                            ml-auto
+                            rounded-[6px]
+                            bg-[#E8F4EA]
+                            px-[8px]
+                            py-[4px]
+                            text-[10px]
+                            font-bold
+                            leading-none
+                            text-[#087A32]
+                          "
+                        >
+                          {alertCount}
+                        </span>
+                      )}
+
+                  </button>
+
+                </div>
+              );
+            })}
 
           </nav>
 
 
-          {/* LOGOUT */}
+          {/* ==================================================
+              LOGOUT
+              ================================================== */}
 
-          <div
-            className="
-              pt-[14px]
-            "
-          >
+          <div className="pt-[10px]">
 
             <button
               type="button"
               onClick={onExit}
               className="
                 flex
-                h-[47px]
+                h-[45px]
                 w-[130px]
                 items-center
                 gap-[10px]
@@ -1033,14 +964,12 @@ export default function MedicalSupervisorLayout({
                 hover:bg-[#F7F9F8]
               "
             >
-
               <LogOut
                 size={18}
                 strokeWidth={1.8}
               />
 
               Logout
-
             </button>
 
           </div>
@@ -1050,16 +979,15 @@ export default function MedicalSupervisorLayout({
       </aside>
 
 
-      {/* MOBILE OVERLAY */}
+      {/* ======================================================
+          MOBILE OVERLAY
+          ====================================================== */}
 
       {mobileOpen && (
-
         <button
           type="button"
           aria-label="Close navigation"
-          onClick={() =>
-            setMobileOpen(false)
-          }
+          onClick={() => setMobileOpen(false)}
           className="
             fixed
             inset-0
@@ -1068,7 +996,6 @@ export default function MedicalSupervisorLayout({
             lg:hidden
           "
         />
-
       )}
 
 
@@ -1079,6 +1006,7 @@ export default function MedicalSupervisorLayout({
       <main
         className="
           min-h-screen
+          bg-white
           pt-[76px]
           lg:pl-[267px]
         "
@@ -1089,6 +1017,7 @@ export default function MedicalSupervisorLayout({
             w-full
             px-[30px]
             py-[27px]
+            pr-[24px]
           "
         >
           {children}
@@ -1097,6 +1026,5 @@ export default function MedicalSupervisorLayout({
       </main>
 
     </div>
-
   );
 }
