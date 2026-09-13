@@ -14,7 +14,6 @@ import {
   Gauge,
   Bell,
   Clock3,
-  Settings,
   LogOut,
 } from "lucide-react";
 
@@ -22,6 +21,12 @@ import {
   useState,
 } from "react";
 
+import "./AdminSidebar.css";
+
+
+/* ============================================================
+   ICON MAP
+============================================================ */
 
 const iconMap = {
 
@@ -106,11 +111,12 @@ const iconMap = {
   "activity-logs":
     Clock3,
 
-  settings:
-    Settings,
-
 };
 
+
+/* ============================================================
+   GET ICON
+============================================================ */
 
 function getIcon(
   key,
@@ -126,6 +132,10 @@ function getIcon(
 }
 
 
+/* ============================================================
+   ADMIN SIDEBAR
+============================================================ */
+
 export default function AdminSidebar({
   nav = [],
   activeKey,
@@ -139,6 +149,10 @@ export default function AdminSidebar({
   ] =
     useState(false);
 
+
+  /* ==========================================================
+     NAVIGATION HANDLER
+  ========================================================== */
 
   const go =
     (key) => {
@@ -161,7 +175,9 @@ export default function AdminSidebar({
 
     <>
 
-      {/* MOBILE MENU */}
+      {/* ======================================================
+          MOBILE MENU BUTTON
+      ====================================================== */}
 
       <button
         type="button"
@@ -169,7 +185,7 @@ export default function AdminSidebar({
           setOpen(true)
         }
         aria-label="Open admin navigation"
-        className="admin-mobile-menu"
+        className="admin-sidebar-v2-mobile-menu"
       >
 
         <Menu
@@ -180,7 +196,9 @@ export default function AdminSidebar({
       </button>
 
 
-      {/* MOBILE OVERLAY */}
+      {/* ======================================================
+          MOBILE OVERLAY
+      ====================================================== */}
 
       {open && (
 
@@ -190,43 +208,44 @@ export default function AdminSidebar({
           onClick={() =>
             setOpen(false)
           }
-          className="admin-sidebar-overlay"
+          className="admin-sidebar-v2-overlay"
         />
 
       )}
 
 
-      {/* SIDEBAR */}
+      {/* ======================================================
+          SIDEBAR
+      ====================================================== */}
 
       <aside
         className={`
-          admin-sidebar
+          admin-sidebar-v2
           ${
             open
-              ? "admin-sidebar-open"
+              ? "admin-sidebar-v2-open"
               : ""
           }
         `}
       >
 
-
-        {/* =================================================
+        {/* ====================================================
             BRAND
-        ================================================= */}
+        ==================================================== */}
 
-        <div className="admin-sidebar-brand">
+        <div className="admin-sidebar-v2-brand">
 
-          <div className="admin-brand-mark">
+          <div className="admin-sidebar-v2-brand-mark">
 
             <ShieldPlus
-              size={36}
-              strokeWidth={2.1}
+              size={34}
+              strokeWidth={2.05}
             />
 
           </div>
 
 
-          <div className="admin-brand-text">
+          <div className="admin-sidebar-v2-brand-text">
 
             <strong>
               HYPERLOCAL
@@ -239,163 +258,189 @@ export default function AdminSidebar({
           </div>
 
 
+          {/* MOBILE CLOSE */}
+
           <button
             type="button"
-            className="admin-sidebar-close"
+            className="admin-sidebar-v2-close"
             onClick={() =>
               setOpen(false)
             }
+            aria-label="Close admin navigation"
           >
 
-            <X size={19} />
+            <X
+              size={19}
+              strokeWidth={1.8}
+            />
 
           </button>
 
         </div>
 
 
-        {/* =================================================
+        {/* ====================================================
             NAVIGATION
-        ================================================= */}
+        ==================================================== */}
 
-        <nav className="admin-sidebar-nav">
+        <nav
+          className="admin-sidebar-v2-nav"
+          aria-label="Admin navigation"
+        >
 
-          {nav.map(
-            (group, groupIndex) => {
+          <div className="admin-sidebar-v2-nav-list">
 
-              const items =
-                group.items ||
-                [group];
+            {nav.map(
+              (group, groupIndex) => {
+
+                const items =
+                  group.items ||
+                  [group];
 
 
-              return (
+                return (
 
-                <div
-                  key={
-                    group.section ||
-                    group.key ||
-                    groupIndex
-                  }
-                  className={`
-                    admin-nav-group
-                    ${
-                      groupIndex > 0
-                        ? "admin-nav-group-spaced"
-                        : ""
+                  <div
+                    key={
+                      group.section ||
+                      group.key ||
+                      groupIndex
                     }
-                  `}
-                >
+                    className={`
+                      admin-sidebar-v2-group
+                      ${
+                        groupIndex > 0
+                          ? "admin-sidebar-v2-group-spaced"
+                          : ""
+                      }
+                    `}
+                  >
 
-                  {group.section && (
+                    {/* SECTION TITLE
+                        Hidden for current flat
+                        admin navigation.
+                    */}
 
-                    <div className="admin-nav-section-title">
+                    {group.section && (
 
-                      {group.section}
+                      <div className="admin-sidebar-v2-section-title">
+
+                        {group.section}
+
+                      </div>
+
+                    )}
+
+
+                    <div className="admin-sidebar-v2-items">
+
+                      {items.map(
+                        (item) => {
+
+                          const Icon =
+                            getIcon(
+                              item.key,
+                              item.icon
+                            );
+
+
+                          const isActive =
+                            activeKey ===
+                            item.key;
+
+
+                          return (
+
+                            <button
+                              key={
+                                item.key
+                              }
+                              type="button"
+                              onClick={() =>
+                                go(
+                                  item.key
+                                )
+                              }
+                              className={`
+                                admin-sidebar-v2-item
+                                ${
+                                  isActive
+                                    ? "active"
+                                    : ""
+                                }
+                              `}
+                            >
+
+                              <span className="admin-sidebar-v2-icon">
+
+                                <Icon
+                                  size={19}
+                                  strokeWidth={
+                                    isActive
+                                      ? 2
+                                      : 1.7
+                                  }
+                                />
+
+                              </span>
+
+
+                              <span className="admin-sidebar-v2-label">
+
+                                {
+                                  item.label
+                                }
+
+                              </span>
+
+
+                              {item.key ===
+                                "notifications" && (
+
+                                <span className="admin-sidebar-v2-badge">
+
+                                  7
+
+                                </span>
+
+                              )}
+
+                            </button>
+
+                          );
+
+                        }
+                      )}
 
                     </div>
 
-                  )}
-
-
-                  <div className="admin-nav-items">
-
-                    {items.map(
-                      (item) => {
-
-                        const Icon =
-                          getIcon(
-                            item.key,
-                            item.icon
-                          );
-
-
-                        const isActive =
-                          activeKey ===
-                          item.key;
-
-
-                        return (
-
-                          <button
-                            key={
-                              item.key
-                            }
-                            type="button"
-                            onClick={() =>
-                              go(
-                                item.key
-                              )
-                            }
-                            className={`
-                              admin-nav-item
-                              ${
-                                isActive
-                                  ? "active"
-                                  : ""
-                              }
-                            `}
-                          >
-
-                            <Icon
-                              size={19}
-                              strokeWidth={
-                                isActive
-                                  ? 2
-                                  : 1.7
-                              }
-                            />
-
-
-                            <span>
-                              {
-                                item.label
-                              }
-                            </span>
-
-
-                            {item.key ===
-                              "notifications" && (
-
-                              <span className="admin-nav-badge">
-                                7
-                              </span>
-
-                            )}
-
-                          </button>
-
-                        );
-
-                      }
-                    )}
-
                   </div>
 
-                </div>
+                );
 
-              );
+              }
+            )}
 
-            }
-          )}
+          </div>
 
         </nav>
 
 
-        {/* =================================================
-            LOGOUT
-        ================================================= */}
+        {/* ====================================================
+            SIDEBAR FOOTER
+        ==================================================== */}
 
-        <div className="admin-sidebar-footer">
+        <div className="admin-sidebar-v2-footer">
 
           <button
             type="button"
-            className="admin-logout"
+            className="admin-sidebar-v2-logout"
             onClick={onExit}
           >
 
             <LogOut
-              size={19}
-              strokeWidth={1.7}
+              size={18}
+              strokeWidth={1.8}
             />
 
             <span>

@@ -4,14 +4,12 @@ import {
 } from "react";
 
 import {
-  Activity,
   BarChart3,
   Bell,
   FileText,
   Home,
   Map,
   ScrollText,
-  Settings,
   ShieldCheck,
   UserCog,
 } from "lucide-react";
@@ -40,18 +38,15 @@ import NotificationsPanel
 import ActivityLogs
   from "./ActivityLogs";
 
-import SettingsPage
-  from "./Settings";
+import WeeklyMonitoring
+  from "./WeeklyMonitoring";
 
 import RolesPermissions
   from "./RolesPermissions";
 
-import WeeklyMonitoring
-  from "./WeeklyMonitoring";
-
 
 /* ============================================================
-   REFERENCE SIDEBAR NAVIGATION
+   ADMIN SIDEBAR NAVIGATION
 ============================================================ */
 
 const NAV = [
@@ -62,21 +57,17 @@ const NAV = [
     icon: Home,
   },
 
-
   {
     key: "agents",
     label: "Agent Management",
     icon: UserCog,
   },
 
-
   {
     key: "supervisors",
-    label:
-      "Medical Supervisor Management",
+    label: "Medical Supervisor Management",
     icon: ShieldCheck,
   },
-
 
   {
     key: "reports",
@@ -84,13 +75,11 @@ const NAV = [
     icon: FileText,
   },
 
-
   {
     key: "risk-map",
     label: "Risk Map",
     icon: Map,
   },
-
 
   {
     key: "analytics",
@@ -98,25 +87,16 @@ const NAV = [
     icon: BarChart3,
   },
 
-
   {
     key: "notifications",
     label: "Notifications",
     icon: Bell,
   },
 
-
   {
     key: "activity",
     label: "Activity Logs",
     icon: ScrollText,
-  },
-
-
-  {
-    key: "settings",
-    label: "Settings",
-    icon: Settings,
   },
 
 ];
@@ -154,6 +134,10 @@ export default function AdminPortal({
     });
 
 
+  /* ==========================================================
+     ACTIVE PAGE
+  ========================================================== */
+
   const activePage =
     useMemo(
       () => {
@@ -161,8 +145,7 @@ export default function AdminPortal({
         return (
           NAV.find(
             (item) =>
-              item.key ===
-              page
+              item.key === page
           ) ||
           NAV[0]
         );
@@ -171,6 +154,10 @@ export default function AdminPortal({
       [page]
     );
 
+
+  /* ==========================================================
+     COMMON PAGE PROPS
+  ========================================================== */
 
   const pageProps = {
 
@@ -182,15 +169,19 @@ export default function AdminPortal({
   };
 
 
+  /* ==========================================================
+     PAGE ROUTING
+  ========================================================== */
+
   const renderPage =
     () => {
 
       switch (page) {
 
 
-        /* ================================================
+        /* ====================================================
            DASHBOARD
-        ================================================ */
+        ==================================================== */
 
         case "dashboard":
 
@@ -201,9 +192,9 @@ export default function AdminPortal({
           );
 
 
-        /* ================================================
-           AGENTS
-        ================================================ */
+        /* ====================================================
+           AGENT MANAGEMENT
+        ==================================================== */
 
         case "agents":
 
@@ -214,9 +205,9 @@ export default function AdminPortal({
           );
 
 
-        /* ================================================
-           SUPERVISORS
-        ================================================ */
+        /* ====================================================
+           MEDICAL SUPERVISOR MANAGEMENT
+        ==================================================== */
 
         case "supervisors":
 
@@ -227,9 +218,9 @@ export default function AdminPortal({
           );
 
 
-        /* ================================================
-           REPORTS
-        ================================================ */
+        /* ====================================================
+           REPORT MANAGEMENT
+        ==================================================== */
 
         case "reports":
 
@@ -240,9 +231,9 @@ export default function AdminPortal({
           );
 
 
-        /* ================================================
+        /* ====================================================
            RISK MAP
-        ================================================ */
+        ==================================================== */
 
         case "risk-map":
 
@@ -253,9 +244,9 @@ export default function AdminPortal({
           );
 
 
-        /* ================================================
+        /* ====================================================
            ANALYTICS
-        ================================================ */
+        ==================================================== */
 
         case "analytics":
 
@@ -267,9 +258,9 @@ export default function AdminPortal({
           );
 
 
-        /* ================================================
+        /* ====================================================
            NOTIFICATIONS
-        ================================================ */
+        ==================================================== */
 
         case "notifications":
 
@@ -280,9 +271,9 @@ export default function AdminPortal({
           );
 
 
-        /* ================================================
-           ACTIVITY
-        ================================================ */
+        /* ====================================================
+           ACTIVITY LOGS
+        ==================================================== */
 
         case "activity":
 
@@ -293,22 +284,9 @@ export default function AdminPortal({
           );
 
 
-        /* ================================================
-           SETTINGS
-        ================================================ */
-
-        case "settings":
-
-          return (
-            <SettingsPage
-              {...pageProps}
-            />
-          );
-
-
-        /* ================================================
+        /* ====================================================
            FALLBACK
-        ================================================ */
+        ==================================================== */
 
         default:
 
@@ -322,6 +300,10 @@ export default function AdminPortal({
 
     };
 
+
+  /* ==========================================================
+     ADMIN LAYOUT
+  ========================================================== */
 
   return (
 

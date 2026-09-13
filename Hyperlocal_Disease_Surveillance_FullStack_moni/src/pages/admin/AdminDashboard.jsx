@@ -58,6 +58,30 @@ const REPORTING_VALUES = [
 
 
 /* ============================================================
+   TIME-BASED GREETING
+============================================================ */
+
+function getTimeBasedGreeting() {
+
+  const hour = new Date().getHours();
+
+  if (hour >= 5 && hour < 12) {
+    return "Good Morning";
+  }
+
+  if (hour >= 12 && hour < 17) {
+    return "Good Afternoon";
+  }
+
+  if (hour >= 17 && hour < 21) {
+    return "Good Evening";
+  }
+
+  return "Good Night";
+}
+
+
+/* ============================================================
    ADMIN DASHBOARD
 ============================================================ */
 
@@ -400,7 +424,7 @@ export default function AdminDashboard({
         <div className="admin-welcome-copy">
 
           <h1>
-            Good Morning, Monish{" "}
+            {getTimeBasedGreeting()}, Monish{" "}
             <span>👋</span>
           </h1>
 
