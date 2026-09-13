@@ -32,7 +32,7 @@ import {
 
 import { api } from "../../api";
 
-import supervisorHero from "../../assets/ui/medical-hero-right.png";
+import supervisorHero from "../../assets/ui/medical-supervisor-hero.svg";
 
 
 // ============================================================

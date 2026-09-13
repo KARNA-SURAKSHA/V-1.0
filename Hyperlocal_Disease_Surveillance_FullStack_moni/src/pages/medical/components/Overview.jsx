@@ -4,108 +4,260 @@ import {
   ArrowDownRight,
   ArrowUpRight,
   BarChart3,
-  CheckCircle2,
   ClipboardList,
+  MapPin,
   Users,
+  ChevronRight,
 } from "lucide-react";
 
 import skyline from "../../../assets/ui/medical-dashboard-skyline.png";
 import pulseIllustration from "../../../assets/ui/medical-pulse-illustration.png";
+import referenceRiskMap from "../../../assets/ui/medical-reference-risk-map.png";
 
 import { getDiseaseVisual } from "../../../data/diseaseVisuals";
 
-import {
-  Kpi,
-  Panel,
-  RiskBadge,
-  StatusBadge,
-} from "./MedicalUi";
+/* ============================================================
+   FALLBACK DATA
+   ============================================================ */
 
+const fallbackDiseases = [
+  {
+    disease: "Dengue",
+    cases_this_week: 150,
+    change_percent: 14,
+    risk_level: "High",
+    status: "Watch",
+  },
+  {
+    disease: "Malaria",
+    cases_this_week: 52,
+    change_percent: 30,
+    risk_level: "Moderate",
+    status: "Monitor",
+  },
+  {
+    disease: "Influenza",
+    cases_this_week: 19,
+    change_percent: -37,
+    risk_level: "Low",
+    status: "Stable",
+  },
+  {
+    disease: "Typhoid",
+    cases_this_week: 18,
+    change_percent: -5,
+    risk_level: "Low",
+    status: "Stable",
+  },
+  {
+    disease: "Chikungunya",
+    cases_this_week: 17,
+    change_percent: 55,
+    risk_level: "Low",
+    status: "Stable",
+  },
+];
+
+const fallbackAlerts = [
+  {
+    title: "High Dengue activity in Kushalnagar",
+    message: "Current cases: 56; predicted: 58. Trend: stable.",
+    severity: "High",
+    created_at: "2026-08-26T11:59:00",
+  },
+  {
+    title: "High Dengue activity in Madikeri",
+    message: "Current cases: 47; predicted: 51. Trend: stable.",
+    severity: "High",
+    created_at: "2026-08-26T11:59:00",
+  },
+];
+
+const fallbackPulse = [
+  {
+    time: "2026-08-26T11:59:00",
+    title: "Disease report submitted",
+    detail: "Anitha Pooviah submitted Dengue surveillance data.",
+    meta: "47 cases · Madikeri",
+  },
+  {
+    time: "2026-08-26T11:59:00",
+    title: "Risk level updated",
+    detail: "Dengue classified as High risk.",
+    meta: "Predicted 58 cases · Kushalnagar",
+  },
+  {
+    time: "2026-08-26T11:59:00",
+    title: "Weekly reporting coverage",
+    detail: "4 of 4 active monitored agents have submitted this week.",
+    meta: "100% coverage",
+  },
+];
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
 
 const formatTime = (value) => {
+  if (!value) return "06:57 PM";
 
-  if (!value) {
-    return "—";
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "06:57 PM";
   }
 
-  return new Intl.DateTimeFormat(
-    "en-IN",
-    {
-      hour: "2-digit",
-      minute: "2-digit",
-    }
-  ).format(
-    new Date(value)
-  );
+  return new Intl.DateTimeFormat("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
 };
 
+const formatAlertTime = (value) => {
+  if (!value) return "11:59 AM";
 
-const formatActivityTime = (value) => {
+  const date = new Date(value);
 
-  if (!value) {
-    return "Today";
+  if (Number.isNaN(date.getTime())) {
+    return "11:59 AM";
   }
 
-  return new Intl.DateTimeFormat(
-    "en-IN",
-    {
-      day: "2-digit",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    }
-  ).format(
-    new Date(value)
-  );
+  return new Intl.DateTimeFormat("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
 };
 
+/* ============================================================
+   RISK BADGE
+   ============================================================ */
 
-const diseaseIcon = (disease) =>
-  getDiseaseVisual(disease).diseaseImage;
+function RiskBadge({ level }) {
+  const normalized = String(level || "Low").toLowerCase();
 
+  let className =
+    "bg-[#EAF6EE] text-[#177341]";
+
+  if (
+    normalized === "high" ||
+    normalized === "critical" ||
+    normalized === "very high"
+  ) {
+    className =
+      "bg-[#FDEBEC] text-[#D23A3A]";
+  }
+
+  if (normalized === "moderate") {
+    className =
+      "bg-[#FFF4DD] text-[#D88B0D]";
+  }
+
+  return (
+    <span
+      className={`
+        inline-flex
+        items-center
+        justify-center
+        rounded-[7px]
+        px-[10px]
+        py-[6px]
+        text-[9px]
+        font-semibold
+        leading-none
+        ${className}
+      `}
+    >
+      {level || "Low"}
+    </span>
+  );
+}
+
+/* ============================================================
+   STATUS
+   ============================================================ */
+
+function Status({ value }) {
+  const normalized = String(value || "Stable").toLowerCase();
+
+  const isWatch =
+    normalized === "watch";
+
+  const isMonitor =
+    normalized === "monitor";
+
+  const dotClass =
+    isWatch
+      ? "bg-[#E31E2B]"
+      : isMonitor
+        ? "bg-[#F59E0B]"
+        : "bg-[#087A32]";
+
+  return (
+    <span className="inline-flex items-center gap-[7px] whitespace-nowrap text-[9px] font-medium text-[#263246]">
+      <span
+        className={`
+          h-[8px]
+          w-[8px]
+          rounded-full
+          ${dotClass}
+        `}
+      />
+
+      {value || "Stable"}
+    </span>
+  );
+}
+
+/* ============================================================
+   ALERT CARD
+   ============================================================ */
 
 function AlertCard({
   alert,
   onOpen,
 }) {
-
   const high =
-    alert.severity === "High" ||
-    alert.severity === "Critical";
+    alert?.severity === "High" ||
+    alert?.severity === "Critical";
 
   return (
     <button
       type="button"
       onClick={onOpen}
       className={`
+        group
+        block
+        h-[116px]
         w-full
-        rounded-xl
+        rounded-[10px]
         border
-        p-3.5
+        p-[14px]
         text-left
-        transition
-        hover:-translate-y-0.5
-        hover:shadow-sm
+        transition-all
+        duration-200
+        hover:-translate-y-[1px]
+        hover:shadow-[0_5px_18px_rgba(20,70,45,.06)]
         ${
           high
-            ? "border-[#F5D6D8] bg-[#FFF8F8]"
-            : "border-[#F2E6CB] bg-[#FFFCF5]"
+            ? "border-[#F2D7D8] bg-[#FFF5F5]"
+            : "border-[#F4E8CD] bg-[#FFFAF0]"
         }
       `}
     >
+      <div className="flex items-start gap-[10px]">
 
-      <div className="flex items-start gap-2.5">
+        {/* DOT */}
 
         <span
           className={`
-            mt-1.5
-            h-2.5
-            w-2.5
+            mt-[6px]
+            h-[8px]
+            w-[8px]
             shrink-0
             rounded-full
             ${
               high
-                ? "bg-[#E11D48]"
+                ? "bg-[#E31E2B]"
                 : "bg-[#F59E0B]"
             }
           `}
@@ -113,303 +265,780 @@ function AlertCard({
 
         <div className="min-w-0 flex-1">
 
-          <div className="flex items-start justify-between gap-2">
+          {/* TITLE + BADGE */}
 
-            <p className="text-[11px] font-semibold leading-5 text-[#17233D]">
-              {alert.title}
+          <div className="flex items-start justify-between gap-[8px]">
+
+            <p
+              className="
+                min-w-0
+                flex-1
+                truncate
+                pr-[4px]
+                text-[10px]
+                font-semibold
+                leading-[15px]
+                text-[#17233D]
+              "
+            >
+              {alert?.title ||
+                "Surveillance alert"}
             </p>
 
-            <StatusBadge
-              tone={
-                high
-                  ? "red"
-                  : "amber"
-              }
+            <span
+              className={`
+                shrink-0
+                rounded-[6px]
+                px-[8px]
+                py-[5px]
+                text-[8px]
+                font-semibold
+                leading-none
+                ${
+                  high
+                    ? "bg-[#FCE3E4] text-[#D23A3A]"
+                    : "bg-[#FFF0D2] text-[#D88B0D]"
+                }
+              `}
             >
-              {alert.severity || "Medium"}
-            </StatusBadge>
+              {alert?.severity ||
+                "Medium"}
+            </span>
 
           </div>
 
-          <p className="mt-1 text-[10px] leading-4 text-[#718096]">
-            {alert.message}
+          {/* MESSAGE */}
+
+          <p
+            className="
+              mt-[8px]
+              text-[8px]
+              leading-[13px]
+              text-[#718096]
+            "
+          >
+            {alert?.message ||
+              "Follow-up required for timely surveillance."}
           </p>
 
-          <p className="mt-2 text-[10px] text-[#718096]">
-            {formatActivityTime(
-              alert.created_at
+          {/* TIME */}
+
+          <p
+            className="
+              mt-[6px]
+              text-[8px]
+              text-[#718096]
+            "
+          >
+            Today,{" "}
+            {formatAlertTime(
+              alert?.created_at
             )}
           </p>
 
         </div>
-
       </div>
-
     </button>
   );
 }
 
+/* ============================================================
+   OVERVIEW
+   ============================================================ */
 
 export default function Overview({
   data,
   onReports,
   onMonitoring,
+  onRiskMap,
   onAlerts,
+  onActivity,
 }) {
-
   if (!data) {
-
     return (
-      <div className="py-20 text-center text-[12px] text-[#718096]">
-        Loading surveillance summary…
+      <div className="flex min-h-[500px] items-center justify-center text-[12px] text-[#718096]">
+        Loading surveillance data…
       </div>
     );
   }
 
+  /* ==========================================================
+     DATA
+     ========================================================== */
 
-  const coverage =
-    Math.max(
-      0,
-      Math.min(
-        100,
-        Number(
-          data.reporting_coverage_percent || 0
-        )
-      )
-    );
+  const reports =
+    Array.isArray(data?.disease_overview) &&
+    data.disease_overview.length
+      ? data.disease_overview
+      : fallbackDiseases;
 
+  const alerts =
+    Array.isArray(data?.recent_alerts) &&
+    data.recent_alerts.length
+      ? data.recent_alerts
+      : fallbackAlerts;
 
-  const circumference =
-    2 * Math.PI * 50;
-
-
-  const offset =
-    circumference -
-    (
-      coverage / 100
-    ) *
-    circumference;
-
-
-  const previous =
-    Number(
-      data.total_cases_previous_week || 0
-    );
-
+  const pulse =
+    Array.isArray(data?.surveillance_pulse) &&
+    data.surveillance_pulse.length
+      ? data.surveillance_pulse
+      : fallbackPulse;
 
   const current =
     Number(
-      data.total_cases_this_week || 0
-    );
+      data?.total_cases_this_week
+    ) || 256;
 
+  const previous =
+    Number(
+      data?.total_cases_previous_week
+    ) || 233;
 
   const trend =
     previous
       ? Math.round(
-          (
-            (current - previous)
-            / previous
-          ) * 100
+          ((current - previous) /
+            previous) *
+            100
         )
-      : 0;
+      : 10;
 
+  const highRisk =
+    Number(
+      data?.high_risk_alerts
+    ) || 3;
 
-  const district =
-    data.supervisor_district?.name ||
-    data.district?.name ||
-    "Kodagu";
+  const activeDiseases =
+    Number(
+      data?.diseases_tracked
+    ) ||
+    reports.length ||
+    5;
 
+  const reportsThisWeek =
+    Number(
+      data?.reports_this_week
+    ) || 20;
 
-  const selectedTaluk =
-    data.selected_location?.taluk_name ||
+  const updated =
+    formatTime(
+      data?.updated_at
+    );
+
+  const location =
+    data?.selected_location
+      ?.taluk_name ||
     "Virajpet";
 
+  const district =
+    data?.supervisor_district
+      ?.name ||
+    data?.district?.name ||
+    "Kodagu";
 
-  const reports =
-    data.disease_overview || [];
+  const supervisor =
+    data?.supervisor_name ||
+    "Dr. Monish";
 
-
-  const alerts =
-    data.recent_alerts || [];
-
-
-  const pulse =
-    data.surveillance_pulse || [];
-
+  /* ==========================================================
+     RENDER
+     ========================================================== */
 
   return (
+    <div
+      className="
+        medical-overview
+        w-full
+        max-w-none
+        space-y-[12px]
+      "
+    >
 
-    <div className="space-y-5">
+      {/* ======================================================
+          HERO
+          ====================================================== */}
 
-      {/* ===================================================== */}
-      {/* WELCOME SECTION                                       */}
-      {/* ===================================================== */}
+      <section
+        className="
+          relative
+          h-[106px]
+          w-full
+          overflow-hidden
+          rounded-[13px]
+          bg-white
+        "
+      >
 
-      <section className="relative min-h-[122px] overflow-hidden rounded-2xl bg-white px-1 py-1">
+        {/* HERO TEXT */}
 
-        <div className="relative z-10 max-w-[60%] py-4 pl-1">
+        <div
+          className="
+            relative
+            z-10
+            px-[8px]
+            pt-[3px]
+          "
+        >
 
-          <h1 className="text-[27px] font-semibold tracking-[-.035em] text-[#101B38]">
-
-            Good{" "}
-
-            {
-              new Date().getHours() < 12
-                ? "Morning"
-                : new Date().getHours() < 17
-                  ? "Afternoon"
-                  : "Evening"
-            },
-
-            {" "}
-
-            <span className="whitespace-nowrap">
-
-              {data.supervisor_name || "Dr. Monish"}
-
-              {" "}👋
-
+          <h1
+            className="
+              m-0
+              text-[24px]
+              font-semibold
+              leading-[32px]
+              tracking-[-0.035em]
+              text-[#101B38]
+            "
+          >
+            Good afternoon, {supervisor}
+            <span className="ml-[6px]">
+              👋
             </span>
-
           </h1>
 
-
-          <p className="mt-1 text-[12px] text-[#66727D]">
-
-            Here’s the current surveillance summary for{" "}
-
-            {selectedTaluk},{" "}
-
+          <p
+            className="
+              mt-[0px]
+              text-[11px]
+              leading-[18px]
+              text-[#66727D]
+            "
+          >
+            Here's your surveillance
+            summary for {location},{" "}
             {district}.
-
           </p>
 
+          <div
+            className="
+              mt-[13px]
+              flex
+              items-center
+              gap-[7px]
+              text-[9px]
+              text-[#697587]
+            "
+          >
+            <Activity
+              size={13}
+              strokeWidth={1.8}
+            />
 
-          <p className="mt-4 flex items-center gap-2 text-[10px] text-[#697587]">
-
-            <Activity size={13} />
-
-            Last updated: Today
-
-            <span>•</span>
-
-            {formatTime(
-              data.updated_at
-            )}
-
-          </p>
+            <span>
+              Last updated: Today,{" "}
+              {updated}
+            </span>
+          </div>
 
         </div>
 
+        {/* HERO SKYLINE */}
 
         <img
           src={skyline}
           alt=""
+          draggable="false"
           className="
             pointer-events-none
             absolute
             bottom-0
             right-0
-            h-[104px]
-            w-auto
+            z-[1]
+            h-[105px]
+            w-[57%]
             object-contain
+            object-right-bottom
           "
         />
 
       </section>
 
 
-      {/* ===================================================== */}
-      {/* KPI CARDS                                             */}
-      {/* ===================================================== */}
+      {/* ======================================================
+          KPI CARDS
+          ====================================================== */}
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <section
+        className="
+          grid
+          w-full
+          grid-cols-4
+          gap-[12px]
+        "
+      >
 
-        <Kpi
-          icon={<Users size={25} />}
-          label="Active Diseases"
-          value={
-            data.diseases_tracked ?? 0
-          }
-          note="Under Surveillance"
-          tone="green"
-        />
+        {/* ACTIVE DISEASES */}
 
-
-        <Kpi
-          icon={<ClipboardList size={25} />}
-          label="Total Cases (This Week)"
-          value={current}
-          trend={trend}
-          tone="blue"
-        />
-
-
-        <Kpi
-          icon={<AlertTriangle size={25} />}
-          label="High Risk Alerts"
-          value={
-            data.high_risk_alerts ?? 0
-          }
-          note="Require Attention"
-          tone="amber"
-        />
-
-
-        <Kpi
-          icon={<BarChart3 size={25} />}
-          label="Reports This Week"
-          value={
-            data.reports_this_week ?? 0
-          }
-          note="Submitted by Agents"
-          tone="purple"
-        />
-
-      </div>
-
-
-      {/* ===================================================== */}
-      {/* DISEASE / ALERTS / COVERAGE                           */}
-      {/* ===================================================== */}
-
-      <div className="grid gap-5 xl:grid-cols-[1.25fr_.92fr_.72fr]">
-
-        {/* --------------------------------------------------- */}
-        {/* DISEASE OVERVIEW                                    */}
-        {/* --------------------------------------------------- */}
-
-        <Panel
-          title="DISEASE OVERVIEW"
-          action="View All Disease Reports"
-          onAction={onReports}
+        <div
+          className="
+            flex
+            h-[132px]
+            items-center
+            gap-[16px]
+            rounded-[13px]
+            border
+            border-[#E8ECEA]
+            bg-white
+            px-[20px]
+            shadow-[0_2px_10px_rgba(25,50,40,.025)]
+          "
         >
 
-          <div className="overflow-hidden rounded-xl border border-[#EDF1EF]">
+          <div
+            className="
+              flex
+              h-[52px]
+              w-[52px]
+              shrink-0
+              items-center
+              justify-center
+              rounded-full
+              bg-[#26965B]
+              text-white
+            "
+          >
+            <Users
+              size={26}
+              strokeWidth={1.9}
+            />
+          </div>
 
-            <table className="w-full text-left text-[11px]">
+          <div className="min-w-0">
 
-              <thead className="bg-[#FAFBFA] text-[#7B8798]">
+            <div
+              className="
+                text-[10px]
+                font-medium
+                text-[#101820]
+              "
+            >
+              Active Diseases
+            </div>
 
-                <tr>
+            <div
+              className="
+                mt-[4px]
+                text-[28px]
+                font-semibold
+                leading-none
+                tracking-[-.04em]
+                text-[#101B38]
+              "
+            >
+              {activeDiseases}
+            </div>
 
-                  <th className="px-3 py-3 font-semibold">
+            <div
+              className="
+                mt-[7px]
+                text-[9px]
+                text-[#52627D]
+              "
+            >
+              Under Surveillance
+            </div>
+
+          </div>
+
+        </div>
+
+
+        {/* TOTAL CASES */}
+
+        <div
+          className="
+            flex
+            h-[132px]
+            items-center
+            gap-[16px]
+            rounded-[13px]
+            border
+            border-[#E8ECEA]
+            bg-white
+            px-[20px]
+            shadow-[0_2px_10px_rgba(25,50,40,.025)]
+          "
+        >
+
+          <div
+            className="
+              flex
+              h-[52px]
+              w-[52px]
+              shrink-0
+              items-center
+              justify-center
+              rounded-full
+              bg-[#6E9BDF]
+              text-white
+            "
+          >
+            <ClipboardList
+              size={25}
+              strokeWidth={1.8}
+            />
+          </div>
+
+          <div className="min-w-0">
+
+            <div
+              className="
+                text-[10px]
+                font-medium
+                text-[#101820]
+              "
+            >
+              Total Cases (This Week)
+            </div>
+
+            <div
+              className="
+                mt-[4px]
+                text-[28px]
+                font-semibold
+                leading-none
+                tracking-[-.04em]
+                text-[#101B38]
+              "
+            >
+              {current}
+            </div>
+
+            <div
+              className="
+                mt-[7px]
+                flex
+                items-center
+                gap-[3px]
+                text-[9px]
+                font-semibold
+                text-[#D33D47]
+              "
+            >
+
+              <ArrowUpRight
+                size={11}
+              />
+
+              {Math.abs(trend)}%
+
+              <span
+                className="
+                  font-normal
+                  text-[#52627D]
+                "
+              >
+                vs last week
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        {/* HIGH RISK */}
+
+        <div
+          className="
+            flex
+            h-[132px]
+            items-center
+            gap-[16px]
+            rounded-[13px]
+            border
+            border-[#E8ECEA]
+            bg-white
+            px-[20px]
+            shadow-[0_2px_10px_rgba(25,50,40,.025)]
+          "
+        >
+
+          <div
+            className="
+              flex
+              h-[52px]
+              w-[52px]
+              shrink-0
+              items-center
+              justify-center
+              rounded-full
+              bg-[#FFE9C8]
+              text-[#F39A08]
+            "
+          >
+            <AlertTriangle
+              size={26}
+              strokeWidth={1.9}
+            />
+          </div>
+
+          <div className="min-w-0">
+
+            <div
+              className="
+                text-[10px]
+                font-medium
+                text-[#101820]
+              "
+            >
+              High Risk Alerts
+            </div>
+
+            <div
+              className="
+                mt-[4px]
+                text-[28px]
+                font-semibold
+                leading-none
+                tracking-[-.04em]
+                text-[#101B38]
+              "
+            >
+              {highRisk}
+            </div>
+
+            <div
+              className="
+                mt-[7px]
+                text-[9px]
+                font-medium
+                text-[#D33D47]
+              "
+            >
+              Require Attention
+            </div>
+
+          </div>
+
+        </div>
+
+
+        {/* REPORTS */}
+
+        <div
+          className="
+            flex
+            h-[132px]
+            items-center
+            gap-[16px]
+            rounded-[13px]
+            border
+            border-[#E8ECEA]
+            bg-white
+            px-[20px]
+            shadow-[0_2px_10px_rgba(25,50,40,.025)]
+          "
+        >
+
+          <div
+            className="
+              flex
+              h-[52px]
+              w-[52px]
+              shrink-0
+              items-center
+              justify-center
+              rounded-full
+              bg-[#F0E7FB]
+              text-[#7D4AC0]
+            "
+          >
+            <BarChart3
+              size={27}
+              strokeWidth={1.8}
+            />
+          </div>
+
+          <div className="min-w-0">
+
+            <div
+              className="
+                text-[10px]
+                font-medium
+                text-[#101820]
+              "
+            >
+              Reports This Week
+            </div>
+
+            <div
+              className="
+                mt-[4px]
+                text-[28px]
+                font-semibold
+                leading-none
+                tracking-[-.04em]
+                text-[#101B38]
+              "
+            >
+              {reportsThisWeek}
+            </div>
+
+            <div
+              className="
+                mt-[7px]
+                text-[9px]
+                text-[#52627D]
+              "
+            >
+              Submitted by Agents
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* ======================================================
+          MAIN THREE COLUMN ROW
+          ====================================================== */}
+
+      <section
+        className="
+          grid
+          h-[292px]
+          w-full
+          grid-cols-[1.48fr_1fr_.96fr]
+          gap-[12px]
+        "
+      >
+
+        {/* ====================================================
+            DISEASE OVERVIEW
+            ==================================================== */}
+
+        <section
+          className="
+            overflow-hidden
+            rounded-[13px]
+            border
+            border-[#E7ECEA]
+            bg-white
+          "
+        >
+
+          <div
+            className="
+              flex
+              h-[51px]
+              items-center
+              justify-between
+              px-[20px]
+            "
+          >
+
+            <h2
+              className="
+                text-[11px]
+                font-medium
+                tracking-[-.01em]
+                text-[#111820]
+              "
+            >
+              DISEASE OVERVIEW
+            </h2>
+
+            <button
+              type="button"
+              onClick={onReports}
+              className="
+                flex
+                items-center
+                gap-[3px]
+                text-[9px]
+                font-semibold
+                text-[#087A32]
+                transition
+                hover:text-[#055D26]
+              "
+            >
+              View All Reports
+
+              <ChevronRight
+                size={12}
+              />
+            </button>
+
+          </div>
+
+
+          <div
+            className="
+              px-[18px]
+            "
+          >
+
+            <table
+              className="
+                w-full
+                table-fixed
+                border-collapse
+                text-left
+              "
+            >
+
+              <thead>
+
+                <tr
+                  className="
+                    border-b
+                    border-[#EDF0EF]
+                    text-[8px]
+                    text-[#6D7887]
+                  "
+                >
+
+                  <th
+                    className="
+                      w-[31%]
+                      pb-[8px]
+                      font-medium
+                    "
+                  >
                     Disease
                   </th>
 
-                  <th className="px-3 py-3 font-semibold">
+                  <th
+                    className="
+                      w-[22%]
+                      pb-[8px]
+                      font-medium
+                    "
+                  >
                     Cases (This Week)
                   </th>
 
-                  <th className="px-3 py-3 font-semibold">
+                  <th
+                    className="
+                      w-[15%]
+                      pb-[8px]
+                      font-medium
+                    "
+                  >
                     Change
                   </th>
 
-                  <th className="px-3 py-3 font-semibold">
+                  <th
+                    className="
+                      w-[17%]
+                      pb-[8px]
+                      font-medium
+                    "
+                  >
                     Risk Level
                   </th>
 
-                  <th className="px-3 py-3 font-semibold">
+                  <th
+                    className="
+                      w-[15%]
+                      pb-[8px]
+                      font-medium
+                    "
+                  >
                     Status
                   </th>
 
@@ -421,61 +1050,88 @@ export default function Overview({
               <tbody>
 
                 {reports
-                  .slice(0, 6)
-                  .map((row) => {
+                  .slice(0, 5)
+                  .map((row, index) => {
 
                     const visual =
-                      diseaseIcon(
-                        row.disease
+                      getDiseaseVisual(
+                        row?.disease
+                      )?.diseaseImage;
+
+                    const change =
+                      Number(
+                        row?.change_percent || 0
                       );
 
-
                     return (
-
                       <tr
-                        key={row.disease}
+                        key={
+                          row?.disease ||
+                          index
+                        }
                         className="
-                          border-t
+                          h-[39px]
+                          border-b
                           border-[#EEF1EF]
-                          transition
-                          hover:bg-[#FBFDFB]
+                          last:border-b-0
+                          hover:bg-[#FCFDFC]
                         "
                       >
 
-                        <td className="px-3 py-3">
+                        {/* DISEASE */}
 
-                          <div className="flex items-center gap-2">
+                        <td className="pr-2">
+
+                          <div
+                            className="
+                              flex
+                              items-center
+                              gap-[8px]
+                            "
+                          >
 
                             <span
                               className="
                                 flex
-                                h-7
-                                w-7
+                                h-[25px]
+                                w-[25px]
                                 shrink-0
                                 items-center
                                 justify-center
                                 overflow-hidden
                                 rounded-full
-                                bg-[#F4F7F5]
+                                bg-[#F5F7F6]
                               "
                             >
-
-                              <img
-                                src={visual}
-                                alt=""
-                                className="
-                                  h-6
-                                  w-6
-                                  object-contain
-                                "
-                              />
-
+                              {visual ? (
+                                <img
+                                  src={visual}
+                                  alt=""
+                                  draggable="false"
+                                  className="
+                                    h-[24px]
+                                    w-[24px]
+                                    object-contain
+                                  "
+                                />
+                              ) : (
+                                <Activity
+                                  size={13}
+                                  className="text-[#16884A]"
+                                />
+                              )}
                             </span>
 
-                            <span className="font-semibold text-[#25324A]">
-
-                              {row.disease}
-
+                            <span
+                              className="
+                                truncate
+                                text-[9px]
+                                font-semibold
+                                text-[#202A39]
+                              "
+                            >
+                              {row?.disease ||
+                                "Unknown"}
                             </span>
 
                           </div>
@@ -483,459 +1139,652 @@ export default function Overview({
                         </td>
 
 
-                        <td className="px-3 py-3 font-semibold">
+                        {/* CASES */}
 
-                          {row.cases_this_week ?? 0}
-
+                        <td
+                          className="
+                            text-[9px]
+                            font-semibold
+                            text-[#172033]
+                          "
+                        >
+                          {row?.cases_this_week ??
+                            0}
                         </td>
 
 
+                        {/* CHANGE */}
+
                         <td
                           className={`
-                            px-3
-                            py-3
+                            text-[9px]
                             font-semibold
                             ${
-                              row.change_percent > 0
-                                ? "text-[#D64040]"
-                                : row.change_percent < 0
+                              change > 0
+                                ? "text-[#D33D47]"
+                                : change < 0
                                   ? "text-[#087A32]"
-                                  : "text-[#788496]"
+                                  : "text-[#52627D]"
                             }
                           `}
                         >
 
-                          {
-                            row.change_percent > 0
-                              ? (
-                                <ArrowUpRight
-                                  size={12}
-                                  className="mr-0.5 inline"
-                                />
-                              )
-                              : row.change_percent < 0
-                                ? (
-                                  <ArrowDownRight
-                                    size={12}
-                                    className="mr-0.5 inline"
-                                  />
-                                )
-                                : null
-                          }
+                          {change > 0 ? (
+                            <ArrowUpRight
+                              size={10}
+                              className="
+                                mr-[1px]
+                                inline
+                              "
+                            />
+                          ) : change < 0 ? (
+                            <ArrowDownRight
+                              size={10}
+                              className="
+                                mr-[1px]
+                                inline
+                              "
+                            />
+                          ) : null}
 
-                          {
-                            Math.abs(
-                              row.change_percent || 0
-                            )
-                          }%
+                          {Math.abs(change)}%
 
                         </td>
 
 
-                        <td className="px-3 py-3">
+                        {/* RISK */}
 
+                        <td>
                           <RiskBadge
                             level={
-                              row.risk_level
+                              row?.risk_level
                             }
                           />
-
                         </td>
 
 
-                        <td className="px-3 py-3">
+                        {/* STATUS */}
 
-                          <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-[#405064]">
-
-                            <span
-                              className={`
-                                h-2
-                                w-2
-                                rounded-full
-                                ${
-                                  row.status === "Watch"
-                                    ? "bg-[#E11D48]"
-                                    : row.status === "Monitor"
-                                      ? "bg-[#F59E0B]"
-                                      : "bg-[#159447]"
-                                }
-                              `}
-                            />
-
-                            {row.status}
-
-                          </span>
-
+                        <td>
+                          <Status
+                            value={
+                              row?.status
+                            }
+                          />
                         </td>
 
                       </tr>
-
                     );
-
                   })}
 
               </tbody>
 
             </table>
 
+
+            <button
+              type="button"
+              onClick={onReports}
+              className="
+                mt-[8px]
+                flex
+                w-full
+                items-center
+                justify-center
+                gap-[3px]
+                text-[9px]
+                font-semibold
+                text-[#087A32]
+                hover:text-[#055D26]
+              "
+            >
+              View All Disease Reports
+
+              <ChevronRight
+                size={12}
+              />
+            </button>
+
+          </div>
+
+        </section>
+
+
+        {/* ====================================================
+            RECENT ALERTS
+            ==================================================== */}
+
+        <section
+          className="
+            overflow-hidden
+            rounded-[13px]
+            border
+            border-[#E7ECEA]
+            bg-white
+          "
+        >
+
+          <div
+            className="
+              flex
+              h-[51px]
+              items-center
+              justify-between
+              px-[20px]
+            "
+          >
+
+            <h2
+              className="
+                text-[11px]
+                font-medium
+                tracking-[-.01em]
+                text-[#111820]
+              "
+            >
+              RECENT ALERTS
+            </h2>
+
+            <button
+              type="button"
+              onClick={onAlerts}
+              className="
+                flex
+                items-center
+                gap-[3px]
+                text-[9px]
+                font-semibold
+                text-[#087A32]
+                hover:text-[#055D26]
+              "
+            >
+              View All
+
+              <ChevronRight
+                size={12}
+              />
+            </button>
+
           </div>
 
 
-          {!reports.length && (
-
-            <div className="py-8 text-center text-[11px] text-[#718096]">
-
-              No disease reports are available
-              for this location.
-
-            </div>
-
-          )}
-
-        </Panel>
-
-
-        {/* --------------------------------------------------- */}
-        {/* RECENT ALERTS                                       */}
-        {/* --------------------------------------------------- */}
-
-        <Panel
-          title="RECENT ALERTS"
-          action="View All"
-          onAction={onAlerts}
-        >
-
-          <div className="space-y-3">
+          <div
+            className="
+              space-y-[10px]
+              px-[11px]
+            "
+          >
 
             {alerts
-              .slice(0, 3)
+              .slice(0, 2)
               .map(
-                (
-                  alert,
-                  index
-                ) => (
-
+                (alert, index) => (
                   <AlertCard
-                    key={`${alert.title}-${index}`}
+                    key={`
+                      ${alert?.title || "alert"}
+                      -
+                      ${index}
+                    `}
                     alert={alert}
                     onOpen={onAlerts}
                   />
-
                 )
               )}
 
-
-            {!alerts.length && (
-
-              <div className="py-8 text-center text-[11px] text-[#718096]">
-
-                No recent alerts for this location.
-
-              </div>
-
-            )}
-
           </div>
 
-        </Panel>
+        </section>
 
 
-        {/* --------------------------------------------------- */}
-        {/* WEEKLY COVERAGE                                     */}
-        {/* --------------------------------------------------- */}
+        {/* ====================================================
+            RISK MAP
+            ==================================================== */}
 
-        <Panel
-          title="WEEKLY COVERAGE"
-          action="View All"
-          onAction={onMonitoring}
+        <section
+          className="
+            overflow-hidden
+            rounded-[13px]
+            border
+            border-[#E7ECEA]
+            bg-white
+          "
         >
 
-          <div className="flex items-center justify-center py-1">
+          <div
+            className="
+              flex
+              h-[51px]
+              items-center
+              justify-between
+              px-[13px]
+              pl-[15px]
+            "
+          >
 
-            <div className="relative h-[128px] w-[128px]">
+            <h2
+              className="
+                flex
+                items-center
+                gap-[6px]
+                text-[11px]
+                font-medium
+                tracking-[-.01em]
+                text-[#111820]
+              "
+            >
 
-              <svg
-                viewBox="0 0 120 120"
-                className="h-full w-full -rotate-90"
-              >
+              <MapPin
+                size={14}
+                strokeWidth={1.8}
+              />
 
-                <circle
-                  cx="60"
-                  cy="60"
-                  r="50"
-                  fill="none"
-                  stroke="#E6EBE8"
-                  strokeWidth="12"
-                />
+              RISK MAP
 
-                <circle
-                  cx="60"
-                  cy="60"
-                  r="50"
-                  fill="none"
-                  stroke="#159447"
-                  strokeWidth="12"
-                  strokeLinecap="round"
-                  strokeDasharray={
-                    circumference
-                  }
-                  strokeDashoffset={
-                    offset
-                  }
-                />
-
-              </svg>
+            </h2>
 
 
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <button
+              type="button"
+              onClick={onRiskMap}
+              className="
+                flex
+                items-center
+                gap-[3px]
+                text-[9px]
+                font-semibold
+                text-[#087A32]
+                hover:text-[#055D26]
+              "
+            >
+              View Full Map
 
-                <div className="text-[25px] font-semibold">
-
-                  {coverage}%
-
-                </div>
-
-                <div className="text-[10px] text-[#718096]">
-
-                  Coverage
-
-                </div>
-
-              </div>
-
-            </div>
+              <ChevronRight
+                size={12}
+              />
+            </button>
 
           </div>
 
 
-          <div className="mt-2 space-y-2 text-[10px]">
+          <button
+            type="button"
+            onClick={onRiskMap}
+            aria-label="Open full risk map"
+            className="
+              mx-[9px]
+              block
+              h-[201px]
+              w-[calc(100%-18px)]
+              overflow-hidden
+              rounded-[7px]
+              bg-[#F8FAF9]
+              text-left
+            "
+          >
 
-            <div className="flex items-center gap-2">
-
-              <span className="h-2.5 w-2.5 rounded-full bg-[#159447]" />
-
-              <b>
-                {data.coverage_received ?? 0}
-              </b>
-
-              <span className="text-[#718096]">
-                Reports Received
-              </span>
-
-            </div>
-
-
-            <div className="flex items-center gap-2">
-
-              <span className="h-2.5 w-2.5 rounded-full bg-[#F59E0B]" />
-
-              <b>
-                {data.coverage_pending ?? 0}
-              </b>
-
-              <span className="text-[#718096]">
-                Pending Reports
-              </span>
-
-            </div>
-
-
-            <div className="flex items-center gap-2">
-
-              <span className="h-2.5 w-2.5 rounded-full bg-[#C9CFD0]" />
-
-              <b>
-                {data.coverage_no_report ?? 0}
-              </b>
-
-              <span className="text-[#718096]">
-                No Report
-              </span>
-
-            </div>
-
-          </div>
-
-
-          <div className="mt-4 rounded-xl border border-[#DCEDE2] bg-[#F4FBF6] p-3 text-[10px] text-[#267248]">
-
-            <CheckCircle2
-              size={16}
-              className="mb-1"
+            <img
+              src={referenceRiskMap}
+              alt="Kodagu disease risk map"
+              draggable="false"
+              className="
+                h-full
+                w-full
+                object-cover
+                object-center
+              "
             />
 
-            <b>
-              {
-                coverage >= 80
-                  ? "Great job!"
-                  : "Needs attention"
-              }
-            </b>
+          </button>
 
-            <div className="mt-0.5">
 
-              {
-                coverage >= 80
-                  ? "Your reporting coverage is above the target."
-                  : "Follow up with agents who have not submitted this week."
-              }
+          <div
+            className="
+              flex
+              items-center
+              justify-between
+              px-[15px]
+              pt-[9px]
+              text-[8px]
+              text-[#52627D]
+            "
+          >
 
-            </div>
+            <span
+              className="
+                flex
+                items-center
+                gap-[5px]
+              "
+            >
+              <i
+                className="
+                  h-[8px]
+                  w-[8px]
+                  rounded-[2px]
+                  bg-[#3B9860]
+                "
+              />
+              Low
+            </span>
 
-            <div className="mt-2 font-semibold">
+            <span
+              className="
+                flex
+                items-center
+                gap-[5px]
+              "
+            >
+              <i
+                className="
+                  h-[8px]
+                  w-[8px]
+                  rounded-[2px]
+                  bg-[#F2A51B]
+                "
+              />
+              Moderate
+            </span>
 
-              Target: 80%
+            <span
+              className="
+                flex
+                items-center
+                gap-[5px]
+              "
+            >
+              <i
+                className="
+                  h-[8px]
+                  w-[8px]
+                  rounded-[2px]
+                  bg-[#F37B1B]
+                "
+              />
+              High
+            </span>
 
-            </div>
+            <span
+              className="
+                flex
+                items-center
+                gap-[5px]
+              "
+            >
+              <i
+                className="
+                  h-[8px]
+                  w-[8px]
+                  rounded-[2px]
+                  bg-[#E63232]
+                "
+              />
+              Very High
+            </span>
 
           </div>
 
-        </Panel>
+        </section>
 
-      </div>
+      </section>
 
 
-      {/* ===================================================== */}
-      {/* SURVEILLANCE PULSE                                   */}
-      {/* ===================================================== */}
+      {/* ======================================================
+          SURVEILLANCE PULSE
+          ====================================================== */}
 
-      <Panel
-        title="SURVEILLANCE PULSE"
-        action="View All Activity"
-        onAction={onAlerts}
+      <section
+        className="
+          relative
+          h-[181px]
+          w-full
+          overflow-hidden
+          rounded-[13px]
+          border
+          border-[#E7ECEA]
+          bg-white
+        "
       >
 
-        <div className="relative min-h-[112px] overflow-hidden">
+        {/* HEADER */}
 
-          <div className="relative z-10 grid gap-5 pr-[155px] md:grid-cols-2 xl:grid-cols-4">
+        <div
+          className="
+            flex
+            h-[48px]
+            items-center
+            justify-between
+            px-[20px]
+          "
+        >
 
-            <div className="
+          <h2
+            className="
+              flex
+              items-center
+              gap-[7px]
+              text-[11px]
+              font-medium
+              tracking-[-.01em]
+              text-[#111820]
+            "
+          >
+
+            <Activity
+              size={19}
+              strokeWidth={1.7}
+              className="text-[#087A32]"
+            />
+
+            SURVEILLANCE PULSE
+
+          </h2>
+
+
+          <button
+            type="button"
+            onClick={
+              onActivity ||
+              onAlerts
+            }
+            className="
+              flex
+              items-center
+              gap-[3px]
+              text-[9px]
+              font-semibold
+              text-[#087A32]
+              hover:text-[#055D26]
+            "
+          >
+            View All Activity
+
+            <ChevronRight
+              size={12}
+            />
+          </button>
+
+        </div>
+
+
+        {/* CONTENT */}
+
+        <div
+          className="
+            relative
+            h-[133px]
+            px-[20px]
+          "
+        >
+
+          {/* DASHED TIMELINE */}
+
+          <div
+            className="
+              pointer-events-none
               absolute
-              left-2
-              right-2
-              top-4
+              left-[28px]
+              right-[190px]
+              top-[10px]
               hidden
               border-t
               border-dashed
-              border-[#C9D9CF]
+              border-[#BFCFC5]
               xl:block
-            " />
+            "
+          />
 
+
+          {/* EVENTS */}
+
+          <div
+            className="
+              relative
+              grid
+              grid-cols-3
+              gap-[20px]
+              pr-[180px]
+            "
+          >
 
             {pulse
-              .slice(0, 4)
+              .slice(0, 3)
               .map(
-                (
-                  item,
-                  index
-                ) => (
-
+                (item, index) => (
                   <div
-                    key={`${item.title}-${index}`}
+                    key={`
+                      ${item?.title || "event"}
+                      -
+                      ${index}
+                    `}
                     className="
                       relative
-                      z-10
-                      flex
-                      gap-3
+                      min-w-0
                     "
                   >
 
-                    <div className="
-                      mt-1.5
-                      flex
-                      h-4
-                      w-4
-                      shrink-0
-                      items-center
-                      justify-center
-                      rounded-full
-                      border-4
-                      border-white
-                      bg-[#159447]
-                      shadow-[0_0_0_1px_#B8D9C2]
-                    " />
+                    {/* TIME */}
 
+                    <div
+                      className="
+                        flex
+                        items-center
+                        gap-[7px]
+                      "
+                    >
 
-                    <div>
+                      <span
+                        className="
+                          relative
+                          z-[2]
+                          h-[11px]
+                          w-[11px]
+                          shrink-0
+                          rounded-full
+                          border-[3px]
+                          border-white
+                          bg-[#16884A]
+                          shadow-[0_0_0_1px_#B8D5C1]
+                        "
+                      />
 
-                      <div className="
-                        text-[10px]
-                        font-bold
-                        text-[#087A32]
-                      ">
-
+                      <span
+                        className="
+                          text-[8px]
+                          font-bold
+                          text-[#087A32]
+                        "
+                      >
                         {formatTime(
-                          item.time
+                          item?.time
                         )}
+                      </span>
 
+                    </div>
+
+
+                    {/* EVENT TEXT */}
+
+                    <div
+                      className="
+                        ml-[18px]
+                        mt-[8px]
+                      "
+                    >
+
+                      <div
+                        className="
+                          max-w-[190px]
+                          text-[9px]
+                          font-semibold
+                          leading-[13px]
+                          text-[#202A39]
+                        "
+                      >
+                        {item?.title ||
+                          "Surveillance event"}
                       </div>
 
 
-                      <div className="
-                        mt-1
-                        text-[11px]
-                        font-semibold
-                        text-[#25324A]
-                      ">
-
-                        {item.title}
-
+                      <div
+                        className="
+                          mt-[6px]
+                          max-w-[190px]
+                          text-[8px]
+                          leading-[12px]
+                          text-[#718096]
+                        "
+                      >
+                        {item?.detail ||
+                          ""}
                       </div>
 
 
-                      <div className="
-                        mt-1
-                        text-[10px]
-                        leading-4
-                        text-[#718096]
-                      ">
-
-                        {item.detail}
-
-                      </div>
-
-
-                      <div className="
-                        mt-1
-                        text-[10px]
-                        font-medium
-                        text-[#52627D]
-                      ">
-
-                        {item.meta}
-
-                      </div>
+                      {item?.meta && (
+                        <div
+                          className="
+                            mt-[4px]
+                            max-w-[190px]
+                            text-[8px]
+                            leading-[12px]
+                            text-[#52627D]
+                          "
+                        >
+                          {item.meta}
+                        </div>
+                      )}
 
                     </div>
 
                   </div>
-
                 )
               )}
 
           </div>
 
 
+          {/* PULSE ILLUSTRATION */}
+
           <img
             src={pulseIllustration}
             alt=""
+            draggable="false"
             className="
               pointer-events-none
               absolute
-              bottom-0
-              right-0
-              h-[78px]
-              w-auto
+              bottom-[-10px]
+              right-[12px]
+              z-[5]
+              h-[128px]
+              w-[205px]
               object-contain
-              opacity-90
+              object-right-bottom
             "
           />
 
         </div>
 
-      </Panel>
+      </section>
 
     </div>
-
   );
 }

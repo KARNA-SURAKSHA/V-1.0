@@ -1,7 +1,6 @@
 import {
   useCallback,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 
@@ -12,14 +11,29 @@ import {
 
 import api from "../../api";
 
+
+// ============================================================
+// MEDICAL SUPERVISOR COMPONENTS
+// ============================================================
+
 import MedicalSupervisorLayout from "./components/MedicalSupervisorLayout";
+
 import Overview from "./components/Overview";
+
 import DiseaseReports from "./components/DiseaseReports";
+
 import WeeklyMonitoring from "./components/WeeklyMonitoring";
+
 import RiskMap from "./components/RiskMap";
+
 import SurveillanceAnalytics from "./components/SurveillanceAnalytics";
+
 import AgentOversight from "./components/AgentOversight";
+
 import Alerts from "./components/Alerts";
+
+import ActivityLogs from "./components/ActivityLogs";
+
 import HomeReliefManagement from "./HomeReliefManagement";
 
 import {
@@ -44,9 +58,15 @@ function normalizeWeekNumber(
   }
 
   const numericWeek =
-    Number(weekNumber);
+    Number(
+      weekNumber
+    );
 
-  if (!Number.isFinite(numericWeek)) {
+  if (
+    !Number.isFinite(
+      numericWeek
+    )
+  ) {
     return null;
   }
 
@@ -56,6 +76,7 @@ function normalizeWeekNumber(
    * YYYYWW
    *
    * Example:
+   *
    * 202635
    *
    * Older records may contain:
@@ -70,10 +91,14 @@ function normalizeWeekNumber(
   }
 
   const numericYear =
-    Number(year);
+    Number(
+      year
+    );
 
   if (
-    Number.isFinite(numericYear) &&
+    Number.isFinite(
+      numericYear
+    ) &&
     numericYear >= 2000
   ) {
     return (
@@ -86,6 +111,10 @@ function normalizeWeekNumber(
 }
 
 
+// ============================================================
+// GET ISO WEEK FROM DATE
+// ============================================================
+
 function getISOWeekFromDate(
   value
 ) {
@@ -94,7 +123,9 @@ function getISOWeekFromDate(
   }
 
   const date =
-    new Date(value);
+    new Date(
+      value
+    );
 
   if (
     Number.isNaN(
@@ -143,7 +174,7 @@ function getISOWeekFromDate(
         ) +
         1
       ) /
-      7
+        7
     );
 
   return (
@@ -162,7 +193,9 @@ function buildAvailableWeeks(
   reports
 ) {
   if (
-    !Array.isArray(reports)
+    !Array.isArray(
+      reports
+    )
   ) {
     return [];
   }
@@ -195,15 +228,19 @@ function buildAvailableWeeks(
     }
 
     const numericValue =
-      Number(value);
+      Number(
+        value
+      );
 
     const year =
       Math.floor(
-        numericValue / 100
+        numericValue /
+          100
       );
 
     const week =
-      numericValue % 100;
+      numericValue %
+      100;
 
     if (
       week < 1 ||
@@ -222,7 +259,9 @@ function buildAvailableWeeks(
         {
           value:
             numericValue,
+
           year,
+
           week,
         }
       );
@@ -232,7 +271,10 @@ function buildAvailableWeeks(
   return Array.from(
     map.values()
   ).sort(
-    (a, b) =>
+    (
+      a,
+      b
+    ) =>
       b.value -
       a.value
   );
@@ -240,12 +282,90 @@ function buildAvailableWeeks(
 
 
 // ============================================================
-// MAIN COMPONENT
+// CREATE ACTIVITY LOG DATA
+// ============================================================
+
+function buildActivityLogs(
+  overview,
+  reports
+) {
+  /*
+   * If the backend eventually provides a dedicated
+   * activity_logs array, use it directly.
+   */
+
+  if (
+    Array.isArray(
+      overview?.activity_logs
+    ) &&
+    overview.activity_logs.length
+  ) {
+    return overview.activity_logs;
+  }
+
+  /*
+   * Otherwise use surveillance pulse data.
+   */
+
+  if (
+    Array.isArray(
+      overview?.surveillance_pulse
+    ) &&
+    overview.surveillance_pulse.length
+  ) {
+    return overview.surveillance_pulse;
+  }
+
+  /*
+   * Final fallback:
+   * build activity entries from reports.
+   */
+
+  if (
+    Array.isArray(
+      reports
+    )
+  ) {
+    return reports
+      .slice(
+        0,
+        12
+      )
+      .map(
+        (
+          report
+        ) => ({
+          time:
+            report?.created_at,
+
+          title:
+            `${report?.disease || "Disease"} report received`,
+
+          detail:
+            `${report?.taluk_name || "Kodagu"} · ${
+              report?.cases_this_week ??
+              report?.current_cases ??
+              0
+            } cases`,
+        })
+      );
+  }
+
+  return [];
+}
+
+
+// ============================================================
+// MAIN MEDICAL SUPERVISOR PORTAL
 // ============================================================
 
 export default function MedicalSupervisorPortal({
   onExit,
 }) {
+  // ==========================================================
+  // ACTIVE TAB
+  // ==========================================================
+
   const [
     tab,
     setTab,
@@ -253,49 +373,101 @@ export default function MedicalSupervisorPortal({
     "overview"
   );
 
+
+  // ==========================================================
+  // LOADING
+  // ==========================================================
+
   const [
     loading,
     setLoading,
-  ] = useState(true);
+  ] = useState(
+    true
+  );
+
 
   const [
     refreshing,
     setRefreshing,
-  ] = useState(false);
+  ] = useState(
+    false
+  );
+
 
   const [
     monitoringLoading,
     setMonitoringLoading,
-  ] = useState(false);
+  ] = useState(
+    false
+  );
+
+
+  // ==========================================================
+  // ERROR
+  // ==========================================================
 
   const [
     error,
     setError,
-  ] = useState("");
+  ] = useState(
+    ""
+  );
+
+
+  // ==========================================================
+  // WEEK
+  // ==========================================================
 
   const [
     selectedWeek,
     setSelectedWeek,
-  ] = useState(null);
+  ] = useState(
+    null
+  );
+
 
   const [
     availableWeeks,
     setAvailableWeeks,
-  ] = useState([]);
+  ] = useState(
+    []
+  );
+
+
+  // ==========================================================
+  // DASHBOARD DATA
+  // ==========================================================
 
   const [
     data,
     setData,
   ] = useState({
-    overview: null,
-    reports: [],
-    monitoring: [],
-    analytics: null,
-    riskMap: [],
-    emerging: [],
-    agents: [],
-    issues: [],
-    diseases: [],
+    overview:
+      null,
+
+    reports:
+      [],
+
+    monitoring:
+      [],
+
+    analytics:
+      null,
+
+    riskMap:
+      [],
+
+    emerging:
+      [],
+
+    agents:
+      [],
+
+    issues:
+      [],
+
+    diseases:
+      [],
   });
 
 
@@ -319,26 +491,28 @@ export default function MedicalSupervisorPortal({
             );
           }
 
+
+          // ==================================================
+          // LOAD ALL DISEASE REPORTS
+          // ==================================================
+
           /*
-           * Load all disease reports first.
+           * Reports are also used by:
            *
-           * These are also used by:
-           *
-           * Agent Oversight
-           *
-           * to calculate:
-           *
-           * - Last submission
-           * - 4 week history
-           * - Compliance
+           * - Agent Oversight
+           * - Activity Logs
+           * - Weekly reporting history
+           * - Compliance calculations
            */
 
           const reports =
             await api.getMedicalReports(
               {
-                limit: 1000,
+                limit:
+                  1000,
               }
             );
+
 
           const normalizedReports =
             Array.isArray(
@@ -347,10 +521,16 @@ export default function MedicalSupervisorPortal({
               ? reports
               : [];
 
+
+          // ==================================================
+          // AVAILABLE REPORTING WEEKS
+          // ==================================================
+
           const weeks =
             buildAvailableWeeks(
               normalizedReports
             );
+
 
           setAvailableWeeks(
             weeks
@@ -358,15 +538,16 @@ export default function MedicalSupervisorPortal({
 
 
           /*
-           * Preserve selected week if it still
-           * exists. Otherwise use latest submitted
-           * reporting week.
+           * Preserve the selected week if it still exists.
+           * Otherwise use the latest available reporting week.
            */
 
           const preferredWeek =
             selectedWeek &&
             weeks.some(
-              (item) =>
+              (
+                item
+              ) =>
                 item.value ===
                 Number(
                   selectedWeek
@@ -379,15 +560,15 @@ export default function MedicalSupervisorPortal({
                   ?.value ||
                 null;
 
+
           setSelectedWeek(
             preferredWeek
           );
 
 
-          /*
-           * Load the remaining Medical Supervisor
-           * data.
-           */
+          // ==================================================
+          // LOAD REMAINING MEDICAL SUPERVISOR DATA
+          // ==================================================
 
           const [
             overview,
@@ -422,6 +603,10 @@ export default function MedicalSupervisorPortal({
               ),
             ]);
 
+
+          // ==================================================
+          // STORE DATA
+          // ==================================================
 
           setData({
             overview,
@@ -473,8 +658,14 @@ export default function MedicalSupervisorPortal({
                 ? diseases
                 : [],
           });
+        } catch (
+          e
+        ) {
+          console.error(
+            "Medical Supervisor portal load error:",
+            e
+          );
 
-        } catch (e) {
           setError(
             e?.message ||
               "Unable to load Medical Supervisor data."
@@ -495,9 +686,15 @@ export default function MedicalSupervisorPortal({
     );
 
 
+  // ==========================================================
+  // INITIAL LOAD
+  // ==========================================================
+
   useEffect(
     () => {
-      load(true);
+      load(
+        true
+      );
     },
     []
   );
@@ -547,10 +744,12 @@ export default function MedicalSupervisorPortal({
             true
           );
 
+
           const monitoring =
             await api.getMedicalMonitoring(
               numericWeek
             );
+
 
           setData(
             (
@@ -566,8 +765,14 @@ export default function MedicalSupervisorPortal({
                   : [],
             })
           );
+        } catch (
+          e
+        ) {
+          console.error(
+            "Medical monitoring error:",
+            e
+          );
 
-        } catch (e) {
           setError(
             e?.message ||
               "Unable to load the selected reporting week."
@@ -605,15 +810,22 @@ export default function MedicalSupervisorPortal({
         );
       }
 
+
       await api.remindSupervisorAgent(
         agentId
       );
+
+
+      /*
+       * Reload monitoring data after reminder.
+       */
 
       const monitoring =
         await api.getMedicalMonitoring(
           selectedWeek ||
             undefined
         );
+
 
       setData(
         (
@@ -645,12 +857,13 @@ export default function MedicalSupervisorPortal({
       );
 
       /*
-       * Reload all dashboard data so
-       * Previously Filed Agent Complaints
-       * immediately shows the new complaint.
+       * Reload all data so the newly submitted
+       * complaint immediately appears.
        */
 
-      await load(false);
+      await load(
+        false
+      );
     };
 
 
@@ -671,14 +884,43 @@ export default function MedicalSupervisorPortal({
           decision,
 
           review_notes:
-            notes || "",
+            notes ||
+            "",
 
           ...extra,
         }
       );
 
-      await load(false);
+
+      await load(
+        false
+      );
     };
+
+
+  // ==========================================================
+  // NAVIGATION
+  // ==========================================================
+
+  const navigateTo =
+    useCallback(
+      (
+        destination
+      ) => {
+        setTab(
+          destination
+        );
+
+        window.scrollTo(
+          {
+            top: 0,
+            behavior:
+              "smooth",
+          }
+        );
+      },
+      []
+    );
 
 
   // ==========================================================
@@ -686,20 +928,20 @@ export default function MedicalSupervisorPortal({
   // ==========================================================
 
   const alertCount =
-    (
+    Number(
       data.overview
         ?.high_risk_alerts ||
-      0
+        0
     ) +
-    (
+    Number(
       data.overview
         ?.pending_emerging_reviews ||
-      0
+        0
     ) +
-    (
+    Number(
       data.overview
         ?.pending_agent_submissions ||
-      0
+        0
     );
 
 
@@ -714,7 +956,81 @@ export default function MedicalSupervisorPortal({
     data.overview
       ?.district
       ?.name ||
-    "Kodagu District";
+    "Kodagu";
+
+
+  // ==========================================================
+  // TALUK / LOCATION
+  // ==========================================================
+
+  const talukName =
+    data.overview
+      ?.selected_location
+      ?.taluk_name ||
+    data.overview
+      ?.taluk_name ||
+    "Virajpet";
+
+
+  const locationName =
+    `${talukName}, ${districtName}`;
+
+
+  // ==========================================================
+  // SUPERVISOR NAME
+  // ==========================================================
+
+  const supervisorName =
+    data.overview
+      ?.supervisor_name ||
+    "Dr. Monish";
+
+
+  // ==========================================================
+  // ACTIVITY LOGS
+  // ==========================================================
+
+  const activityLogs =
+    buildActivityLogs(
+      data.overview,
+      data.reports
+    );
+
+
+  // ==========================================================
+  // LOADING SCREEN
+  // ==========================================================
+
+  if (
+    loading
+  ) {
+    return (
+      <MedicalSupervisorLayout
+        activeTab={
+          tab
+        }
+        onTabChange={
+          setTab
+        }
+        onExit={
+          onExit
+        }
+        alertCount={
+          0
+        }
+        districtName={
+          districtName
+        }
+        locationName={
+          locationName
+        }
+      >
+
+        <Loading />
+
+      </MedicalSupervisorLayout>
+    );
+  }
 
 
   // ==========================================================
@@ -723,243 +1039,357 @@ export default function MedicalSupervisorPortal({
 
   return (
     <MedicalSupervisorLayout
-      activeTab={tab}
-      onTabChange={setTab}
-      onExit={onExit}
+
+      activeTab={
+        tab
+      }
+
+      onTabChange={
+        setTab
+      }
+
+      onExit={
+        onExit
+      }
+
       alertCount={
         alertCount
       }
+
       districtName={
         districtName
       }
+
+      locationName={
+        locationName
+      }
+
     >
 
+
       {/* ====================================================
-          ERROR
+          ERROR MESSAGE
           ==================================================== */}
 
-      {error && (
-        <div className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-[#F0CACA] bg-[#FFF5F5] px-4 py-3 text-[11px] text-[#C62828]">
+      {
+        error && (
+          <div className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-[#F0CACA] bg-[#FFF5F5] px-4 py-3 text-[11px] text-[#C62828]">
 
-          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
 
-            <AlertCircle
-              size={15}
-            />
+              <AlertCircle
+                size={
+                  15
+                }
+              />
 
-            {error}
+              <span>
+                {
+                  error
+                }
+              </span>
+
+            </div>
+
+
+            <button
+              type="button"
+              onClick={() =>
+                load(
+                  true
+                )
+              }
+              disabled={
+                refreshing
+              }
+              className="inline-flex items-center gap-2 rounded-lg border border-[#F0CACA] bg-white px-3 py-2 font-semibold transition hover:bg-[#FFF9F9] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+
+              <RefreshCw
+                size={
+                  13
+                }
+                className={
+                  refreshing
+                    ? "animate-spin"
+                    : ""
+                }
+              />
+
+              Retry
+
+            </button>
 
           </div>
-
-          <button
-            type="button"
-            onClick={() =>
-              load(true)
-            }
-            className="inline-flex items-center gap-2 rounded-lg border border-[#F0CACA] bg-white px-3 py-2 font-semibold"
-          >
-
-            <RefreshCw
-              size={13}
-              className={
-                refreshing
-                  ? "animate-spin"
-                  : ""
-              }
-            />
-
-            Retry
-
-          </button>
-
-        </div>
-      )}
+        )
+      }
 
 
       {/* ====================================================
-          PAGE REFRESH
+          OVERVIEW
           ==================================================== */}
 
-      {tab !==
-        "home-relief" && (
-        <div className="mb-3 flex justify-end">
+      {
+        tab ===
+          "overview" && (
 
-          <button
-            type="button"
-            onClick={() =>
-              load(true)
+          <Overview
+
+            data={
+              data.overview
             }
-            disabled={
-              refreshing
+
+            onReports={() =>
+              navigateTo(
+                "reports"
+              )
             }
-            className="inline-flex items-center gap-2 rounded-lg border border-[#DDE5E0] bg-white px-3 py-2 text-[10px] font-semibold text-[#52627D] hover:bg-[#F7FAF8] disabled:cursor-not-allowed disabled:opacity-60"
-          >
 
-            <RefreshCw
-              size={13}
-              className={
-                refreshing
-                  ? "animate-spin"
-                  : ""
-              }
-            />
+            onMonitoring={() =>
+              navigateTo(
+                "monitoring"
+              )
+            }
 
-            Refresh
+            onAlerts={() =>
+              navigateTo(
+                "alerts"
+              )
+            }
 
-          </button>
+            onRiskMap={() =>
+              navigateTo(
+                "risk-map"
+              )
+            }
 
-        </div>
-      )}
+            onActivity={() =>
+              navigateTo(
+                "activity"
+              )
+            }
+
+          />
+
+        )
+      }
 
 
       {/* ====================================================
-          CONTENT
+          DISEASE REPORTS
           ==================================================== */}
 
-      {loading ? (
+      {
+        tab ===
+          "reports" && (
 
-        <Loading />
+          <DiseaseReports
 
-      ) : tab ===
-        "overview" ? (
+            reports={
+              data.reports
+            }
 
-        <Overview
-          data={
-            data.overview
-          }
+            onRefresh={() =>
+              load(
+                true
+              )
+            }
 
-          onReports={() =>
-            setTab(
-              "reports"
-            )
-          }
+          />
 
-          onMonitoring={() =>
-            setTab(
-              "monitoring"
-            )
-          }
+        )
+      }
 
-          onAlerts={() =>
-            setTab(
-              "alerts"
-            )
-          }
-        />
 
-      ) : tab ===
-        "reports" ? (
+      {/* ====================================================
+          WEEKLY MONITORING
+          ==================================================== */}
 
-        <DiseaseReports
-          reports={
-            data.reports
-          }
+      {
+        tab ===
+          "monitoring" && (
 
-          onRefresh={() =>
-            load(true)
-          }
-        />
+          <WeeklyMonitoring
 
-      ) : tab ===
-        "monitoring" ? (
+            rows={
+              data.monitoring
+            }
 
-        <WeeklyMonitoring
-          rows={
-            data.monitoring
-          }
+            availableWeeks={
+              availableWeeks
+            }
 
-          availableWeeks={
-            availableWeeks
-          }
+            selectedWeek={
+              selectedWeek
+            }
 
-          selectedWeek={
-            selectedWeek
-          }
+            onWeekChange={
+              handleWeekChange
+            }
 
-          onWeekChange={
-            handleWeekChange
-          }
+            onRemind={
+              remindAgent
+            }
 
-          onRemind={
-            remindAgent
-          }
+            onRefresh={() =>
+              load(
+                true
+              )
+            }
 
-          onRefresh={() =>
-            load(true)
-          }
+            loading={
+              monitoringLoading
+            }
 
-          loading={
-            monitoringLoading
-          }
-        />
+          />
 
-      ) : tab ===
-        "risk-map" ? (
+        )
+      }
 
-        <RiskMap
-          data={
-            data.riskMap
-          }
-        />
 
-      ) : tab ===
-        "analytics" ? (
+      {/* ====================================================
+          RISK MAP
+          ==================================================== */}
 
-        <SurveillanceAnalytics
-          data={
-            data.analytics
-          }
-        />
+      {
+        tab ===
+          "risk-map" && (
 
-      ) : tab ===
-        "agents" ? (
+          <RiskMap
 
-        <AgentOversight
-          agents={
-            data.agents
-          }
+            data={
+              data.riskMap
+            }
 
-          issues={
-            data.issues
-          }
+          />
 
-          reports={
-            data.reports
-          }
+        )
+      }
 
-          onSubmitIssue={
-            submitIssue
-          }
-        />
 
-      ) : tab ===
-        "alerts" ? (
+      {/* ====================================================
+          SURVEILLANCE ANALYTICS
+          ==================================================== */}
 
-        <Alerts
-          alerts={
-            data.overview
-              ?.recent_alerts ||
-            []
-          }
+      {
+        tab ===
+          "analytics" && (
 
-          emerging={
-            data.emerging
-          }
+          <SurveillanceAnalytics
 
-          diseases={
-            data.diseases
-          }
+            data={
+              data.analytics
+            }
 
-          onReviewEmerging={
-            reviewEmerging
-          }
-        />
+          />
 
-      ) : (
+        )
+      }
 
-        <HomeReliefManagement />
 
-      )}
+      {/* ====================================================
+          AGENT OVERSIGHT
+          ==================================================== */}
+
+      {
+        tab ===
+          "agents" && (
+
+          <AgentOversight
+
+            agents={
+              data.agents
+            }
+
+            issues={
+              data.issues
+            }
+
+            reports={
+              data.reports
+            }
+
+            onSubmitIssue={
+              submitIssue
+            }
+
+          />
+
+        )
+      }
+
+
+      {/* ====================================================
+          ALERTS
+          ==================================================== */}
+
+      {
+        tab ===
+          "alerts" && (
+
+          <Alerts
+
+            alerts={
+              data.overview
+                ?.recent_alerts ||
+              []
+            }
+
+            emerging={
+              data.emerging
+            }
+
+            diseases={
+              data.diseases
+            }
+
+            onReviewEmerging={
+              reviewEmerging
+            }
+
+          />
+
+        )
+      }
+
+
+      {/* ====================================================
+          ACTIVITY LOGS
+          ==================================================== */}
+
+      {
+        tab ===
+          "activity" && (
+
+          <ActivityLogs
+
+            logs={
+              activityLogs
+            }
+
+            reports={
+              data.reports
+            }
+
+          />
+
+        )
+      }
+
+
+      {/* ====================================================
+          HOME RELIEF
+          ==================================================== */}
+
+      {
+        tab ===
+          "home-relief" && (
+
+          <HomeReliefManagement />
+
+        )
+      }
+
 
     </MedicalSupervisorLayout>
   );

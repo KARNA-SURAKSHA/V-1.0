@@ -1,0 +1,1318 @@
+/* ============================================================
+   MEDICAL SUPERVISOR — OVERVIEW
+   ============================================================ */
+
+.medical-overview {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  color: #111827;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+}
+
+
+/* ============================================================
+   HERO / GREETING
+   ============================================================ */
+
+.overview-hero {
+  position: relative;
+  width: 100%;
+  height: 126px;
+  min-height: 126px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  padding: 12px 8px 0 8px;
+  margin: 0 0 10px 0;
+  background: #ffffff;
+  border-radius: 0;
+}
+
+.overview-hero-content {
+  position: relative;
+  z-index: 5;
+  width: 52%;
+  padding-top: 0;
+}
+
+.overview-hero h1 {
+  margin: 0;
+  padding: 0;
+  color: #111827;
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 650;
+  letter-spacing: -0.7px;
+}
+
+.overview-wave {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 22px;
+  line-height: 1;
+  transform: translateY(1px);
+}
+
+.overview-hero p {
+  margin: 5px 0 0 0;
+  color: #667085;
+  font-size: 12px;
+  line-height: 19px;
+  font-weight: 400;
+}
+
+.overview-hero p strong {
+  color: #667085;
+  font-weight: 500;
+}
+
+.overview-last-updated {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  color: #667085;
+  font-size: 10px;
+  line-height: 15px;
+}
+
+.overview-last-updated svg {
+  color: #667085;
+  flex-shrink: 0;
+}
+
+
+/* ============================================================
+   HERO IMAGE
+   ============================================================ */
+
+.overview-hero-art {
+  position: absolute;
+  z-index: 2;
+  right: 0;
+  bottom: 0;
+  width: 59%;
+  height: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.overview-hero-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 126px;
+  object-fit: contain;
+  object-position: right bottom;
+  pointer-events: none;
+  user-select: none;
+}
+
+
+/* ============================================================
+   KPI CARDS
+   ============================================================ */
+
+.overview-kpis {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 11px;
+  margin-bottom: 11px;
+}
+
+.overview-kpi-card {
+  min-width: 0;
+  height: 102px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 16px 19px;
+  background: #ffffff;
+  border: 1px solid #e4e9e7;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.015);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.overview-kpi-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 16px rgba(16, 24, 40, 0.05);
+}
+
+.overview-kpi-icon {
+  width: 51px;
+  height: 51px;
+  min-width: 51px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overview-kpi-icon.green {
+  color: #ffffff;
+  background: #299b61;
+}
+
+.overview-kpi-icon.blue {
+  color: #ffffff;
+  background: #6198df;
+}
+
+.overview-kpi-icon.orange {
+  color: #f59e0b;
+  background: #fff0d5;
+}
+
+.overview-kpi-icon.purple {
+  color: #8956d4;
+  background: #f0e5fa;
+}
+
+.overview-kpi-info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.overview-kpi-label {
+  display: block;
+  color: #111827;
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.overview-kpi-value {
+  display: block;
+  margin-top: 4px;
+  color: #0f172a;
+  font-size: 27px;
+  line-height: 29px;
+  font-weight: 650;
+  letter-spacing: -0.8px;
+}
+
+.overview-kpi-sub {
+  display: block;
+  margin-top: 5px;
+  color: #667085;
+  font-size: 9px;
+  line-height: 13px;
+  white-space: nowrap;
+}
+
+.overview-kpi-sub.danger {
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.overview-kpi-change {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 5px;
+  font-size: 9px;
+  line-height: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.overview-kpi-change.positive-red {
+  color: #dc3545;
+}
+
+.overview-kpi-change.negative-green {
+  color: #16804c;
+}
+
+
+/* ============================================================
+   MAIN THREE-COLUMN SECTION
+   ============================================================ */
+
+.overview-middle-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.72fr)
+    minmax(0, 1.08fr)
+    minmax(270px, 0.90fr);
+  gap: 11px;
+  align-items: stretch;
+}
+
+.overview-panel {
+  min-width: 0;
+  background: #ffffff;
+  border: 1px solid #e3e8e5;
+  border-radius: 13px;
+  overflow: hidden;
+}
+
+
+/* ============================================================
+   PANEL HEADER
+   ============================================================ */
+
+.overview-panel-header {
+  min-height: 51px;
+  height: 51px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 17px;
+}
+
+.overview-panel-header h2 {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #111827;
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.overview-panel-header h2 svg {
+  flex-shrink: 0;
+  color: #182230;
+}
+
+.overview-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #14814d;
+  font-family: inherit;
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 550;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.overview-link:hover {
+  color: #0a653b;
+}
+
+.overview-link:focus-visible {
+  outline: 2px solid rgba(20, 129, 77, 0.25);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+
+/* ============================================================
+   DISEASE OVERVIEW
+   ============================================================ */
+
+.disease-panel {
+  min-height: 329px;
+}
+
+.disease-table {
+  width: 100%;
+  padding: 0 17px;
+}
+
+.disease-table-header,
+.disease-table-row {
+  display: grid;
+  grid-template-columns:
+    minmax(125px, 1.35fr)
+    minmax(83px, 1fr)
+    minmax(56px, 0.75fr)
+    minmax(70px, 0.78fr)
+    minmax(67px, 0.80fr);
+  align-items: center;
+  column-gap: 8px;
+}
+
+.disease-table-header {
+  height: 29px;
+  border-bottom: 1px solid #e8ecea;
+  color: #667085;
+  font-size: 8px;
+  line-height: 11px;
+  font-weight: 500;
+}
+
+.disease-table-row {
+  height: 39px;
+  border-bottom: 1px solid #edf0ee;
+  color: #182230;
+  font-size: 9px;
+  line-height: 13px;
+}
+
+.disease-table-row:last-child {
+  border-bottom: none;
+}
+
+.disease-name {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.disease-name > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.overview-disease-icon {
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.disease-icon-red {
+  color: #dc2626;
+  background: #fff0f0;
+}
+
+.disease-icon-green {
+  color: #16804c;
+  background: #e9f7ef;
+}
+
+.disease-icon-orange {
+  color: #f59e0b;
+  background: #fff5dc;
+}
+
+.disease-icon-purple {
+  color: #7c4dcb;
+  background: #f2eafa;
+}
+
+.disease-cases {
+  color: #111827;
+  font-weight: 600;
+}
+
+.disease-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-weight: 600;
+}
+
+.disease-change.up {
+  color: #dc3545;
+}
+
+.disease-change.down {
+  color: #16804c;
+}
+
+.disease-change.flat {
+  color: #667085;
+}
+
+.risk-pill {
+  width: max-content;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 9px;
+  border-radius: 6px;
+  font-size: 8px;
+  line-height: 10px;
+  font-weight: 600;
+}
+
+.risk-pill.low {
+  color: #187346;
+  background: #e8f5ec;
+}
+
+.risk-pill.moderate {
+  color: #d97706;
+  background: #fff3d9;
+}
+
+.risk-pill.high {
+  color: #dc2626;
+  background: #ffebeb;
+}
+
+.risk-pill.very-high {
+  color: #b91c1c;
+  background: #ffe0e0;
+}
+
+.disease-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #253246;
+  font-size: 8px;
+  line-height: 11px;
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  min-width: 7px;
+  border-radius: 50%;
+}
+
+.status-dot.green {
+  background: #13854d;
+}
+
+.status-dot.orange {
+  background: #f59e0b;
+}
+
+.status-dot.red {
+  background: #dc2626;
+}
+
+.overview-bottom-link {
+  width: 100%;
+  height: 41px;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 0;
+  border-top: 1px solid #edf0ee;
+  background: #ffffff;
+  color: #14814d;
+  font-family: inherit;
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.overview-bottom-link:hover {
+  background: #fbfdfc;
+}
+
+
+/* ============================================================
+   RECENT ALERTS
+   ============================================================ */
+
+.alerts-panel {
+  min-height: 329px;
+}
+
+.overview-alert-list {
+  padding: 0 11px 11px;
+}
+
+.overview-alert-card {
+  width: 100%;
+  display: block;
+  margin: 0 0 10px;
+  padding: 13px 12px 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.overview-alert-card:last-child {
+  margin-bottom: 0;
+}
+
+.overview-alert-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 13px rgba(16, 24, 40, 0.05);
+}
+
+.overview-alert-card.high {
+  background: #fff4f4;
+  border-color: #f3d7d7;
+}
+
+.overview-alert-card.medium {
+  background: #fffaf0;
+  border-color: #f2e4c5;
+}
+
+.overview-alert-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.overview-alert-top strong {
+  min-width: 0;
+  flex: 1;
+  color: #172033;
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 600;
+}
+
+.overview-alert-dot {
+  width: 8px;
+  height: 8px;
+  min-width: 8px;
+  margin-top: 3px;
+  border-radius: 50%;
+}
+
+.overview-alert-dot.red {
+  background: #df2525;
+}
+
+.overview-alert-dot.orange {
+  background: #f59e0b;
+}
+
+.overview-alert-badge {
+  flex-shrink: 0;
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-size: 8px;
+  line-height: 10px;
+  font-weight: 600;
+}
+
+.overview-alert-badge.high {
+  color: #dc2626;
+  background: #ffe5e5;
+}
+
+.overview-alert-badge.medium {
+  color: #e88a0c;
+  background: #fff0d1;
+}
+
+.overview-alert-card p {
+  margin: 8px 0 6px 15px;
+  color: #617085;
+  font-size: 8px;
+  line-height: 12px;
+}
+
+.overview-alert-time {
+  display: block;
+  margin-left: 15px;
+  color: #64748b;
+  font-size: 8px;
+  line-height: 12px;
+}
+
+
+/* ============================================================
+   RISK MAP PANEL
+   ============================================================ */
+
+.risk-map-panel {
+  min-height: 329px;
+}
+
+.risk-map-preview {
+  position: relative;
+  display: block;
+  width: calc(100% - 20px);
+  height: 201px;
+  margin: 0 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  overflow: hidden;
+  background: #f7faf8;
+  cursor: pointer;
+}
+
+.risk-map-background {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      135deg,
+      #f8faf8 0%,
+      #ffffff 50%,
+      #f3f7f4 100%
+    );
+}
+
+.risk-map-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.45;
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 95%,
+      #dfe6e1 96%
+    ),
+    linear-gradient(
+      transparent 95%,
+      #dfe6e1 96%
+    );
+  background-size:
+    27px 27px;
+}
+
+.risk-region {
+  position: absolute;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  clip-path: polygon(
+    17% 8%,
+    43% 0%,
+    73% 11%,
+    95% 31%,
+    86% 64%,
+    68% 82%,
+    41% 100%,
+    13% 82%,
+    0% 48%
+  );
+}
+
+.region-green-1 {
+  width: 148px;
+  height: 102px;
+  top: 16px;
+  right: 13px;
+  background: #37a66a;
+  transform: rotate(7deg);
+}
+
+.region-green-2 {
+  width: 116px;
+  height: 102px;
+  top: 69px;
+  right: 66px;
+  background: #26995a;
+  transform: rotate(-5deg);
+}
+
+.region-green-3 {
+  width: 110px;
+  height: 80px;
+  top: 34px;
+  left: 24px;
+  background: #4bad74;
+  transform: rotate(10deg);
+}
+
+.region-yellow-1 {
+  width: 104px;
+  height: 96px;
+  top: 73px;
+  left: 84px;
+  background: #f8b51e;
+  transform: rotate(7deg);
+}
+
+.region-yellow-2 {
+  width: 87px;
+  height: 72px;
+  top: 108px;
+  right: 114px;
+  background: #ffad1b;
+  transform: rotate(-12deg);
+}
+
+.region-orange-1 {
+  width: 87px;
+  height: 82px;
+  bottom: 13px;
+  left: 100px;
+  background: #f47b18;
+  transform: rotate(12deg);
+}
+
+.region-red-1 {
+  width: 78px;
+  height: 72px;
+  bottom: 26px;
+  left: 47px;
+  background: #e73535;
+  transform: rotate(-6deg);
+}
+
+.region-red-2 {
+  width: 66px;
+  height: 67px;
+  bottom: 56px;
+  left: 86px;
+  background: #ef3e3e;
+  transform: rotate(14deg);
+}
+
+.risk-map-legend {
+  min-height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 5px;
+  padding: 0 9px;
+}
+
+.risk-map-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #667085;
+  font-size: 8px;
+  line-height: 11px;
+  white-space: nowrap;
+}
+
+.risk-map-legend i {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+}
+
+.legend-low {
+  background: #3e9c69;
+}
+
+.legend-moderate {
+  background: #f5ad1d;
+}
+
+.legend-high {
+  background: #f47721;
+}
+
+.legend-very-high {
+  background: #df2929;
+}
+
+
+/* ============================================================
+   SURVEILLANCE PULSE
+   ============================================================ */
+
+.overview-pulse-panel {
+  position: relative;
+  width: 100%;
+  height: 176px;
+  min-height: 176px;
+  margin-top: 11px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e3e8e5;
+  border-radius: 13px;
+}
+
+.overview-pulse-header {
+  height: 49px;
+  min-height: 49px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 19px;
+}
+
+.overview-pulse-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.overview-pulse-title svg {
+  color: #159557;
+}
+
+.overview-pulse-title h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 11px;
+  line-height: 15px;
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   PULSE BODY
+   ============================================================ */
+
+.overview-pulse-content {
+  position: relative;
+  width: 100%;
+  height: 126px;
+  display: flex;
+}
+
+.overview-pulse-timeline {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  min-width: 0;
+  height: 126px;
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  padding: 1px 19px 10px;
+}
+
+.overview-pulse-timeline::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: 27px;
+  right: 23px;
+  top: 9px;
+  border-top: 1px dashed #a9cdbb;
+}
+
+.pulse-event {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+  padding-right: 18px;
+}
+
+.pulse-event-top {
+  position: relative;
+  z-index: 3;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pulse-dot {
+  width: 10px;
+  height: 10px;
+  min-width: 10px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #198652;
+  box-shadow: 0 0 0 1px #198652;
+}
+
+.pulse-time {
+  color: #15804b;
+  font-size: 8px;
+  line-height: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.pulse-event-body {
+  padding: 7px 0 0 20px;
+}
+
+.pulse-event-body strong {
+  display: block;
+  max-width: 175px;
+  color: #1b2737;
+  font-size: 9px;
+  line-height: 13px;
+  font-weight: 600;
+}
+
+.pulse-event-body p {
+  max-width: 185px;
+  margin: 6px 0 4px;
+  color: #617085;
+  font-size: 8px;
+  line-height: 11px;
+}
+
+.pulse-event-body > span {
+  display: block;
+  max-width: 185px;
+  color: #64748b;
+  font-size: 8px;
+  line-height: 11px;
+}
+
+
+/* ============================================================
+   PULSE ILLUSTRATION
+   ============================================================ */
+
+.pulse-illustration {
+  position: absolute;
+  z-index: 4;
+  right: 14px;
+  bottom: 0;
+  width: 190px;
+  height: 124px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+
+/* ============================================================
+   CLIPBOARD
+   ============================================================ */
+
+.pulse-clipboard {
+  position: absolute;
+  z-index: 3;
+  left: 59px;
+  bottom: 0;
+  width: 67px;
+  height: 88px;
+  border: 5px solid #9fc9ad;
+  border-radius: 7px;
+  background: #eaf7ee;
+}
+
+.clipboard-clip {
+  position: absolute;
+  top: -13px;
+  left: 19px;
+  width: 25px;
+  height: 17px;
+  border: 5px solid #73a98a;
+  border-radius: 8px 8px 4px 4px;
+  background: #86b99a;
+}
+
+.clipboard-paper {
+  position: absolute;
+  left: 7px;
+  right: 7px;
+  top: 17px;
+  bottom: 6px;
+  border-radius: 3px;
+  background: #ffffff;
+}
+
+.clipboard-line {
+  height: 4px;
+  margin-left: 7px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  background: #d9e9df;
+}
+
+.clipboard-line.short {
+  width: 21px;
+  margin-top: 8px;
+}
+
+.clipboard-line.medium {
+  width: 34px;
+}
+
+.clipboard-line.long {
+  width: 42px;
+}
+
+.clipboard-chart {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 7px;
+  height: 29px;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.chart-bar {
+  flex: 1;
+  border-radius: 3px 3px 0 0;
+  background: #4aa878;
+}
+
+.chart-bar.one {
+  height: 34%;
+}
+
+.chart-bar.two {
+  height: 55%;
+}
+
+.chart-bar.three {
+  height: 76%;
+}
+
+.chart-bar.four {
+  height: 47%;
+}
+
+
+/* ============================================================
+   MAGNIFYING GLASS
+   ============================================================ */
+
+.pulse-magnifier {
+  position: absolute;
+  z-index: 5;
+  left: 105px;
+  bottom: 21px;
+  width: 55px;
+  height: 55px;
+}
+
+.magnifier-circle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 42px;
+  height: 42px;
+  border: 5px solid #177a4b;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.magnifier-handle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 8px;
+  height: 27px;
+  border-radius: 6px;
+  background: #177a4b;
+  transform: rotate(-44deg);
+  transform-origin: center;
+}
+
+
+/* ============================================================
+   PULSE LEAVES
+   ============================================================ */
+
+.pulse-leaf {
+  position: absolute;
+  z-index: 1;
+  width: 16px;
+  height: 35px;
+  border-radius: 100% 0 100% 0;
+  background: #c9e6d3;
+  opacity: 0.9;
+}
+
+.leaf-left-one {
+  left: 9px;
+  bottom: 9px;
+  transform: rotate(-28deg);
+}
+
+.leaf-left-two {
+  left: 29px;
+  bottom: 0;
+  transform: rotate(23deg);
+}
+
+.leaf-right-one {
+  right: 4px;
+  bottom: 9px;
+  transform: rotate(30deg);
+}
+
+.leaf-right-two {
+  right: 25px;
+  bottom: 0;
+  transform: rotate(-24deg);
+}
+
+
+/* ============================================================
+   RESPONSIVE — 1250px
+   ============================================================ */
+
+@media (max-width: 1250px) {
+
+  .overview-kpi-card {
+    padding-left: 14px;
+    padding-right: 14px;
+    gap: 11px;
+  }
+
+  .overview-kpi-icon {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+  }
+
+  .overview-middle-grid {
+    grid-template-columns:
+      minmax(0, 1.55fr)
+      minmax(0, 1fr)
+      minmax(245px, 0.82fr);
+  }
+
+  .risk-map-preview {
+    height: 195px;
+  }
+
+  .overview-pulse-timeline {
+    padding-right: 5px;
+  }
+
+  .pulse-illustration {
+    width: 175px;
+  }
+}
+
+
+/* ============================================================
+   RESPONSIVE — 1050px
+   ============================================================ */
+
+@media (max-width: 1050px) {
+
+  .overview-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .overview-middle-grid {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(280px, 0.8fr);
+  }
+
+  .disease-panel {
+    grid-row: span 2;
+  }
+
+  .overview-hero-content {
+    width: 58%;
+  }
+
+  .overview-hero-art {
+    width: 55%;
+  }
+
+  .overview-pulse-panel {
+    height: auto;
+    min-height: 235px;
+  }
+
+  .overview-pulse-content {
+    height: auto;
+    min-height: 180px;
+  }
+
+  .overview-pulse-timeline {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+    row-gap: 18px;
+    padding-bottom: 18px;
+  }
+
+  .overview-pulse-timeline::before {
+    display: none;
+  }
+
+  .pulse-illustration {
+    display: none;
+  }
+}
+
+
+/* ============================================================
+   RESPONSIVE — 760px
+   ============================================================ */
+
+@media (max-width: 760px) {
+
+  .overview-hero {
+    height: 155px;
+    min-height: 155px;
+    padding-left: 4px;
+  }
+
+  .overview-hero-content {
+    width: 100%;
+    z-index: 4;
+  }
+
+  .overview-hero h1 {
+    font-size: 21px;
+  }
+
+  .overview-hero-art {
+    width: 100%;
+    opacity: 0.25;
+  }
+
+  .overview-kpis {
+    grid-template-columns: 1fr;
+  }
+
+  .overview-middle-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .disease-panel {
+    grid-row: auto;
+  }
+
+  .disease-table {
+    overflow-x: auto;
+  }
+
+  .disease-table-header,
+  .disease-table-row {
+    min-width: 620px;
+  }
+
+  .risk-map-preview {
+    height: 230px;
+  }
+
+  .overview-pulse-timeline {
+    grid-template-columns: 1fr;
+  }
+
+  .overview-pulse-panel {
+    min-height: 400px;
+  }
+
+  .overview-pulse-content {
+    min-height: 340px;
+  }
+}
+
+
+/* ============================================================
+   REDUCE MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .overview-kpi-card,
+  .overview-alert-card {
+    transition: none;
+  }
+
+}

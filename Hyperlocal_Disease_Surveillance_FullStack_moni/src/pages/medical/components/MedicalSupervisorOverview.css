@@ -1,0 +1,1129 @@
+/* ============================================================
+   MEDICAL SUPERVISOR OVERVIEW
+   Desktop reference: 1536 x 1024
+   ============================================================ */
+
+.medical-overview {
+  width: 100%;
+  color: #101b38;
+}
+
+.ms-loading {
+  min-height: 500px;
+  display: grid;
+  place-items: center;
+  color: #718096;
+  font-size: 13px;
+}
+
+
+/* ============================================================
+   WELCOME
+   ============================================================ */
+
+.ms-welcome {
+  position: relative;
+  height: 124px;
+  overflow: hidden;
+  margin-bottom: 18px;
+  background: #ffffff;
+}
+
+.ms-welcome-copy {
+  position: relative;
+  z-index: 2;
+  width: 53%;
+  padding: 6px 0 0 8px;
+}
+
+.ms-welcome h1 {
+  margin: 0;
+  color: #101b38;
+  font-size: 27px;
+  line-height: 34px;
+  font-weight: 600;
+  letter-spacing: -0.8px;
+}
+
+.ms-welcome h1 span {
+  font-size: 24px;
+}
+
+.ms-welcome p {
+  margin: 5px 0 0;
+  color: #56647a;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.ms-updated {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+  color: #697587;
+  font-size: 11px;
+}
+
+.ms-updated svg {
+  color: #39475b;
+}
+
+.ms-skyline {
+  position: absolute;
+  right: -2px;
+  bottom: 0;
+  width: 66%;
+  height: 124px;
+  object-fit: cover;
+  object-position: left bottom;
+  pointer-events: none;
+}
+
+
+/* ============================================================
+   KPI GRID
+   ============================================================ */
+
+.ms-kpi-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.ms-kpi-card {
+  min-width: 0;
+  height: 154px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 18px;
+
+  padding: 20px 21px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5eae7;
+  border-radius: 12px;
+
+  box-shadow:
+    0 3px 12px rgba(
+      31,
+      49,
+      68,
+      0.045
+    );
+}
+
+.ms-kpi-icon {
+  width: 68px;
+  height: 68px;
+  min-width: 68px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+}
+
+.ms-kpi-icon.green {
+  background: #218d4f;
+  color: #ffffff;
+}
+
+.ms-kpi-icon.blue {
+  background: #6398dc;
+  color: #ffffff;
+}
+
+.ms-kpi-icon.amber {
+  background: #fff0d6;
+  color: #f39a00;
+}
+
+.ms-kpi-icon.purple {
+  background: #f0e5ff;
+  color: #7b4bc4;
+}
+
+.ms-kpi-copy {
+  min-width: 0;
+}
+
+.ms-kpi-label {
+  color: #18233a;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.ms-kpi-value {
+  margin-top: 6px;
+  color: #101b38;
+  font-size: 30px;
+  line-height: 32px;
+  font-weight: 500;
+  letter-spacing: -0.8px;
+}
+
+.ms-kpi-note {
+  margin-top: 8px;
+  color: #667085;
+  font-size: 11px;
+  line-height: 15px;
+}
+
+.ms-kpi-note.danger-note {
+  color: #d62535;
+  font-weight: 600;
+}
+
+.trend-note {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ms-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+
+  white-space: nowrap;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ms-trend.up {
+  color: #d62d3e;
+}
+
+.ms-trend.down {
+  color: #087a32;
+}
+
+.ms-trend.neutral {
+  color: #667085;
+}
+
+
+/* ============================================================
+   MIDDLE GRID
+   ============================================================ */
+
+.ms-middle-grid {
+  display: grid;
+
+  grid-template-columns:
+    1.43fr
+    0.99fr
+    0.92fr;
+
+  gap: 14px;
+
+  margin-bottom: 16px;
+}
+
+
+/* ============================================================
+   GENERIC PANEL
+   ============================================================ */
+
+.ms-panel {
+  min-width: 0;
+
+  background: #ffffff;
+
+  border: 1px solid #e5eae7;
+  border-radius: 12px;
+
+  box-shadow:
+    0 3px 12px rgba(
+      31,
+      49,
+      68,
+      0.035
+    );
+
+  overflow: hidden;
+}
+
+.ms-panel-header {
+  height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 0 22px;
+
+  border-bottom: 1px solid #eef1ef;
+}
+
+.ms-panel-header h2 {
+  margin: 0;
+
+  color: #101b38;
+
+  font-size: 13px;
+  line-height: 17px;
+
+  font-weight: 600;
+}
+
+.ms-panel-action {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #087a32;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.ms-panel-action span {
+  font-size: 16px;
+  line-height: 10px;
+}
+
+.ms-panel-action:hover {
+  color: #065f28;
+}
+
+.ms-panel-body {
+  min-width: 0;
+}
+
+
+/* ============================================================
+   DISEASE OVERVIEW
+   ============================================================ */
+
+.ms-disease-panel,
+.ms-alerts-panel,
+.ms-risk-panel {
+  height: 382px;
+}
+
+.ms-disease-panel .ms-panel-body {
+  height: 330px;
+  padding: 0;
+}
+
+.ms-disease-table-wrap {
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.ms-disease-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  table-layout: fixed;
+}
+
+.ms-disease-table th,
+.ms-disease-table td {
+  padding: 0 11px;
+
+  text-align: left;
+
+  vertical-align: middle;
+}
+
+.ms-disease-table th {
+  height: 39px;
+
+  color: #697587;
+
+  font-size: 9px;
+
+  font-weight: 500;
+
+  white-space: nowrap;
+}
+
+.ms-disease-table th:nth-child(1) {
+  width: 28%;
+}
+
+.ms-disease-table th:nth-child(2) {
+  width: 21%;
+}
+
+.ms-disease-table th:nth-child(3) {
+  width: 15%;
+}
+
+.ms-disease-table th:nth-child(4) {
+  width: 17%;
+}
+
+.ms-disease-table th:nth-child(5) {
+  width: 19%;
+}
+
+.ms-disease-table tbody tr {
+  height: 49px;
+
+  border-top:
+    1px solid #edf1ef;
+}
+
+.ms-disease-table tbody tr:hover {
+  background: #fbfdfb;
+}
+
+.ms-disease-name {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  min-width: 0;
+}
+
+.ms-disease-name strong {
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+
+  color: #18233a;
+
+  font-size: 11px;
+
+  font-weight: 600;
+}
+
+.ms-disease-icon {
+  width: 30px;
+  height: 30px;
+
+  min-width: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 50%;
+
+  background: #f5f7f6;
+}
+
+.ms-disease-icon img {
+  width: 25px;
+  height: 25px;
+
+  object-fit: contain;
+}
+
+.ms-number-cell {
+  color: #18233a;
+
+  font-size: 11px;
+
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   RISK BADGES
+   ============================================================ */
+
+.ms-risk-pill {
+  min-width: 52px;
+  height: 29px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 10px;
+
+  border-radius: 7px;
+
+  font-size: 10px;
+
+  font-weight: 600;
+}
+
+.ms-risk-pill.low {
+  background: #e9f6ed;
+  color: #177341;
+}
+
+.ms-risk-pill.moderate {
+  background: #fff4df;
+  color: #d68705;
+}
+
+.ms-risk-pill.high {
+  background: #fff0f0;
+  color: #d6323f;
+}
+
+.ms-risk-pill.very-high {
+  background: #ffe7e7;
+  color: #c62828;
+}
+
+
+/* ============================================================
+   STATUS
+   ============================================================ */
+
+.ms-status {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  white-space: nowrap;
+
+  color: #273449;
+
+  font-size: 10px;
+
+  font-weight: 500;
+}
+
+.ms-status i {
+  width: 9px;
+  height: 9px;
+
+  border-radius: 50%;
+}
+
+.ms-status.stable i {
+  background: #168b49;
+}
+
+.ms-status.monitor i {
+  background: #ef9900;
+}
+
+.ms-status.watch i {
+  background: #df2434;
+}
+
+
+/* ============================================================
+   DISEASE FOOTER BUTTON
+   ============================================================ */
+
+.ms-table-bottom-action {
+  margin: auto auto 10px;
+
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #087a32;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.ms-table-bottom-action span {
+  margin-left: 8px;
+
+  font-size: 16px;
+}
+
+
+/* ============================================================
+   RECENT ALERTS
+   ============================================================ */
+
+.ms-alerts-panel .ms-panel-body {
+  height: 330px;
+
+  padding: 14px 12px;
+}
+
+.ms-alert-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 14px;
+}
+
+.ms-alert-item {
+  width: 100%;
+
+  min-height: 115px;
+
+  display: flex;
+  align-items: flex-start;
+
+  gap: 10px;
+
+  padding: 14px 12px;
+
+  border: 1px solid transparent;
+
+  border-radius: 10px;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.ms-alert-item.high {
+  border-color: #f6dddd;
+  background: #fff5f5;
+}
+
+.ms-alert-item.medium {
+  border-color: #f5e9d0;
+  background: #fffbf3;
+}
+
+.ms-alert-item:hover {
+  transform: translateY(-1px);
+}
+
+.ms-alert-dot {
+  width: 9px;
+  height: 9px;
+
+  min-width: 9px;
+
+  margin-top: 7px;
+
+  border-radius: 50%;
+}
+
+.ms-alert-dot.red {
+  background: #df2434;
+}
+
+.ms-alert-dot.orange {
+  background: #ef9900;
+}
+
+.ms-alert-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.ms-alert-topline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 8px;
+}
+
+.ms-alert-topline strong {
+  min-width: 0;
+
+  color: #18233a;
+
+  font-size: 11px;
+
+  line-height: 17px;
+
+  font-weight: 600;
+}
+
+.ms-alert-copy p {
+  margin: 8px 0 0;
+
+  color: #697587;
+
+  font-size: 10px;
+
+  line-height: 15px;
+}
+
+.ms-alert-copy small {
+  display: block;
+
+  margin-top: 8px;
+
+  color: #697587;
+
+  font-size: 9px;
+}
+
+.ms-severity {
+  min-width: 50px;
+  height: 29px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 8px;
+
+  flex-shrink: 0;
+
+  border-radius: 7px;
+
+  font-size: 10px;
+
+  font-weight: 600;
+}
+
+.ms-severity.red {
+  background: #ffe9e9;
+  color: #d63340;
+}
+
+.ms-severity.orange {
+  background: #fff1d9;
+  color: #e18c00;
+}
+
+
+/* ============================================================
+   RISK MAP
+   ============================================================ */
+
+.ms-risk-panel .ms-panel-body {
+  height: 330px;
+
+  padding: 13px 13px 10px;
+}
+
+.ms-map-button {
+  display: block;
+
+  width: 100%;
+  height: 230px;
+
+  padding: 0;
+
+  border: 0;
+
+  overflow: hidden;
+
+  border-radius: 8px;
+
+  background: #f7faf8;
+
+  cursor: pointer;
+}
+
+.ms-map-button img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  object-position: center;
+}
+
+.ms-map-legend {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 8px;
+
+  margin-top: 20px;
+
+  padding: 0 4px;
+}
+
+.ms-map-legend span {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  white-space: nowrap;
+
+  color: #4f5d70;
+
+  font-size: 9px;
+}
+
+.ms-map-legend i {
+  width: 10px;
+  height: 10px;
+
+  border-radius: 2px;
+}
+
+.ms-map-legend i.low {
+  background: #409b63;
+}
+
+.ms-map-legend i.moderate {
+  background: #f2ad22;
+}
+
+.ms-map-legend i.high {
+  background: #f36b18;
+}
+
+.ms-map-legend i.very-high {
+  background: #df3039;
+}
+
+
+/* ============================================================
+   EMPTY
+   ============================================================ */
+
+.ms-empty {
+  min-height: 250px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 20px;
+
+  color: #718096;
+
+  font-size: 11px;
+
+  text-align: center;
+}
+
+
+/* ============================================================
+   SURVEILLANCE PULSE
+   ============================================================ */
+
+.ms-pulse-panel {
+  height: 200px;
+}
+
+.ms-pulse-panel .ms-panel-body {
+  height: 148px;
+
+  padding: 0 21px;
+}
+
+.ms-pulse-content {
+  position: relative;
+
+  height: 100%;
+
+  overflow: hidden;
+}
+
+.ms-pulse-line {
+  position: absolute;
+
+  left: 10px;
+  right: 210px;
+
+  top: 34px;
+
+  height: 1px;
+
+  background: #b8d6c2;
+}
+
+.ms-pulse-grid {
+  position: relative;
+
+  z-index: 2;
+
+  width: calc(100% - 185px);
+
+  height: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 19px;
+}
+
+.ms-pulse-event {
+  position: relative;
+
+  min-width: 0;
+
+  display: flex;
+
+  gap: 11px;
+
+  padding-top: 27px;
+}
+
+.ms-pulse-marker {
+  width: 12px;
+  height: 12px;
+
+  min-width: 12px;
+
+  margin-top: 1px;
+
+  border: 3px solid #ffffff;
+
+  border-radius: 50%;
+
+  background: #159447;
+
+  box-shadow:
+    0 0 0 1px #b8d9c2;
+}
+
+.ms-pulse-event::after {
+  content: "";
+
+  position: absolute;
+
+  left: 6px;
+
+  top: 39px;
+
+  width: 1px;
+
+  height: 72px;
+
+  background: #b8d1c0;
+}
+
+.ms-pulse-copy {
+  min-width: 0;
+}
+
+.ms-pulse-time {
+  margin-top: -2px;
+
+  color: #087a32;
+
+  font-size: 10px;
+
+  line-height: 14px;
+
+  font-weight: 600;
+}
+
+.ms-pulse-copy strong {
+  display: block;
+
+  max-width: 150px;
+
+  margin-top: 12px;
+
+  color: #1b2940;
+
+  font-size: 10px;
+
+  line-height: 15px;
+
+  font-weight: 600;
+}
+
+.ms-pulse-copy p {
+  max-width: 165px;
+
+  margin: 6px 0 0;
+
+  color: #687587;
+
+  font-size: 9px;
+
+  line-height: 14px;
+}
+
+.ms-pulse-copy small {
+  display: block;
+
+  max-width: 165px;
+
+  margin-top: 5px;
+
+  color: #52627d;
+
+  font-size: 9px;
+
+  line-height: 13px;
+}
+
+.ms-pulse-image {
+  position: absolute;
+
+  right: 4px;
+  bottom: -2px;
+
+  width: 190px;
+  height: 118px;
+
+  object-fit: contain;
+
+  pointer-events: none;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1180px) {
+
+  .ms-kpi-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .ms-middle-grid {
+    grid-template-columns:
+      1.35fr 1fr;
+  }
+
+  .ms-risk-panel {
+    grid-column: 1 / -1;
+  }
+
+  .ms-risk-panel .ms-panel-body {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .ms-map-button {
+    flex: 1;
+  }
+
+  .ms-map-legend {
+    width: 230px;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    margin: 0;
+  }
+}
+
+
+@media (max-width: 900px) {
+
+  .ms-welcome-copy {
+    width: 80%;
+  }
+
+  .ms-skyline {
+    width: 85%;
+    opacity: .35;
+  }
+
+  .ms-middle-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ms-risk-panel {
+    grid-column: auto;
+  }
+
+  .ms-risk-panel .ms-panel-body {
+    display: block;
+  }
+
+  .ms-map-legend {
+    width: auto;
+
+    flex-direction: row;
+
+    margin-top: 15px;
+  }
+
+  .ms-pulse-panel {
+    height: auto;
+  }
+
+  .ms-pulse-grid {
+    width: 100%;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    padding-bottom: 20px;
+  }
+
+  .ms-pulse-image {
+    display: none;
+  }
+}
+
+
+@media (max-width: 600px) {
+
+  .ms-welcome {
+    height: 145px;
+  }
+
+  .ms-welcome h1 {
+    font-size: 23px;
+  }
+
+  .ms-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ms-kpi-card {
+    height: 128px;
+  }
+
+  .ms-disease-panel,
+  .ms-alerts-panel,
+  .ms-risk-panel {
+    height: auto;
+
+    min-height: 350px;
+  }
+
+  .ms-disease-panel .ms-panel-body,
+  .ms-alerts-panel .ms-panel-body,
+  .ms-risk-panel .ms-panel-body {
+    height: auto;
+  }
+
+  .ms-disease-table-wrap {
+    overflow-x: auto;
+  }
+
+  .ms-disease-table {
+    min-width: 620px;
+  }
+
+  .ms-pulse-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ms-pulse-line {
+    display: none;
+  }
+}

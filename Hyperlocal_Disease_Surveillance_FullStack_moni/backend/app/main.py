@@ -1,25 +1,63 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .database import engine, ensure_schema_compatibility
-from . import models
-from .feature_init import initialize_feature
-
-from .routers.auth_router import router as auth_router
-from .routers.locations import router as locations_router
-from .routers.dashboard import router as dashboard_router
-from .routers.agent import router as agent_router
-from .routers.admin import router as admin_router
-from .routers.medical_chat import router as medical_chat_router
-from .routers.medical import router as medical_router
-from .routers.medical_supervisor import (
-    router as medical_supervisor_router
+from .database import (
+    engine,
+    ensure_schema_compatibility,
 )
-from .routers.home_relief import router as home_relief_router
+
+from . import models
+
+from .feature_init import (
+    initialize_feature,
+)
+
+from .routers.auth_router import (
+    router as auth_router,
+)
+
+from .routers.locations import (
+    router as locations_router,
+)
+
+from .routers.dashboard import (
+    router as dashboard_router,
+)
+
+from .routers.agent import (
+    router as agent_router,
+)
+
+from .routers.admin import (
+    router as admin_router,
+)
+
+from .routers.medical_chat import (
+    router as medical_chat_router,
+)
+
+from .routers.medical import (
+    router as medical_router,
+)
+
+from .routers.medical_supervisor import (
+    router as medical_supervisor_router,
+)
+
+from .routers.home_relief import (
+    router as home_relief_router,
+)
+
 
 # Medical Supervisor Management
 from .routers.admin_supervisors import (
-    router as admin_supervisors_router
+    router as admin_supervisors_router,
+)
+
+
+# Admin Report Management
+from .routers.admin_report_management import (
+    router as admin_report_management_router,
 )
 
 
@@ -31,7 +69,9 @@ models.Base.metadata.create_all(
     bind=engine
 )
 
+
 ensure_schema_compatibility()
+
 
 initialize_feature()
 
@@ -72,11 +112,17 @@ app.add_middleware(
 
     allow_credentials=True,
 
-    allow_methods=["*"],
+    allow_methods=[
+        "*"
+    ],
 
-    allow_headers=["*"],
+    allow_headers=[
+        "*"
+    ],
 
-    expose_headers=["*"],
+    expose_headers=[
+        "*"
+    ],
 )
 
 
@@ -85,30 +131,35 @@ app.add_middleware(
 # ============================================================
 
 # Authentication
+
 app.include_router(
     auth_router
 )
 
 
 # Locations
+
 app.include_router(
     locations_router
 )
 
 
 # User Dashboard
+
 app.include_router(
     dashboard_router
 )
 
 
 # Agent
+
 app.include_router(
     agent_router
 )
 
 
 # Admin
+
 app.include_router(
     admin_router
 )
@@ -117,21 +168,18 @@ app.include_router(
 # ============================================================
 # ADMIN MEDICAL SUPERVISOR MANAGEMENT
 # ============================================================
-#
-# Handles:
-#
-# GET    /admin/supervisors
-# GET    /admin/supervisors/stats
-# GET    /admin/supervisors/{id}
-# POST   /admin/supervisors
-# PUT    /admin/supervisors/{id}
-# PATCH  /admin/supervisors/{id}/status
-# DELETE /admin/supervisors/{id}
-#
-# ============================================================
 
 app.include_router(
     admin_supervisors_router
+)
+
+
+# ============================================================
+# ADMIN REPORT MANAGEMENT
+# ============================================================
+
+app.include_router(
+    admin_report_management_router
 )
 
 
@@ -182,8 +230,11 @@ app.include_router(
 def health():
 
     return {
-        "ok": True,
-        "service": "Hyperlocal Disease Surveillance API",
+        "ok":
+            True,
+
+        "service":
+            "Hyperlocal Disease Surveillance API",
     }
 
 
