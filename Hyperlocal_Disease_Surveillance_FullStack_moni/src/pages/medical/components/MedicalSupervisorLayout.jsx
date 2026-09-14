@@ -1,30 +1,37 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import {
   Bell,
   CalendarDays,
   ChevronDown,
-  LayoutDashboard,
-  FileText,
   ClipboardCheck,
-  MapPinned,
-  BarChart3,
-  UserRoundCog,
-  HeartPulse,
-  Menu,
+  FileText,
+  LayoutDashboard,
   LogOut,
   MapPin,
+  MapPinned,
+  Menu,
+  BarChart3,
+  UserRoundCog,
 } from "lucide-react";
 
-import { useAuth } from "../../../context/AuthContext";
+import {
+  useAuth,
+} from "../../../context/AuthContext";
 
 import medicalDoctor from "../../../assets/ui/medical-doctor.png";
+
 import supervisorLogo from "../../../assets/ui/medical-supervisor-logo.png";
 
 
-/* ============================================================
-   MEDICAL SUPERVISOR NAVIGATION
-   ============================================================ */
+// ============================================================
+// NAVIGATION
+// ============================================================
 
 export const MEDICAL_NAV = [
   {
@@ -39,12 +46,6 @@ export const MEDICAL_NAV = [
     label: "Disease Reports",
     icon: FileText,
     section: "SURVEILLANCE",
-  },
-
-  {
-    key: "monitoring",
-    label: "Weekly Monitoring",
-    icon: ClipboardCheck,
   },
 
   {
@@ -73,36 +74,34 @@ export const MEDICAL_NAV = [
   },
 
   {
-    key: "activity",
-    label: "Activity Logs",
-    icon: ClipboardCheck,
-  },
-
-  {
     key: "home-relief",
     label: "Home Relief",
-    icon: HeartPulse,
+    icon: ClipboardCheck,
     section: "MEDICAL CONTENT",
   },
+
 ];
 
 
-/* ============================================================
-   HEADER DATE
-   ============================================================ */
+// ============================================================
+// DATE
+// ============================================================
 
 function formatHeaderDate(date) {
-  return new Intl.DateTimeFormat("en-IN", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(date);
+  return new Intl.DateTimeFormat(
+    "en-IN",
+    {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }
+  ).format(date);
 }
 
 
-/* ============================================================
-   MEDICAL SUPERVISOR LAYOUT
-   ============================================================ */
+// ============================================================
+// LAYOUT
+// ============================================================
 
 export default function MedicalSupervisorLayout({
   activeTab,
@@ -113,693 +112,176 @@ export default function MedicalSupervisorLayout({
   locationName,
   children,
 }) {
-  const { session } = useAuth();
+  const {
+    session,
+  } = useAuth();
 
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [now, setNow] = useState(() => new Date());
+  const [
+    profileOpen,
+    setProfileOpen,
+  ] = useState(false);
 
-  const profileRef = useRef(null);
+  const [
+    mobileOpen,
+    setMobileOpen,
+  ] = useState(false);
+
+  const [
+    now,
+    setNow,
+  ] = useState(
+    () => new Date()
+  );
+
+  const profileRef =
+    useRef(null);
 
 
-  /* ==========================================================
-     LIVE CLOCK
-     ========================================================== */
+  // ==========================================================
+  // LIVE DATE
+  // ==========================================================
 
   useEffect(() => {
-    const timer = window.setInterval(() => {
-      setNow(new Date());
-    }, 60 * 1000);
+    const timer =
+      window.setInterval(
+        () => {
+          setNow(
+            new Date()
+          );
+        },
+        60 * 1000
+      );
 
-    return () => window.clearInterval(timer);
+    return () =>
+      window.clearInterval(
+        timer
+      );
   }, []);
 
 
-  /* ==========================================================
-     CLOSE PROFILE WHEN CLICKING OUTSIDE
-     ========================================================== */
+  // ==========================================================
+  // CLOSE PROFILE
+  // ==========================================================
 
   useEffect(() => {
-    const close = (event) => {
-      if (
-        profileRef.current &&
-        !profileRef.current.contains(event.target)
-      ) {
-        setProfileOpen(false);
-      }
-    };
+    const closeProfile =
+      (event) => {
+        if (
+          profileRef.current &&
+          !profileRef.current.contains(
+            event.target
+          )
+        ) {
+          setProfileOpen(false);
+        }
+      };
 
-    document.addEventListener("mousedown", close);
+    document.addEventListener(
+      "mousedown",
+      closeProfile
+    );
 
-    return () => {
-      document.removeEventListener("mousedown", close);
-    };
+    return () =>
+      document.removeEventListener(
+        "mousedown",
+        closeProfile
+      );
   }, []);
 
 
-  /* ==========================================================
-     MOBILE BODY LOCK
-     ========================================================== */
+  // ==========================================================
+  // BODY LOCK
+  // ==========================================================
 
   useEffect(() => {
-    document.body.style.overflow = mobileOpen
-      ? "hidden"
-      : "";
+    document.body.style.overflow =
+      mobileOpen
+        ? "hidden"
+        : "";
 
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow =
+        "";
     };
-  }, [mobileOpen]);
+  }, [
+    mobileOpen,
+  ]);
 
 
-  /* ==========================================================
-     USER INFORMATION
-     ========================================================== */
+  // ==========================================================
+  // USER
+  // ==========================================================
 
   const fullName =
     session?.full_name ||
     "Dr. Monish";
 
-  const role = "Medical Supervisor";
+  const role =
+    "Medical Supervisor";
 
-  const dateLabel = useMemo(
-    () => formatHeaderDate(now),
-    [now]
-  );
-
-
-  /* ==========================================================
-     NAVIGATION
-     ========================================================== */
-
-  const selectTab = (key) => {
-    onTabChange(key);
-
-    setMobileOpen(false);
-    setProfileOpen(false);
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
+  const dateLabel =
+    useMemo(
+      () =>
+        formatHeaderDate(
+          now
+        ),
+      [now]
+    );
 
 
-  /* ==========================================================
-     RENDER
-     ========================================================== */
+  // ==========================================================
+  // NAVIGATION
+  // ==========================================================
+
+  const selectTab =
+    (key) => {
+      onTabChange(
+        key
+      );
+
+      setMobileOpen(
+        false
+      );
+
+      setProfileOpen(
+        false
+      );
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    };
+
+
+  // ==========================================================
+  // RENDER
+  // ==========================================================
 
   return (
     <div
       className="
-        medical-shell
         min-h-screen
+        w-full
         bg-[#FBFCFB]
-        text-[#101B38]
+        text-[#17233D]
       "
     >
 
       {/* ======================================================
-          TOP HEADER
-          ====================================================== */}
-
-      <header
-        className="
-          fixed
-          inset-x-0
-          top-0
-          z-50
-          h-[76px]
-          border-b
-          border-[#E7EBE8]
-          bg-white
-        "
-      >
-        <div className="flex h-full items-center">
-
-          {/* ==================================================
-              LOGO AREA
-              ================================================== */}
-
-          <div
-            className="
-              flex
-              h-full
-              w-[267px]
-              shrink-0
-              items-center
-              gap-[12px]
-              border-r
-              border-[#E7EBE8]
-              px-[20px]
-            "
-          >
-            <img
-              src={supervisorLogo}
-              alt="Medical Supervisor"
-              draggable="false"
-              className="
-                h-[47px]
-                w-[43px]
-                object-contain
-              "
-            />
-
-            <div>
-              <div
-                className="
-                  text-[16px]
-                  font-bold
-                  leading-none
-                  tracking-[-0.025em]
-                  text-[#17233D]
-                "
-              >
-                MEDICAL SUPERVISOR
-              </div>
-
-              <div
-                className="
-                  mt-[6px]
-                  text-[11px]
-                  text-[#52627D]
-                "
-              >
-                Surveillance System
-              </div>
-            </div>
-          </div>
-
-
-          {/* ==================================================
-              HEADER RIGHT AREA
-              ================================================== */}
-
-          <div
-            className="
-              flex
-              min-w-0
-              flex-1
-              items-center
-              justify-between
-              px-[29px]
-            "
-          >
-
-            {/* MENU */}
-
-            <button
-              type="button"
-              onClick={() =>
-                setMobileOpen((value) => !value)
-              }
-              aria-label="Toggle navigation"
-              className="
-                flex
-                h-[40px]
-                w-[40px]
-                items-center
-                justify-center
-                rounded-[10px]
-                text-[#17233D]
-                transition
-                hover:bg-[#F4F7F5]
-              "
-            >
-              <Menu
-                size={23}
-                strokeWidth={1.8}
-              />
-            </button>
-
-
-            {/* =================================================
-                HEADER CONTROLS
-                ================================================= */}
-
-            <div
-              className="
-                flex
-                items-center
-                gap-[12px]
-              "
-            >
-
-              {/* LOCATION */}
-
-              <button
-                type="button"
-                className="
-                  hidden
-                  h-[44px]
-                  min-w-[188px]
-                  items-center
-                  gap-[8px]
-                  rounded-[7px]
-                  border
-                  border-[#E2E7E4]
-                  bg-white
-                  px-[14px]
-                  text-[12px]
-                  font-semibold
-                  text-[#17233D]
-                  md:flex
-                "
-              >
-                <MapPin
-                  size={17}
-                  className="text-[#087A32]"
-                />
-
-                <span
-                  className="
-                    flex-1
-                    truncate
-                    text-left
-                  "
-                >
-                  {locationName ||
-                    districtName ||
-                    "Kodagu"}
-                </span>
-
-                <ChevronDown size={14} />
-              </button>
-
-
-              {/* DATE */}
-
-              <button
-                type="button"
-                className="
-                  hidden
-                  h-[44px]
-                  min-w-[200px]
-                  items-center
-                  gap-[8px]
-                  rounded-[7px]
-                  border
-                  border-[#E2E7E4]
-                  bg-white
-                  px-[14px]
-                  text-[12px]
-                  font-semibold
-                  text-[#17233D]
-                  md:flex
-                "
-              >
-                <CalendarDays size={17} />
-
-                <span
-                  className="
-                    flex-1
-                    text-left
-                  "
-                >
-                  {dateLabel}
-                </span>
-
-                <ChevronDown size={14} />
-              </button>
-
-
-              {/* ALERTS */}
-
-              <button
-                type="button"
-                onClick={() => selectTab("alerts")}
-                aria-label="Alerts"
-                className="
-                  relative
-                  flex
-                  h-[40px]
-                  w-[40px]
-                  items-center
-                  justify-center
-                  rounded-[10px]
-                  transition
-                  hover:bg-[#F4F7F5]
-                "
-              >
-                <Bell
-                  size={21}
-                  strokeWidth={1.8}
-                />
-
-                {Number(alertCount || 0) > 0 && (
-                  <span
-                    className="
-                      absolute
-                      right-[-1px]
-                      top-[-1px]
-                      flex
-                      h-[18px]
-                      min-w-[18px]
-                      items-center
-                      justify-center
-                      rounded-full
-                      bg-[#E51D2A]
-                      px-[4px]
-                      text-[9px]
-                      font-bold
-                      text-white
-                    "
-                  >
-                    {alertCount > 99
-                      ? "99+"
-                      : alertCount}
-                  </span>
-                )}
-              </button>
-
-
-              {/* PROFILE */}
-
-              <div
-                ref={profileRef}
-                className="relative"
-              >
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    setProfileOpen((value) => !value)
-                  }
-                  className="
-                    flex
-                    items-center
-                    gap-[8px]
-                    rounded-[10px]
-                    px-[6px]
-                    py-[4px]
-                    transition
-                    hover:bg-[#F4F7F5]
-                  "
-                >
-
-                  <img
-                    src={medicalDoctor}
-                    alt="Medical Supervisor"
-                    draggable="false"
-                    className="
-                      h-[40px]
-                      w-[40px]
-                      rounded-full
-                      bg-[#EAF6EE]
-                      object-cover
-                    "
-                  />
-
-                  <div
-                    className="
-                      hidden
-                      min-w-[104px]
-                      text-left
-                      sm:block
-                    "
-                  >
-                    <div
-                      className="
-                        text-[12px]
-                        font-semibold
-                        leading-tight
-                        text-[#17233D]
-                      "
-                    >
-                      {fullName}
-                    </div>
-
-                    <div
-                      className="
-                        mt-[3px]
-                        text-[10px]
-                        text-[#718096]
-                      "
-                    >
-                      {role}
-                    </div>
-                  </div>
-
-                  <ChevronDown
-                    size={15}
-                    className={
-                      profileOpen
-                        ? "rotate-180 transition-transform"
-                        : "transition-transform"
-                    }
-                  />
-                </button>
-
-
-                {/* PROFILE DROPDOWN */}
-
-                {profileOpen && (
-                  <div
-                    className="
-                      absolute
-                      right-0
-                      top-[52px]
-                      w-[270px]
-                      overflow-hidden
-                      rounded-[15px]
-                      border
-                      border-[#E2E8E4]
-                      bg-white
-                      shadow-[0_18px_45px_rgba(16,42,67,.14)]
-                    "
-                  >
-
-                    <div
-                      className="
-                        border-b
-                        border-[#E7ECE9]
-                        bg-[#F6FBF7]
-                        p-[16px]
-                      "
-                    >
-                      <div className="flex items-center gap-[12px]">
-
-                        <img
-                          src={medicalDoctor}
-                          alt="Medical Supervisor"
-                          draggable="false"
-                          className="
-                            h-[44px]
-                            w-[44px]
-                            rounded-full
-                            bg-[#EAF6EE]
-                            object-cover
-                          "
-                        />
-
-                        <div className="min-w-0">
-
-                          <div
-                            className="
-                              truncate
-                              text-[13px]
-                              font-semibold
-                            "
-                          >
-                            {fullName}
-                          </div>
-
-                          <div
-                            className="
-                              mt-[2px]
-                              text-[10px]
-                              text-[#718096]
-                            "
-                          >
-                            {role}
-                          </div>
-
-                        </div>
-
-                      </div>
-                    </div>
-
-
-                    <div className="p-[12px]">
-
-                      <div
-                        className="
-                          flex
-                          items-center
-                          gap-[12px]
-                          rounded-[10px]
-                          p-[10px]
-                        "
-                      >
-                        <UserRoundCog
-                          size={17}
-                          className="text-[#087A32]"
-                        />
-
-                        <div>
-                          <div
-                            className="
-                              text-[9px]
-                              font-bold
-                              uppercase
-                              tracking-[.08em]
-                              text-[#8A93A3]
-                            "
-                          >
-                            Role
-                          </div>
-
-                          <div
-                            className="
-                              text-[12px]
-                              font-medium
-                            "
-                          >
-                            {role}
-                          </div>
-                        </div>
-                      </div>
-
-
-                      <div
-                        className="
-                          flex
-                          items-center
-                          gap-[12px]
-                          rounded-[10px]
-                          p-[10px]
-                        "
-                      >
-                        <MapPin
-                          size={17}
-                          className="text-[#315C88]"
-                        />
-
-                        <div>
-                          <div
-                            className="
-                              text-[9px]
-                              font-bold
-                              uppercase
-                              tracking-[.08em]
-                              text-[#8A93A3]
-                            "
-                          >
-                            Assigned District
-                          </div>
-
-                          <div
-                            className="
-                              text-[12px]
-                              font-medium
-                            "
-                          >
-                            {districtName || "Kodagu"}
-                          </div>
-                        </div>
-                      </div>
-
-
-                      <div
-                        className="
-                          flex
-                          items-center
-                          gap-[12px]
-                          rounded-[10px]
-                          p-[10px]
-                        "
-                      >
-                        <Bell
-                          size={17}
-                          className="text-[#315C88]"
-                        />
-
-                        <div>
-                          <div
-                            className="
-                              text-[9px]
-                              font-bold
-                              uppercase
-                              tracking-[.08em]
-                              text-[#8A93A3]
-                            "
-                          >
-                            Alerts
-                          </div>
-
-                          <div
-                            className="
-                              text-[12px]
-                              font-medium
-                            "
-                          >
-                            {alertCount || 0} active
-                          </div>
-                        </div>
-                      </div>
-
-                    </div>
-
-
-                    <div
-                      className="
-                        border-t
-                        border-[#E7ECE9]
-                        p-[12px]
-                      "
-                    >
-                      <button
-                        type="button"
-                        onClick={onExit}
-                        className="
-                          flex
-                          w-full
-                          items-center
-                          gap-[8px]
-                          rounded-[10px]
-                          px-[12px]
-                          py-[10px]
-                          text-left
-                          text-[12px]
-                          font-semibold
-                          text-[#C62828]
-                          transition
-                          hover:bg-[#FFF4F4]
-                        "
-                      >
-                        <LogOut size={16} />
-                        Logout
-                      </button>
-                    </div>
-
-                  </div>
-                )}
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-      </header>
-
-
-      {/* ======================================================
-          MEDICAL SUPERVISOR SIDEBAR
-          COMPACT SPACING
+          SIDEBAR
           ====================================================== */}
 
       <aside
         className={`
           fixed
-          bottom-0
           left-0
-          top-[76px]
-          z-40
-          w-[267px]
+          top-0
+          z-[60]
+          h-screen
+          w-[283px]
           border-r
-          border-[#E5EAE7]
+          border-[#E4E8E5]
           bg-white
           transition-transform
           duration-200
@@ -812,79 +294,155 @@ export default function MedicalSupervisorLayout({
         `}
       >
 
+        {/* ====================================================
+            BRAND
+            ==================================================== */}
+
         <div
           className="
             flex
-            h-full
-            flex-col
-            px-[15px]
-            py-[9px]
+            h-[89px]
+            w-full
+            items-center
+            border-b
+            border-[#E4E8E5]
+            px-[21px]
           "
         >
 
-          <nav
+          <img
+            src={supervisorLogo}
+            alt="Medical Supervisor"
+            draggable="false"
             className="
-              flex-1
-              overflow-y-auto
-              pr-[2px]
+              h-[48px]
+              w-[43px]
+              shrink-0
+              object-contain
+            "
+          />
+
+          <div
+            className="
+              ml-[12px]
+              min-w-0
             "
           >
 
-            {MEDICAL_NAV.map((item) => {
+            <div
+              className="
+                whitespace-nowrap
+                text-[16px]
+                font-bold
+                leading-none
+                tracking-[-0.35px]
+                text-[#17233D]
+              "
+            >
+              MEDICAL SUPERVISOR
+            </div>
 
-              const Icon = item.icon;
+            <div
+              className="
+                mt-[7px]
+                text-[11px]
+                font-medium
+                leading-none
+                text-[#667085]
+              "
+            >
+              Surveillance System
+            </div>
+
+          </div>
+
+        </div>
+
+
+        {/* ====================================================
+            NAVIGATION
+            ==================================================== */}
+
+        <nav
+          className="
+            h-[calc(100vh-89px)]
+            overflow-y-auto
+            px-[12px]
+            py-[20px]
+          "
+        >
+
+          {MEDICAL_NAV.map(
+            (item) => {
+              const Icon =
+                item.icon;
 
               const active =
-                activeTab === item.key;
+                activeTab ===
+                item.key;
 
               return (
-                <div key={item.key}>
+                <div
+                  key={
+                    item.key
+                  }
+                >
 
-                  {/* SECTION TITLE */}
+                  {/* ==========================================
+                      SECTION
+                      ========================================== */}
 
                   {item.section && (
                     <div
                       className={`
-                        px-[10px]
-                        text-[11px]
-                        font-bold
+                        px-[12px]
+                        text-[10px]
+                        font-semibold
                         uppercase
-                        tracking-[.075em]
-                        text-[#087A32]
+                        tracking-[0.02em]
+                        text-[#667085]
 
                         ${
-                          item.section === "OVERVIEW"
-                            ? "pt-[7px] pb-[5px]"
-                            : "pt-[15px] pb-[5px]"
+                          item.section ===
+                          "OVERVIEW"
+                            ? "pb-[8px]"
+                            : "pt-[19px] pb-[8px]"
                         }
                       `}
                     >
-                      {item.section}
+                      {
+                        item.section
+                      }
                     </div>
                   )}
 
 
-                  {/* NAV BUTTON */}
+                  {/* ==========================================
+                      NAV ITEM
+                      ========================================== */}
 
                   <button
                     type="button"
                     onClick={() =>
-                      selectTab(item.key)
+                      selectTab(
+                        item.key
+                      )
                     }
                     className={`
                       flex
-                      h-[53px]
+                      h-[43px]
                       w-full
                       items-center
                       gap-[14px]
                       rounded-[9px]
                       px-[14px]
                       text-left
-                      transition
+                      transition-colors
+                      duration-150
 
                       ${
                         active
-                          ? "bg-[#E8F4EA] text-[#087A32]"
+                          ? "bg-[#E8F4EA] text-[#36734B]"
                           : "text-[#17233D] hover:bg-[#F6F9F7]"
                       }
                     `}
@@ -892,31 +450,52 @@ export default function MedicalSupervisorLayout({
 
                     <Icon
                       size={19}
-                      strokeWidth={1.7}
-                      className="shrink-0"
+                      strokeWidth={
+                        active
+                          ? 2
+                          : 1.7
+                      }
+                      className="
+                        shrink-0
+                      "
                     />
 
                     <span
-                      className="
+                      className={`
+                        whitespace-nowrap
                         text-[13px]
-                        font-medium
                         leading-none
-                      "
+                        ${
+                          active
+                            ? "font-semibold"
+                            : "font-medium"
+                        }
+                      `}
                     >
-                      {item.label}
+                      {
+                        item.label
+                      }
                     </span>
 
 
                     {/* ALERT BADGE */}
 
-                    {item.key === "alerts" &&
-                      Number(alertCount || 0) > 0 && (
+                    {item.key ===
+                      "alerts" &&
+                      Number(
+                        alertCount ||
+                          0
+                      ) > 0 && (
                         <span
                           className="
                             ml-auto
+                            flex
+                            min-w-[21px]
+                            items-center
+                            justify-center
                             rounded-[6px]
                             bg-[#E8F4EA]
-                            px-[8px]
+                            px-[6px]
                             py-[4px]
                             text-[10px]
                             font-bold
@@ -924,7 +503,9 @@ export default function MedicalSupervisorLayout({
                             text-[#087A32]
                           "
                         >
-                          {alertCount}
+                          {
+                            alertCount
+                          }
                         </span>
                       )}
 
@@ -932,51 +513,686 @@ export default function MedicalSupervisorLayout({
 
                 </div>
               );
-            })}
-
-          </nav>
+            }
+          )}
 
 
           {/* ==================================================
               LOGOUT
               ================================================== */}
 
-          <div className="pt-[10px]">
+          <div
+            className="
+              mt-[18px]
+              border-t
+              border-[#EEF1EF]
+              pt-[17px]
+            "
+          >
 
             <button
               type="button"
-              onClick={onExit}
+              onClick={
+                onExit
+              }
               className="
                 flex
-                h-[45px]
-                w-[130px]
+                h-[43px]
+                w-full
                 items-center
-                gap-[10px]
-                rounded-[7px]
-                border
-                border-[#E0E5E2]
-                bg-white
-                px-[20px]
+                gap-[14px]
+                rounded-[9px]
+                px-[14px]
+                text-left
                 text-[13px]
                 font-medium
                 text-[#17233D]
                 transition
-                hover:bg-[#F7F9F8]
+                hover:bg-[#F6F9F7]
               "
             >
+
               <LogOut
-                size={18}
-                strokeWidth={1.8}
+                size={19}
+                strokeWidth={1.7}
               />
 
               Logout
+
             </button>
+
+          </div>
+
+        </nav>
+
+      </aside>
+
+
+      {/* ======================================================
+          HEADER
+          ====================================================== */}
+
+      <header
+        className="
+          fixed
+          left-0
+          right-0
+          top-0
+          z-[50]
+          ml-[283px]
+          h-[89px]
+          border-b
+          border-[#E4E8E5]
+          bg-white
+        "
+      >
+
+        <div
+          className="
+            flex
+            h-full
+            items-center
+            justify-between
+            px-[28px]
+          "
+        >
+
+          {/* ==================================================
+              MENU
+              ================================================== */}
+
+          <button
+            type="button"
+            onClick={() =>
+              setMobileOpen(
+                (value) =>
+                  !value
+              )
+            }
+            aria-label="Toggle navigation"
+            className="
+              flex
+              h-[40px]
+              w-[40px]
+              items-center
+              justify-center
+              rounded-[9px]
+              text-[#263238]
+              transition
+              hover:bg-[#F4F7F5]
+            "
+          >
+            <Menu
+              size={25}
+              strokeWidth={1.7}
+            />
+          </button>
+
+
+          {/* ==================================================
+              RIGHT CONTROLS
+              ================================================== */}
+
+          <div
+            className="
+              flex
+              items-center
+              gap-[14px]
+            "
+          >
+
+            {/* LOCATION */}
+
+            <button
+              type="button"
+              className="
+                hidden
+                h-[44px]
+                min-w-[202px]
+                items-center
+                gap-[9px]
+                rounded-[8px]
+                border
+                border-[#E1E6E3]
+                bg-white
+                px-[14px]
+                text-[12px]
+                font-semibold
+                text-[#17233D]
+                md:flex
+              "
+            >
+
+              <MapPin
+                size={18}
+                strokeWidth={1.8}
+                className="
+                  shrink-0
+                  text-[#087A32]
+                "
+              />
+
+              <span
+                className="
+                  flex-1
+                  truncate
+                  text-left
+                "
+              >
+                {
+                  locationName ||
+                  districtName ||
+                  "Virajpet, Kodagu"
+                }
+              </span>
+
+              <ChevronDown
+                size={15}
+                strokeWidth={1.7}
+              />
+
+            </button>
+
+
+            {/* DATE */}
+
+            <button
+              type="button"
+              className="
+                hidden
+                h-[44px]
+                min-w-[199px]
+                items-center
+                gap-[9px]
+                rounded-[8px]
+                border
+                border-[#E1E6E3]
+                bg-white
+                px-[14px]
+                text-[12px]
+                font-semibold
+                text-[#17233D]
+                md:flex
+              "
+            >
+
+              <CalendarDays
+                size={18}
+                strokeWidth={1.7}
+              />
+
+              <span
+                className="
+                  flex-1
+                  text-left
+                "
+              >
+                {
+                  dateLabel
+                }
+              </span>
+
+              <ChevronDown
+                size={15}
+                strokeWidth={1.7}
+              />
+
+            </button>
+
+
+            {/* NOTIFICATION */}
+
+            <button
+              type="button"
+              onClick={() =>
+                selectTab(
+                  "alerts"
+                )
+              }
+              aria-label="Alerts"
+              className="
+                relative
+                flex
+                h-[40px]
+                w-[40px]
+                items-center
+                justify-center
+                rounded-[9px]
+                text-[#263238]
+                transition
+                hover:bg-[#F4F7F5]
+              "
+            >
+
+              <Bell
+                size={22}
+                strokeWidth={1.7}
+              />
+
+              {Number(
+                alertCount ||
+                  0
+              ) > 0 && (
+                <span
+                  className="
+                    absolute
+                    right-[-1px]
+                    top-[-2px]
+                    flex
+                    h-[19px]
+                    min-w-[19px]
+                    items-center
+                    justify-center
+                    rounded-full
+                    bg-[#D83A43]
+                    px-[4px]
+                    text-[9px]
+                    font-bold
+                    leading-none
+                    text-white
+                  "
+                >
+                  {
+                    alertCount >
+                    99
+                      ? "99+"
+                      : alertCount
+                  }
+                </span>
+              )}
+
+            </button>
+
+
+            {/* PROFILE */}
+
+            <div
+              ref={profileRef}
+              className="
+                relative
+              "
+            >
+
+              <button
+                type="button"
+                onClick={() =>
+                  setProfileOpen(
+                    (value) =>
+                      !value
+                  )
+                }
+                className="
+                  flex
+                  items-center
+                  gap-[9px]
+                  rounded-[9px]
+                  px-[4px]
+                  py-[3px]
+                  transition
+                  hover:bg-[#F4F7F5]
+                "
+              >
+
+                <img
+                  src={
+                    medicalDoctor
+                  }
+                  alt="Medical Supervisor"
+                  draggable="false"
+                  className="
+                    h-[42px]
+                    w-[42px]
+                    rounded-full
+                    bg-[#EAF6EE]
+                    object-cover
+                  "
+                />
+
+                <div
+                  className="
+                    hidden
+                    min-w-[112px]
+                    text-left
+                    sm:block
+                  "
+                >
+
+                  <div
+                    className="
+                      text-[12px]
+                      font-semibold
+                      leading-tight
+                      text-[#17233D]
+                    "
+                  >
+                    {
+                      fullName
+                    }
+                  </div>
+
+                  <div
+                    className="
+                      mt-[3px]
+                      text-[10px]
+                      leading-tight
+                      text-[#718096]
+                    "
+                  >
+                    {
+                      role
+                    }
+                  </div>
+
+                </div>
+
+                <ChevronDown
+                  size={15}
+                  strokeWidth={1.8}
+                  className={
+                    profileOpen
+                      ? "rotate-180 transition-transform"
+                      : "transition-transform"
+                  }
+                />
+
+              </button>
+
+
+              {/* ==============================================
+                  PROFILE DROPDOWN
+                  ============================================== */}
+
+              {profileOpen && (
+                <div
+                  className="
+                    absolute
+                    right-0
+                    top-[52px]
+                    z-[80]
+                    w-[270px]
+                    overflow-hidden
+                    rounded-[14px]
+                    border
+                    border-[#E1E7E3]
+                    bg-white
+                    shadow-[0_18px_45px_rgba(16,42,67,.14)]
+                  "
+                >
+
+                  <div
+                    className="
+                      border-b
+                      border-[#E7ECE9]
+                      bg-[#F6FBF7]
+                      p-[16px]
+                    "
+                  >
+
+                    <div
+                      className="
+                        flex
+                        items-center
+                        gap-[12px]
+                      "
+                    >
+
+                      <img
+                        src={
+                          medicalDoctor
+                        }
+                        alt=""
+                        className="
+                          h-[44px]
+                          w-[44px]
+                          rounded-full
+                          bg-[#EAF6EE]
+                          object-cover
+                        "
+                      />
+
+                      <div
+                        className="
+                          min-w-0
+                        "
+                      >
+
+                        <div
+                          className="
+                            truncate
+                            text-[13px]
+                            font-semibold
+                            text-[#17233D]
+                          "
+                        >
+                          {
+                            fullName
+                          }
+                        </div>
+
+                        <div
+                          className="
+                            mt-[3px]
+                            text-[10px]
+                            text-[#718096]
+                          "
+                        >
+                          {
+                            role
+                          }
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+
+                  <div
+                    className="
+                      p-[12px]
+                    "
+                  >
+
+                    <div
+                      className="
+                        flex
+                        items-center
+                        gap-[12px]
+                        rounded-[9px]
+                        p-[10px]
+                      "
+                    >
+
+                      <UserRoundCog
+                        size={17}
+                        className="
+                          text-[#087A32]
+                        "
+                      />
+
+                      <div>
+
+                        <div
+                          className="
+                            text-[9px]
+                            font-bold
+                            uppercase
+                            tracking-[.08em]
+                            text-[#8A93A3]
+                          "
+                        >
+                          Role
+                        </div>
+
+                        <div
+                          className="
+                            text-[12px]
+                            font-medium
+                            text-[#17233D]
+                          "
+                        >
+                          {
+                            role
+                          }
+                        </div>
+
+                      </div>
+
+                    </div>
+
+
+                    <div
+                      className="
+                        flex
+                        items-center
+                        gap-[12px]
+                        rounded-[9px]
+                        p-[10px]
+                      "
+                    >
+
+                      <MapPin
+                        size={17}
+                        className="
+                          text-[#315C88]
+                        "
+                      />
+
+                      <div>
+
+                        <div
+                          className="
+                            text-[9px]
+                            font-bold
+                            uppercase
+                            tracking-[.08em]
+                            text-[#8A93A3]
+                          "
+                        >
+                          Assigned District
+                        </div>
+
+                        <div
+                          className="
+                            text-[12px]
+                            font-medium
+                            text-[#17233D]
+                          "
+                        >
+                          {
+                            districtName ||
+                            "Kodagu"
+                          }
+                        </div>
+
+                      </div>
+
+                    </div>
+
+
+                    <div
+                      className="
+                        flex
+                        items-center
+                        gap-[12px]
+                        rounded-[9px]
+                        p-[10px]
+                      "
+                    >
+
+                      <Bell
+                        size={17}
+                        className="
+                          text-[#315C88]
+                        "
+                      />
+
+                      <div>
+
+                        <div
+                          className="
+                            text-[9px]
+                            font-bold
+                            uppercase
+                            tracking-[.08em]
+                            text-[#8A93A3]
+                          "
+                        >
+                          Alerts
+                        </div>
+
+                        <div
+                          className="
+                            text-[12px]
+                            font-medium
+                            text-[#17233D]
+                          "
+                        >
+                          {
+                            alertCount ||
+                            0
+                          }{" "}
+                          active
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+
+                  <div
+                    className="
+                      border-t
+                      border-[#E7ECE9]
+                      p-[12px]
+                    "
+                  >
+
+                    <button
+                      type="button"
+                      onClick={
+                        onExit
+                      }
+                      className="
+                        flex
+                        w-full
+                        items-center
+                        gap-[8px]
+                        rounded-[9px]
+                        px-[12px]
+                        py-[10px]
+                        text-left
+                        text-[12px]
+                        font-semibold
+                        text-[#C62828]
+                        transition
+                        hover:bg-[#FFF4F4]
+                      "
+                    >
+
+                      <LogOut
+                        size={16}
+                      />
+
+                      Logout
+
+                    </button>
+
+                  </div>
+
+                </div>
+              )}
+
+            </div>
 
           </div>
 
         </div>
 
-      </aside>
+      </header>
 
 
       {/* ======================================================
@@ -987,11 +1203,13 @@ export default function MedicalSupervisorLayout({
         <button
           type="button"
           aria-label="Close navigation"
-          onClick={() => setMobileOpen(false)}
+          onClick={() =>
+            setMobileOpen(false)
+          }
           className="
             fixed
             inset-0
-            z-30
+            z-[55]
             bg-black/10
             lg:hidden
           "
@@ -1000,15 +1218,15 @@ export default function MedicalSupervisorLayout({
 
 
       {/* ======================================================
-          MAIN CONTENT
+          MAIN
           ====================================================== */}
 
       <main
         className="
           min-h-screen
-          bg-white
-          pt-[76px]
-          lg:pl-[267px]
+          bg-[#FBFCFB]
+          pt-[89px]
+          lg:ml-[283px]
         "
       >
 
@@ -1016,8 +1234,7 @@ export default function MedicalSupervisorLayout({
           className="
             w-full
             px-[30px]
-            py-[27px]
-            pr-[24px]
+            py-[18px]
           "
         >
           {children}

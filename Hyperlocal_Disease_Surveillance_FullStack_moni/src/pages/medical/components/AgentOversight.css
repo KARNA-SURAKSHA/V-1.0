@@ -1,0 +1,1134 @@
+/* =========================================================
+   AGENT OVERSIGHT PAGE
+========================================================= */
+
+.agent-oversight-page {
+  width: 100%;
+  min-height: 100%;
+  padding: 0 28px 30px;
+  box-sizing: border-box;
+  background: #ffffff;
+  color: #102033;
+  font-family: inherit;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.agent-oversight-hero {
+  position: relative;
+  width: 100%;
+  height: 112px;
+  display: flex;
+  align-items: flex-start;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.agent-oversight-hero-content {
+  position: relative;
+  z-index: 5;
+  padding-left: 18px;
+  padding-top: 4px;
+}
+
+.agent-oversight-hero-content h1 {
+  margin: 0;
+  color: #0d1725;
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 700;
+  letter-spacing: -0.8px;
+}
+
+.agent-oversight-hero-content p {
+  margin: 9px 0 0;
+  color: #1b2939;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+}
+
+
+/* ---------------------------------------------------------
+   MEDICAL SUPERVISOR DASHBOARD HERO IMAGE
+--------------------------------------------------------- */
+
+.agent-oversight-hero-image {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 47%;
+  height: 112px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.agent-oversight-hero-image::before {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  top: 0;
+  width: 38%;
+  height: 100%;
+
+  background: linear-gradient(
+    90deg,
+    #ffffff 0%,
+    rgba(255, 255, 255, 0.92) 15%,
+    rgba(255, 255, 255, 0.65) 30%,
+    rgba(255, 255, 255, 0) 100%
+  );
+
+  pointer-events: none;
+}
+
+.agent-oversight-hero-image img {
+  width: 100%;
+  height: 100%;
+  display: block;
+
+  object-fit: cover;
+  object-position: right center;
+}
+
+
+/* =========================================================
+   SUMMARY CARDS
+========================================================= */
+
+.agent-summary-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 0;
+  margin-bottom: 18px;
+}
+
+.agent-summary-card {
+  min-height: 122px;
+  padding: 24px 20px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+
+  background: #ffffff;
+  border: 1px solid #e0e6e2;
+  border-radius: 15px;
+
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+  box-sizing: border-box;
+}
+
+.summary-icon {
+  width: 60px;
+  height: 60px;
+  flex: 0 0 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+}
+
+.summary-icon.green {
+  background: #e5f4eb;
+  color: #07883f;
+}
+
+.summary-icon.orange {
+  background: #fff0d4;
+  color: #e88b00;
+}
+
+.summary-card-content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.summary-card-content span {
+  color: #172536;
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 400;
+}
+
+.summary-card-content strong {
+  color: #071426;
+  font-size: 27px;
+  line-height: 31px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   ROSTER CARD
+========================================================= */
+
+.agent-roster-card {
+  width: 100%;
+  background: #ffffff;
+
+  border: 1px solid #e0e6e2;
+  border-radius: 15px;
+
+  overflow: hidden;
+  box-sizing: border-box;
+
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.025);
+}
+
+
+/* =========================================================
+   ROSTER HEADER
+========================================================= */
+
+.roster-header {
+  height: 71px;
+  padding: 0 21px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  border-bottom: 1px solid #e5e9e7;
+  box-sizing: border-box;
+}
+
+.roster-header-icon {
+  color: #008842;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.roster-header h2 {
+  margin: 0;
+
+  color: #102033;
+  font-size: 18px;
+  line-height: 23px;
+  font-weight: 650;
+  letter-spacing: -0.15px;
+}
+
+
+/* =========================================================
+   ROSTER TABLE
+========================================================= */
+
+.roster-table {
+  width: 100%;
+}
+
+.roster-row {
+  min-height: 56px;
+
+  display: grid;
+  grid-template-columns:
+    1.35fr
+    1.25fr
+    1.08fr
+    1.08fr
+    0.82fr
+    0.48fr;
+
+  align-items: center;
+
+  padding: 0 18px;
+
+  border-bottom: 1px solid #edf0ef;
+  box-sizing: border-box;
+}
+
+.roster-row:last-child {
+  border-bottom: none;
+}
+
+.roster-heading {
+  min-height: 43px;
+
+  color: #102033;
+  font-size: 10px;
+  line-height: 13px;
+  font-weight: 700;
+}
+
+.roster-heading > div:last-child {
+  text-align: right;
+  padding-right: 8px;
+}
+
+
+/* =========================================================
+   AGENT NAME
+========================================================= */
+
+.agent-name-cell {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.agent-avatar {
+  width: 35px;
+  height: 35px;
+  flex: 0 0 35px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  background: #eaf1ff;
+
+  color: #2865d5;
+
+  font-size: 10px;
+  line-height: 1;
+  font-weight: 600;
+}
+
+.agent-name-cell strong {
+  min-width: 0;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: #172536;
+  font-size: 11px;
+  line-height: 15px;
+  font-weight: 650;
+}
+
+
+/* =========================================================
+   REGION
+========================================================= */
+
+.region-cell {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  color: #546579;
+
+  font-size: 10px;
+  line-height: 15px;
+}
+
+.region-cell svg {
+  flex: 0 0 auto;
+  color: #008b45;
+}
+
+
+/* =========================================================
+   LAST SUBMISSION
+========================================================= */
+
+.submission-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.submission-cell strong {
+  color: #172536;
+
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 500;
+}
+
+.submission-cell small {
+  color: #8995a2;
+
+  font-size: 8px;
+  line-height: 12px;
+}
+
+
+/* =========================================================
+   MONTHLY HISTORY
+========================================================= */
+
+.history-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  color: #253547;
+
+  font-size: 10px;
+  line-height: 14px;
+}
+
+.history-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.history-dots i {
+  width: 9px;
+  height: 9px;
+
+  display: block;
+
+  border-radius: 2px;
+  background: #078b45;
+}
+
+.history-dots i.history-missed {
+  background: #f0a4a9;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.status-cell {
+  display: flex;
+  align-items: center;
+}
+
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  padding: 7px 10px;
+
+  border-radius: 8px;
+
+  white-space: nowrap;
+
+  font-size: 9px;
+  line-height: 12px;
+  font-weight: 500;
+}
+
+.status-tag.delayed {
+  background: #fff0d5;
+  color: #cf8100;
+}
+
+
+/* =========================================================
+   REPORT BUTTON
+========================================================= */
+
+.action-cell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.report-button {
+  width: 63px;
+  height: 32px;
+
+  border: none;
+  border-radius: 7px;
+
+  background: #00883f;
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 10px;
+  line-height: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  box-shadow: 0 3px 7px rgba(0, 126, 58, 0.18);
+
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.report-button:hover {
+  background: #007637;
+  box-shadow: 0 4px 9px rgba(0, 126, 58, 0.22);
+}
+
+.report-button:active {
+  transform: translateY(1px);
+}
+
+
+/* =========================================================
+   REPORT OVERLAY
+========================================================= */
+
+.report-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+
+  background: rgba(11, 20, 30, 0.06);
+
+  animation: reportOverlayIn 0.18s ease-out;
+}
+
+@keyframes reportOverlayIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+
+/* =========================================================
+   REPORT SIDE PANEL
+========================================================= */
+
+.report-panel {
+  position: fixed;
+
+  top: 0;
+  right: 0;
+
+  width: 455px;
+  max-width: 92vw;
+  height: 100vh;
+
+  z-index: 100;
+
+  background: #ffffff;
+
+  border-left: 1px solid #dfe5e2;
+
+  box-shadow: -8px 0 30px rgba(15, 23, 42, 0.12);
+
+  display: flex;
+  flex-direction: column;
+
+  animation: reportPanelIn 0.2s ease-out;
+}
+
+@keyframes reportPanelIn {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+
+/* =========================================================
+   REPORT PANEL HEADER
+========================================================= */
+
+.report-panel-header {
+  min-height: 63px;
+  padding: 0 19px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border-bottom: 1px solid #e1e6e4;
+  box-sizing: border-box;
+}
+
+.report-panel-header h2 {
+  margin: 0;
+
+  color: #172536;
+
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 650;
+  letter-spacing: -0.25px;
+}
+
+.close-report {
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #707b85;
+
+  cursor: pointer;
+
+  border-radius: 6px;
+}
+
+.close-report:hover {
+  background: #f3f5f4;
+  color: #1d2935;
+}
+
+
+/* =========================================================
+   REPORT BODY
+========================================================= */
+
+.report-panel-body {
+  flex: 1;
+
+  overflow-y: auto;
+
+  padding: 17px 19px 20px;
+
+  box-sizing: border-box;
+}
+
+.report-panel-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.report-panel-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.report-panel-body::-webkit-scrollbar-thumb {
+  background: #d4dcd8;
+  border-radius: 10px;
+}
+
+
+/* =========================================================
+   REPORT TITLE ROW
+========================================================= */
+
+.report-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  margin-bottom: 17px;
+}
+
+.report-title-row > strong {
+  color: #182635;
+
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+}
+
+.action-required {
+  flex: 0 0 auto;
+
+  padding: 8px 10px;
+
+  border-radius: 8px;
+
+  background: #fbe7e9;
+  color: #b84b53;
+
+  font-size: 10px;
+  line-height: 13px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   REPORT SECTIONS
+========================================================= */
+
+.report-section {
+  margin-bottom: 17px;
+}
+
+.report-section > label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #172536;
+
+  font-size: 11px;
+  line-height: 15px;
+  font-weight: 500;
+}
+
+.report-section > label span {
+  color: #b6544d;
+}
+
+
+/* =========================================================
+   SELECTED AGENT
+========================================================= */
+
+.selected-agent {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.selected-agent-avatar {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #eaf1ff;
+  color: #2865d5;
+
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.selected-agent-details {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.selected-agent-details strong {
+  color: #172536;
+
+  font-size: 12px;
+  line-height: 17px;
+  font-weight: 600;
+}
+
+.selected-agent-details span {
+  color: #566575;
+
+  font-size: 11px;
+  line-height: 15px;
+}
+
+
+/* =========================================================
+   SELECT
+========================================================= */
+
+.report-section select {
+  width: 100%;
+  height: 42px;
+
+  padding: 0 12px;
+
+  border: 1px solid #d9dfdc;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #263545;
+
+  font-family: inherit;
+  font-size: 11px;
+
+  outline: none;
+
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.report-section select:focus {
+  border-color: #82b99a;
+  box-shadow: 0 0 0 2px rgba(0, 136, 63, 0.07);
+}
+
+
+/* =========================================================
+   TEXTAREA
+========================================================= */
+
+.report-section textarea {
+  width: 100%;
+  min-height: 91px;
+
+  resize: vertical;
+
+  padding: 11px 12px;
+
+  border: 1px solid #d9dfdc;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #253545;
+
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 17px;
+
+  outline: none;
+
+  box-sizing: border-box;
+}
+
+.report-section textarea:focus {
+  border-color: #82b99a;
+  box-shadow: 0 0 0 2px rgba(0, 136, 63, 0.07);
+}
+
+
+/* =========================================================
+   PROOF HEADING
+========================================================= */
+
+.proof-heading {
+  margin: 22px 0 17px;
+
+  color: #1b2837;
+
+  font-size: 11px;
+  line-height: 15px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   UPLOAD BOX
+========================================================= */
+
+.upload-box {
+  position: relative;
+
+  width: 100%;
+  min-height: 117px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  border: 1px dashed #d4dcd8;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: #67747f;
+
+  cursor: pointer;
+
+  box-sizing: border-box;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.upload-box:hover {
+  background: #fafcfb;
+  border-color: #86a994;
+}
+
+.upload-box svg {
+  color: #7d8790;
+}
+
+.upload-box strong {
+  color: #3c4955;
+
+  font-size: 11px;
+  line-height: 15px;
+  font-weight: 500;
+}
+
+.upload-box small {
+  color: #697680;
+
+  font-size: 10px;
+  line-height: 14px;
+}
+
+.upload-box input {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  opacity: 0;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   UPLOADED FILES
+========================================================= */
+
+.uploaded-files {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+
+  margin-top: -2px;
+  margin-bottom: 18px;
+}
+
+.uploaded-file {
+  min-width: 0;
+
+  min-height: 52px;
+
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  padding: 7px 8px;
+
+  border: 1px solid #dfe5e2;
+  border-radius: 8px;
+
+  box-sizing: border-box;
+}
+
+.uploaded-file-icon {
+  width: 27px;
+  height: 27px;
+  flex: 0 0 27px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #a66b36;
+}
+
+.uploaded-file-info {
+  min-width: 0;
+
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.uploaded-file-info strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: #334252;
+
+  font-size: 9px;
+  line-height: 12px;
+  font-weight: 500;
+}
+
+.uploaded-file-info span {
+  color: #77828c;
+
+  font-size: 8px;
+  line-height: 11px;
+}
+
+.uploaded-file > button {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #43835f;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   REPORT FOOTER
+========================================================= */
+
+.report-footer {
+  display: grid;
+  grid-template-columns: 1fr 90px;
+  gap: 10px;
+
+  margin-top: 22px;
+}
+
+.submit-complaint {
+  min-height: 45px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 0 12px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #087d3f;
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  box-shadow: 0 3px 7px rgba(0, 126, 58, 0.16);
+
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.submit-complaint:hover {
+  background: #076e38;
+}
+
+.submit-complaint:active {
+  transform: translateY(1px);
+}
+
+.cancel-complaint {
+  min-height: 45px;
+
+  border: 1px solid #dfe4e2;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #253343;
+
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.cancel-complaint:hover {
+  background: #f7f9f8;
+  border-color: #cbd4d0;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1150px) {
+
+  .roster-row {
+    grid-template-columns:
+      1.25fr
+      1.05fr
+      0.95fr
+      1fr
+      0.8fr
+      0.5fr;
+  }
+
+  .agent-name-cell strong {
+    font-size: 10px;
+  }
+
+  .agent-oversight-hero-image {
+    width: 43%;
+  }
+
+}
+
+
+@media (max-width: 950px) {
+
+  .agent-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .roster-table {
+    overflow-x: auto;
+  }
+
+  .roster-row {
+    min-width: 900px;
+  }
+
+  .agent-oversight-hero-image {
+    width: 45%;
+  }
+
+}
+
+
+@media (max-width: 650px) {
+
+  .agent-oversight-page {
+    padding: 0 14px 24px;
+  }
+
+  .agent-oversight-hero {
+    height: 135px;
+  }
+
+  .agent-oversight-hero-content {
+    padding-left: 4px;
+  }
+
+  .agent-oversight-hero-content h1 {
+    font-size: 23px;
+    line-height: 29px;
+  }
+
+  .agent-oversight-hero-content p {
+    font-size: 12px;
+  }
+
+  .agent-oversight-hero-image {
+    width: 55%;
+    opacity: 0.7;
+  }
+
+  .report-panel {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .uploaded-files {
+    grid-template-columns: 1fr;
+  }
+
+}
