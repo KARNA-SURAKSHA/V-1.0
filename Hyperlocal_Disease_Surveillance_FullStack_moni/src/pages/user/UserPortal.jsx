@@ -973,6 +973,9 @@ export default function UserPortal({
           >
 
             <MedicalChatbot
+              username={
+                username
+              }
               selectedLocation={
                 selectedLocation
               }
