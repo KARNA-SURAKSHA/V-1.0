@@ -22,8 +22,6 @@ import Overview from "./components/Overview";
 
 import DiseaseReports from "./components/DiseaseReports";
 
-import WeeklyMonitoring from "./components/WeeklyMonitoring";
-
 import RiskMap from "./components/RiskMap";
 
 import SurveillanceAnalytics from "./components/SurveillanceAnalytics";
@@ -394,13 +392,6 @@ export default function MedicalSupervisorPortal({
   );
 
 
-  const [
-    monitoringLoading,
-    setMonitoringLoading,
-  ] = useState(
-    false
-  );
-
 
   // ==========================================================
   // ERROR
@@ -413,25 +404,6 @@ export default function MedicalSupervisorPortal({
     ""
   );
 
-
-  // ==========================================================
-  // WEEK
-  // ==========================================================
-
-  const [
-    selectedWeek,
-    setSelectedWeek,
-  ] = useState(
-    null
-  );
-
-
-  const [
-    availableWeeks,
-    setAvailableWeeks,
-  ] = useState(
-    []
-  );
 
 
   // ==========================================================
@@ -448,8 +420,6 @@ export default function MedicalSupervisorPortal({
     reports:
       [],
 
-    monitoring:
-      [],
 
     analytics:
       null,
@@ -523,50 +493,6 @@ export default function MedicalSupervisorPortal({
 
 
           // ==================================================
-          // AVAILABLE REPORTING WEEKS
-          // ==================================================
-
-          const weeks =
-            buildAvailableWeeks(
-              normalizedReports
-            );
-
-
-          setAvailableWeeks(
-            weeks
-          );
-
-
-          /*
-           * Preserve the selected week if it still exists.
-           * Otherwise use the latest available reporting week.
-           */
-
-          const preferredWeek =
-            selectedWeek &&
-            weeks.some(
-              (
-                item
-              ) =>
-                item.value ===
-                Number(
-                  selectedWeek
-                )
-            )
-              ? Number(
-                  selectedWeek
-                )
-              : weeks[0]
-                  ?.value ||
-                null;
-
-
-          setSelectedWeek(
-            preferredWeek
-          );
-
-
-          // ==================================================
           // LOAD REMAINING MEDICAL SUPERVISOR DATA
           // ==================================================
 
@@ -578,7 +504,6 @@ export default function MedicalSupervisorPortal({
             agents,
             issues,
             diseases,
-            monitoring,
           ] =
             await Promise.all([
               api.getMedicalOverview(),
@@ -597,10 +522,6 @@ export default function MedicalSupervisorPortal({
 
               api.getMedicalDiseases(),
 
-              api.getMedicalMonitoring(
-                preferredWeek ||
-                  undefined
-              ),
             ]);
 
 
@@ -613,13 +534,6 @@ export default function MedicalSupervisorPortal({
 
             reports:
               normalizedReports,
-
-            monitoring:
-              Array.isArray(
-                monitoring
-              )
-                ? monitoring
-                : [],
 
             analytics,
 
@@ -680,9 +594,7 @@ export default function MedicalSupervisorPortal({
           );
         }
       },
-      [
-        selectedWeek,
-      ]
+      []
     );
 
 
@@ -698,150 +610,6 @@ export default function MedicalSupervisorPortal({
     },
     []
   );
-
-
-  // ==========================================================
-  // CHANGE MONITORING WEEK
-  // ==========================================================
-
-  const handleWeekChange =
-    useCallback(
-      async (
-        weekNumber
-      ) => {
-        if (
-          weekNumber ===
-            undefined ||
-          weekNumber ===
-            null ||
-          weekNumber ===
-            ""
-        ) {
-          return;
-        }
-
-        const numericWeek =
-          Number(
-            weekNumber
-          );
-
-        if (
-          !Number.isFinite(
-            numericWeek
-          )
-        ) {
-          return;
-        }
-
-        try {
-          setError("");
-
-          setSelectedWeek(
-            numericWeek
-          );
-
-          setMonitoringLoading(
-            true
-          );
-
-
-          const monitoring =
-            await api.getMedicalMonitoring(
-              numericWeek
-            );
-
-
-          setData(
-            (
-              previous
-            ) => ({
-              ...previous,
-
-              monitoring:
-                Array.isArray(
-                  monitoring
-                )
-                  ? monitoring
-                  : [],
-            })
-          );
-        } catch (
-          e
-        ) {
-          console.error(
-            "Medical monitoring error:",
-            e
-          );
-
-          setError(
-            e?.message ||
-              "Unable to load the selected reporting week."
-          );
-        } finally {
-          setMonitoringLoading(
-            false
-          );
-        }
-      },
-      []
-    );
-
-
-  // ==========================================================
-  // REMIND AGENT
-  // ==========================================================
-
-  const remindAgent =
-    async (
-      agent
-    ) => {
-      const agentId =
-        agent?.agent_id ??
-        agent?.id;
-
-      if (
-        agentId ===
-          undefined ||
-        agentId ===
-          null
-      ) {
-        throw new Error(
-          "Agent ID is missing."
-        );
-      }
-
-
-      await api.remindSupervisorAgent(
-        agentId
-      );
-
-
-      /*
-       * Reload monitoring data after reminder.
-       */
-
-      const monitoring =
-        await api.getMedicalMonitoring(
-          selectedWeek ||
-            undefined
-        );
-
-
-      setData(
-        (
-          previous
-        ) => ({
-          ...previous,
-
-          monitoring:
-            Array.isArray(
-              monitoring
-            )
-              ? monitoring
-              : [],
-        })
-      );
-    };
 
 
   // ==========================================================
@@ -1064,6 +832,7 @@ export default function MedicalSupervisorPortal({
         locationName
       }
 
+
     >
 
 
@@ -1145,12 +914,6 @@ export default function MedicalSupervisorPortal({
               )
             }
 
-            onMonitoring={() =>
-              navigateTo(
-                "monitoring"
-              )
-            }
-
             onAlerts={() =>
               navigateTo(
                 "alerts"
@@ -1193,52 +956,6 @@ export default function MedicalSupervisorPortal({
               load(
                 true
               )
-            }
-
-          />
-
-        )
-      }
-
-
-      {/* ====================================================
-          WEEKLY MONITORING
-          ==================================================== */}
-
-      {
-        tab ===
-          "monitoring" && (
-
-          <WeeklyMonitoring
-
-            rows={
-              data.monitoring
-            }
-
-            availableWeeks={
-              availableWeeks
-            }
-
-            selectedWeek={
-              selectedWeek
-            }
-
-            onWeekChange={
-              handleWeekChange
-            }
-
-            onRemind={
-              remindAgent
-            }
-
-            onRefresh={() =>
-              load(
-                true
-              )
-            }
-
-            loading={
-              monitoringLoading
             }
 
           />

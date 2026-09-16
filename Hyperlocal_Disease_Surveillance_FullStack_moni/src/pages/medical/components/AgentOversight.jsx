@@ -1,159 +1,68 @@
-import {
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useMemo, useRef, useState } from "react";
 
 import {
   AlertTriangle,
   CheckCircle2,
-  ChevronDown,
-  Clock3,
   FileText,
   FileUp,
   MapPin,
   Paperclip,
-  Send,
   ShieldAlert,
+  ShieldCheck,
   Users,
   X,
 } from "lucide-react";
 
-import {
-  Panel,
-  StatusBadge,
-  Toast,
-} from "./MedicalUi";
+import medicalSupervisorHero from "../../../assets/medical-supervisor-hero.png";
 
+/* ============================================================
+   DATE HELPERS
+============================================================ */
 
-// ============================================================
-// DATE / REPORT HELPERS
-// ============================================================
+function isoWeekKeyFromDate(value) {
+  if (!value) return null;
 
-function isoWeekKeyFromDate(
-  value
-) {
-  if (!value) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
     return null;
   }
 
-  const date =
-    new Date(value);
-
-  if (
-    Number.isNaN(
-      date.getTime()
+  const utc = new Date(
+    Date.UTC(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
     )
-  ) {
-    return null;
-  }
+  );
 
-  const utc =
-    new Date(
-      Date.UTC(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate()
-      )
-    );
-
-  const day =
-    utc.getUTCDay() ||
-    7;
+  const day = utc.getUTCDay() || 7;
 
   utc.setUTCDate(
-    utc.getUTCDate() +
-      4 -
-      day
+    utc.getUTCDate() + 4 - day
   );
 
-  const yearStart =
-    new Date(
-      Date.UTC(
-        utc.getUTCFullYear(),
-        0,
-        1
-      )
-    );
+  const yearStart = new Date(
+    Date.UTC(
+      utc.getUTCFullYear(),
+      0,
+      1
+    )
+  );
 
-  const week =
-    Math.ceil(
+  const week = Math.ceil(
+    (
       (
-        (
-          (
-            utc -
-            yearStart
-          ) /
-          86400000
-        ) +
-        1
+        utc - yearStart
       ) /
-      7
-    );
+        86400000 +
+      1
+    ) / 7
+  );
 
   return (
-    utc.getUTCFullYear() *
-      100 +
+    utc.getUTCFullYear() * 100 +
     week
-  );
-}
-
-
-function normalizeReportWeek(
-  report
-) {
-  const raw =
-    Number(
-      report?.week_number
-    );
-
-  /*
-   * Already YYYYWW.
-   */
-
-  if (
-    Number.isFinite(raw) &&
-    raw >= 1000
-  ) {
-    return raw;
-  }
-
-  /*
-   * Older format:
-   *
-   * week_number = 35
-   * year = 2026
-   */
-
-  if (
-    Number.isFinite(raw) &&
-    raw >= 1 &&
-    raw <= 53
-  ) {
-    const year =
-      Number(
-        report?.year
-      );
-
-    if (
-      Number.isFinite(year) &&
-      year >= 2000
-    ) {
-      return (
-        year *
-          100 +
-        raw
-      );
-    }
-  }
-
-  /*
-   * Last fallback:
-   * derive week from submission date.
-   */
-
-  return isoWeekKeyFromDate(
-    report?.created_at
   );
 }
 
@@ -161,8 +70,7 @@ function normalizeReportWeek(
 function startOfISOWeek(
   value = new Date()
 ) {
-  const date =
-    new Date(value);
+  const date = new Date(value);
 
   date.setHours(
     0,
@@ -172,13 +80,10 @@ function startOfISOWeek(
   );
 
   const day =
-    date.getDay() ||
-    7;
+    date.getDay() || 7;
 
   date.setDate(
-    date.getDate() -
-      day +
-      1
+    date.getDate() - day + 1
   );
 
   return date;
@@ -195,7 +100,7 @@ function currentWeekKey() {
 function previousWeekKeys(
   count = 4
 ) {
-  const currentStart =
+  const start =
     startOfISOWeek(
       new Date()
     );
@@ -203,18 +108,15 @@ function previousWeekKeys(
   const result = [];
 
   for (
-    let index = 1;
-    index <= count;
-    index += 1
+    let i = 1;
+    i <= count;
+    i += 1
   ) {
     const date =
-      new Date(
-        currentStart
-      );
+      new Date(start);
 
     date.setDate(
-      date.getDate() -
-        index * 7
+      date.getDate() - i * 7
     );
 
     const key =
@@ -223,9 +125,7 @@ function previousWeekKeys(
       );
 
     if (key) {
-      result.push(
-        key
-      );
+      result.push(key);
     }
   }
 
@@ -233,9 +133,53 @@ function previousWeekKeys(
 }
 
 
-function formatDate(
-  value
+function normalizeReportWeek(
+  report
 ) {
+  const raw =
+    Number(
+      report?.week_number
+    );
+
+  if (
+    Number.isFinite(raw) &&
+    raw >= 1000
+  ) {
+    return raw;
+  }
+
+  if (
+    Number.isFinite(raw) &&
+    raw >= 1 &&
+    raw <= 53
+  ) {
+    const year =
+      Number(
+        report?.year
+      );
+
+    if (
+      Number.isFinite(year) &&
+      year >= 2000
+    ) {
+      return (
+        year * 100 +
+        raw
+      );
+    }
+  }
+
+  return isoWeekKeyFromDate(
+    report?.created_at
+  );
+}
+
+
+/* ============================================================
+   DISPLAY HELPERS
+============================================================ */
+
+function formatDate(value) {
   if (!value) {
     return "No submission";
   }
@@ -256,18 +200,13 @@ function formatDate(
     {
       day: "2-digit",
       month: "short",
-      year: "numeric",
     }
   );
 }
 
 
-function formatTime(
-  value
-) {
-  if (!value) {
-    return "";
-  }
+function formatTime(value) {
+  if (!value) return "";
 
   const date =
     new Date(value);
@@ -299,15 +238,11 @@ function getInitials(
       .split(/\s+/)
       .filter(Boolean);
 
-  if (
-    !parts.length
-  ) {
+  if (!parts.length) {
     return "AG";
   }
 
-  if (
-    parts.length === 1
-  ) {
+  if (parts.length === 1) {
     return parts[0]
       .slice(0, 2)
       .toUpperCase();
@@ -315,28 +250,32 @@ function getInitials(
 
   return (
     parts[0][0] +
-    parts[
-      parts.length - 1
-    ][0]
+    parts[parts.length - 1][0]
   ).toUpperCase();
 }
 
 
-// ============================================================
-// STATUS
-// ============================================================
+/* ============================================================
+   STATUS
+============================================================ */
 
-function getStatusMeta(
-  row
-) {
+function getStatusMeta(row) {
+  const monthlySubmitted = Number(
+    row?.monthlySubmitted ?? 0
+  );
+
   /*
-   * If the current cycle has been submitted,
-   * the agent is compliant.
+   * Agent Oversight status is based ONLY on the displayed
+   * four-week compliance count.
+   *
+   * 4/4 -> Compliant
+   * 1-3/4 -> Delayed
+   * 0/4 -> Unresponsive
+   *
+   * There is deliberately no Pending state.
    */
 
-  if (
-    row.currentSubmitted
-  ) {
+  if (monthlySubmitted >= 4) {
     return {
       label: "Compliant",
       tone: "green",
@@ -344,55 +283,25 @@ function getStatusMeta(
     };
   }
 
-  /*
-   * If the current reporting deadline has passed,
-   * the agent requires follow-up.
-   */
-
-  if (
-    row.currentOverdue
-  ) {
+  if (monthlySubmitted <= 0) {
     return {
-      label:
-        row.monthlySubmitted ===
-        0
-          ? "Unresponsive"
-          : "Delayed",
-
+      label: "Unresponsive",
       tone: "red",
-
-      icon:
-        AlertTriangle,
-    };
-  }
-
-  /*
-   * The agent may still be compliant historically
-   * but has an incomplete four-week history.
-   */
-
-  if (
-    row.monthlySubmitted <
-    4
-  ) {
-    return {
-      label: "Delayed",
-      tone: "amber",
-      icon: Clock3,
+      icon: AlertTriangle,
     };
   }
 
   return {
-    label: "Pending",
-    tone: "blue",
-    icon: Clock3,
+    label: "Delayed",
+    tone: "amber",
+    icon: AlertTriangle,
   };
 }
 
 
-// ============================================================
-// COMPLAINT DRAWER
-// ============================================================
+/* ============================================================
+   COMPLAINT DRAWER
+============================================================ */
 
 function ComplaintDrawer({
   agent,
@@ -413,14 +322,18 @@ function ComplaintDrawer({
   const [
     severity,
     setSeverity,
-  ] = useState(
-    "High"
-  );
+  ] = useState("High");
 
   const [
     description,
     setDescription,
-  ] = useState("");
+  ] = useState(
+    `Agent ${
+      agent?.full_name ||
+      agent?.name ||
+      "Unknown Agent"
+    } missed 1 of 4 weekly surveillance reports and missed the Friday 5:00 PM deadline.`
+  );
 
   const [
     files,
@@ -432,13 +345,31 @@ function ComplaintDrawer({
     setDragging,
   ] = useState(false);
 
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+  const [
+    success,
+    setSuccess,
+  ] = useState("");
+
+
+  /* ----------------------------------------------------------
+     ADD FILES
+  ---------------------------------------------------------- */
 
   const addFiles =
     (incoming) => {
-      const next =
+      const selected =
         Array.from(
           incoming || []
         ).filter(Boolean);
+
+      if (!selected.length) {
+        return;
+      }
 
       setFiles(
         (previous) => {
@@ -450,28 +381,20 @@ function ComplaintDrawer({
               )
             );
 
-          const merged =
-            [
-              ...previous,
-            ];
+          const merged = [
+            ...previous,
+          ];
 
-          next.forEach(
+          selected.forEach(
             (file) => {
               const key =
                 `${file.name}-${file.size}-${file.lastModified}`;
 
               if (
-                !existing.has(
-                  key
-                )
+                !existing.has(key)
               ) {
-                existing.add(
-                  key
-                );
-
-                merged.push(
-                  file
-                );
+                existing.add(key);
+                merged.push(file);
               }
             }
           );
@@ -479,70 +402,149 @@ function ComplaintDrawer({
           return merged;
         }
       );
+
+      setError("");
     };
 
+
+  /* ----------------------------------------------------------
+     REMOVE FILE
+  ---------------------------------------------------------- */
 
   const removeFile =
     (index) => {
       setFiles(
         (previous) =>
           previous.filter(
-            (
-              _,
-              fileIndex
-            ) =>
-              fileIndex !==
-              index
+            (_, i) =>
+              i !== index
           )
       );
     };
 
 
+  /* ----------------------------------------------------------
+     SUBMIT COMPLAINT
+  ---------------------------------------------------------- */
+
   const submit =
-    async (
-      event
-    ) => {
+    async (event) => {
       event.preventDefault();
+
+      if (saving) {
+        return;
+      }
+
+      const agentId =
+        Number(
+          agent?.agent_id ??
+          agent?.id
+        );
 
       const cleanDescription =
         description.trim();
 
       if (
-        !cleanDescription
+        !Number.isInteger(
+          agentId
+        ) ||
+        agentId <= 0
       ) {
+        setError(
+          "A valid field agent could not be identified."
+        );
         return;
       }
 
-      await onSubmit({
-        agent_id:
-          agent?.id ??
-          agent?.agent_id,
+      if (
+        !cleanDescription
+      ) {
+        setError(
+          "Please provide a description for the complaint."
+        );
+        return;
+      }
 
-        issue_type:
-          category,
+      /*
+       * Proof is required according to
+       * the UI specification.
+       */
 
-        severity:
-          severity,
+      if (!files.length) {
+        setError(
+          "Please attach at least one proof or system audit log."
+        );
+        return;
+      }
 
-        description:
-          cleanDescription,
+      if (
+        typeof onSubmit !==
+        "function"
+      ) {
+        setError(
+          "Complaint submission is not connected to the Medical Supervisor portal."
+        );
+        return;
+      }
 
-        evidence:
-          files
-            .map(
-              (file) =>
-                file.name
-            )
-            .join(", "),
+      setError("");
+      setSuccess("");
 
-        files,
-      });
+      try {
+        await onSubmit({
+          agent_id:
+            agentId,
+
+          issue_type:
+            category,
+
+          severity:
+            severity,
+
+          description:
+            cleanDescription,
+
+          evidence:
+            files
+              .map(
+                (file) =>
+                  file.name
+              )
+              .join(", "),
+
+          files:
+            files,
+        });
+
+        setSuccess(
+          "Complaint and proof submitted successfully to System Admin."
+        );
+
+      } catch (submissionError) {
+        console.error(
+          "Agent complaint submission failed:",
+          submissionError
+        );
+
+        setError(
+          submissionError?.message ||
+            "Unable to submit the complaint. Please try again."
+        );
+      }
     };
 
 
   return (
     <div
-      className="fixed inset-0 z-[90] flex justify-end bg-[#102A43]/25 backdrop-blur-[1px]"
+      className="
+        fixed
+        inset-0
+        z-[100]
+        flex
+        justify-end
+        bg-[#102A43]/20
+        backdrop-blur-[1px]
+      "
       onMouseDown={
         (event) => {
           if (
@@ -556,512 +558,706 @@ function ComplaintDrawer({
       }
     >
 
-      <aside className="flex h-full w-full max-w-[520px] flex-col border-l border-[#E1E7E3] bg-white shadow-[-12px_0_35px_rgba(16,42,67,.12)]">
+      <aside
+        className="
+          flex
+          h-full
+          w-full
+          max-w-[455px]
+          flex-col
+          border-l
+          border-[#E1E7E3]
+          bg-white
+          shadow-[-12px_0_35px_rgba(16,42,67,.14)]
+        "
+      >
 
         <form
-          onSubmit={
-            submit
-          }
-          className="flex min-h-0 flex-1 flex-col"
+          onSubmit={submit}
+          className="
+            flex
+            min-h-0
+            flex-1
+            flex-col
+          "
         >
 
           {/* =================================================
-              DRAWER HEADER
-              ================================================= */}
+              HEADER
+          ================================================= */}
 
-          <div className="flex items-start justify-between border-b border-[#E7ECE9] px-5 py-4">
+          <div
+            className="
+              flex
+              min-h-[64px]
+              items-center
+              justify-between
+              border-b
+              border-[#E5EAE7]
+              px-5
+            "
+          >
 
-            <div className="min-w-0 pr-4">
-
-              <div className="flex items-center gap-2">
-
-                <ShieldAlert
-                  size={17}
-                  className="text-[#087A32]"
-                />
-
-                <span className="text-[10px] font-bold uppercase tracking-[.11em] text-[#087A32]">
-                  Agent Oversight
-                </span>
-
-              </div>
-
-              <h2 className="mt-1 text-[19px] font-semibold tracking-[-.025em] text-[#101B38]">
-                File Agent Complaint &amp; Submit Proof
-              </h2>
-
-            </div>
-
+            <h2
+              className="
+                text-[18px]
+                font-semibold
+                tracking-[-.02em]
+                text-[#172536]
+              "
+            >
+              File Agent Complaint &amp; Submit Proof
+            </h2>
 
             <button
               type="button"
-              onClick={
-                onClose
-              }
-              disabled={
-                saving
-              }
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[#697586] transition hover:bg-[#F4F7F5] hover:text-[#17233D] disabled:cursor-not-allowed disabled:opacity-50"
-              aria-label="Close complaint drawer"
+              onClick={onClose}
+              disabled={saving}
+              className="
+                flex
+                h-8
+                w-8
+                items-center
+                justify-center
+                rounded-lg
+                text-[#6F7A85]
+                hover:bg-[#F4F7F5]
+                disabled:opacity-50
+              "
             >
-
-              <X
-                size={18}
-              />
-
+              <X size={20} />
             </button>
 
           </div>
 
 
           {/* =================================================
-              DRAWER BODY
-              ================================================= */}
+              BODY
+          ================================================= */}
 
-          <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
+          <div
+            className="
+              min-h-0
+              flex-1
+              overflow-y-auto
+              px-5
+              py-4
+            "
+          >
 
-            <div className="space-y-5">
+            <div
+              className="
+                text-[12px]
+                font-semibold
+                text-[#172536]
+              "
+            >
+              File Agent Complaint &amp; Submit Proof
+            </div>
 
-              {/* =============================================
-                  AGENT
-                  ============================================= */}
 
-              <div className="rounded-xl border border-[#F2D2D2] bg-[#FFF8F8] p-3.5">
+            {/* AGENT */}
 
-                <div className="flex items-start justify-between gap-3">
+            <div
+              className="
+                mt-3
+                flex
+                items-center
+                justify-between
+              "
+            >
 
-                  <div>
+              <span
+                className="
+                  text-[11px]
+                  font-medium
+                  text-[#26364D]
+                "
+              >
+                Field Agent
+              </span>
 
-                    <div className="text-[11px] font-semibold text-[#26364D]">
-                      Field Agent
-                    </div>
+              <span
+                className="
+                  rounded-lg
+                  bg-[#FBE7E9]
+                  px-2.5
+                  py-2
+                  text-[10px]
+                  font-semibold
+                  text-[#B84B53]
+                "
+              >
+                Action Required
+              </span>
 
-                    <div className="mt-2 flex items-center gap-3">
+            </div>
 
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EAF1FF] text-[11px] font-bold text-[#356FD1]">
 
-                        {
-                          getInitials(
-                            agent?.full_name ||
-                              agent?.name
-                          )
-                        }
+            <div
+              className="
+                mt-2
+                flex
+                items-center
+                gap-3
+              "
+            >
 
-                      </div>
+              <div
+                className="
+                  flex
+                  h-9
+                  w-9
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-full
+                  bg-[#EAF1FF]
+                  text-[10px]
+                  font-bold
+                  text-[#356FD1]
+                "
+              >
+                {getInitials(
+                  agent?.full_name ||
+                    agent?.name
+                )}
+              </div>
 
-                      <div>
+              <div
+                className="
+                  text-[12px]
+                  text-[#172536]
+                "
+              >
 
-                        <div className="text-[13px] font-semibold text-[#17233D]">
+                <span
+                  className="font-semibold"
+                >
+                  {
+                    agent?.full_name ||
+                    agent?.name ||
+                    "Unknown Agent"
+                  }
+                </span>
 
-                          {
-                            agent?.full_name ||
-                              agent?.name ||
-                              "Unknown Agent"
-                          }
+                {" "}
 
-                        </div>
-
-                        <div className="mt-0.5 flex items-center gap-1.5 text-[10px] text-[#718096]">
-
-                          <MapPin
-                            size={11}
-                          />
-
-                          {
-                            agent?.taluk_name ||
-                              "Unknown Taluk"
-                          }
-
-                        </div>
-
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                  <StatusBadge
-                    tone="red"
-                  >
-                    Action Required
-                  </StatusBadge>
-
-                </div>
+                <span
+                  className="text-[#647386]"
+                >
+                  (
+                  {
+                    agent?.agent_code ||
+                    `AGT-${String(
+                      agent?.id || 0
+                    ).padStart(3, "0")}`
+                  }
+                  )
+                </span>
 
               </div>
 
+            </div>
 
-              {/* =============================================
-                  COMPLAINT CATEGORY
-                  ============================================= */}
 
-              <label className="block">
+            {/* CATEGORY */}
 
-                <span className="text-[11px] font-semibold text-[#26364D]">
-                  Complaint Category
+            <label className="mt-6 block">
+
+              <span
+                className="
+                  text-[11px]
+                  font-medium
+                  text-[#172536]
+                "
+              >
+                Complaint Category
+              </span>
+
+              <select
+                value={category}
+                onChange={
+                  (event) =>
+                    setCategory(
+                      event.target.value
+                    )
+                }
+                className="
+                  mt-2
+                  h-[42px]
+                  w-full
+                  rounded-lg
+                  border
+                  border-[#D9DFDC]
+                  bg-white
+                  px-3
+                  text-[11px]
+                  text-[#263545]
+                  outline-none
+                  focus:border-[#087A32]
+                "
+              >
+
+                <option>
+                  Missed Weekly Submissions / Negligence
+                </option>
+
+                <option>
+                  Repeated Late Submission
+                </option>
+
+                <option>
+                  Unresponsive Agent
+                </option>
+
+                <option>
+                  Incorrect / Incomplete Report
+                </option>
+
+                <option>
+                  Other
+                </option>
+
+              </select>
+
+            </label>
+
+
+            {/* SEVERITY */}
+
+            <label className="mt-4 block">
+
+              <span
+                className="
+                  text-[11px]
+                  font-medium
+                  text-[#172536]
+                "
+              >
+                Severity
+              </span>
+
+              <select
+                value={severity}
+                onChange={
+                  (event) =>
+                    setSeverity(
+                      event.target.value
+                    )
+                }
+                className="
+                  mt-2
+                  h-[42px]
+                  w-full
+                  rounded-lg
+                  border
+                  border-[#D9DFDC]
+                  bg-white
+                  px-3
+                  text-[11px]
+                  text-[#263545]
+                  outline-none
+                  focus:border-[#087A32]
+                "
+              >
+
+                <option>
+                  High
+                </option>
+
+                <option>
+                  Medium
+                </option>
+
+                <option>
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+
+            {/* DESCRIPTION */}
+
+            <label className="mt-4 block">
+
+              <span
+                className="
+                  text-[11px]
+                  font-medium
+                  text-[#172536]
+                "
+              >
+                Description
+              </span>
+
+              <textarea
+                required
+                value={description}
+                onChange={
+                  (event) =>
+                    setDescription(
+                      event.target.value
+                    )
+                }
+                rows={4}
+                className="
+                  mt-2
+                  w-full
+                  resize-none
+                  rounded-lg
+                  border
+                  border-[#D9DFDC]
+                  px-3
+                  py-3
+                  text-[11px]
+                  leading-[17px]
+                  text-[#263545]
+                  outline-none
+                  focus:border-[#087A32]
+                "
+              />
+
+            </label>
+
+
+            {/* PROOF */}
+
+            <div
+              className="
+                mt-6
+                text-[11px]
+                font-semibold
+                text-[#1B2837]
+              "
+            >
+              PROOF &amp; EVIDENCE SECTION
+            </div>
+
+
+            <div className="mt-4">
+
+              <div
+                className="
+                  mb-2
+                  text-[11px]
+                  font-medium
+                  text-[#172536]
+                "
+              >
+                Attach Proof / System Audit Logs{" "}
+                <span className="text-[#B6544D]">
+                  (Required)
                 </span>
-
-                <div className="relative mt-1.5">
-
-                  <select
-                    value={
-                      category
-                    }
-                    onChange={
-                      (
-                        event
-                      ) =>
-                        setCategory(
-                          event.target.value
-                        )
-                    }
-                    className="h-11 w-full appearance-none rounded-xl border border-[#DCE4DF] bg-white px-3 pr-9 text-[11px] text-[#26364D] outline-none transition focus:border-[#087A32] focus:ring-2 focus:ring-[#087A32]/10"
-                  >
-
-                    <option>
-                      Missed Weekly Submissions / Negligence
-                    </option>
-
-                    <option>
-                      Repeated Late Submission
-                    </option>
-
-                    <option>
-                      Data Quality Concern
-                    </option>
-
-                    <option>
-                      Failure to Respond to Supervisor
-                    </option>
-
-                    <option>
-                      Other
-                    </option>
-
-                  </select>
-
-                  <ChevronDown
-                    size={15}
-                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#718096]"
-                  />
-
-                </div>
-
-              </label>
+              </div>
 
 
-              {/* =============================================
-                  SEVERITY
-                  ============================================= */}
-
-              <label className="block">
-
-                <span className="text-[11px] font-semibold text-[#26364D]">
-                  Severity
-                </span>
-
-                <div className="relative mt-1.5">
-
-                  <select
-                    value={
-                      severity
-                    }
-                    onChange={
-                      (
-                        event
-                      ) =>
-                        setSeverity(
-                          event.target.value
-                        )
-                    }
-                    className="h-11 w-full appearance-none rounded-xl border border-[#DCE4DF] bg-white px-3 pr-9 text-[11px] text-[#26364D] outline-none transition focus:border-[#087A32] focus:ring-2 focus:ring-[#087A32]/10"
-                  >
-
-                    <option>
-                      Low
-                    </option>
-
-                    <option>
-                      Medium
-                    </option>
-
-                    <option>
-                      High
-                    </option>
-
-                    <option>
-                      Critical
-                    </option>
-
-                  </select>
-
-                  <ChevronDown
-                    size={15}
-                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#718096]"
-                  />
-
-                </div>
-
-              </label>
-
-
-              {/* =============================================
-                  DESCRIPTION
-                  ============================================= */}
-
-              <label className="block">
-
-                <div className="flex items-center justify-between gap-3">
-
-                  <span className="text-[11px] font-semibold text-[#26364D]">
-                    Description
-                  </span>
-
-                  <span className="text-[9px] text-[#8792A2]">
-                    Required
-                  </span>
-
-                </div>
-
-                <textarea
-                  required
-                  value={
-                    description
+              <button
+                type="button"
+                onClick={() =>
+                  fileInputRef.current?.click()
+                }
+                onDragEnter={
+                  (event) => {
+                    event.preventDefault();
+                    setDragging(true);
                   }
-                  onChange={
-                    (
+                }
+                onDragOver={
+                  (event) => {
+                    event.preventDefault();
+                    setDragging(true);
+                  }
+                }
+                onDragLeave={
+                  (event) => {
+                    event.preventDefault();
+                    setDragging(false);
+                  }
+                }
+                onDrop={
+                  (event) => {
+                    event.preventDefault();
+
+                    setDragging(false);
+
+                    addFiles(
                       event
-                    ) =>
-                      setDescription(
-                        event.target.value
-                      )
+                        .dataTransfer
+                        .files
+                    );
                   }
-                  rows={5}
-                  placeholder="Describe the issue and why System Admin action is required."
-                  className="mt-1.5 w-full resize-none rounded-xl border border-[#DCE4DF] px-3 py-3 text-[11px] leading-5 text-[#26364D] outline-none transition placeholder:text-[#A0A8B3] focus:border-[#087A32] focus:ring-2 focus:ring-[#087A32]/10"
-                />
-
-              </label>
-
-
-              {/* =============================================
-                  PROOF
-                  ============================================= */}
-
-              <section>
-
-                <div className="mb-2 flex items-center justify-between gap-3">
-
-                  <div className="flex items-center gap-2">
-
-                    <FileText
-                      size={14}
-                      className="text-[#52627D]"
-                    />
-
-                    <span className="text-[11px] font-semibold text-[#26364D]">
-                      PROOF &amp; EVIDENCE SECTION
-                    </span>
-
-                  </div>
-
-                  <span className="text-[9px] text-[#8792A2]">
-                    Optional
-                  </span>
-
-                </div>
-
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    fileInputRef.current?.click()
-                  }
-                  onDragEnter={
-                    (event) => {
-                      event.preventDefault();
-                      setDragging(
-                        true
-                      );
-                    }
-                  }
-                  onDragOver={
-                    (event) => {
-                      event.preventDefault();
-                      setDragging(
-                        true
-                      );
-                    }
-                  }
-                  onDragLeave={
-                    (event) => {
-                      event.preventDefault();
-                      setDragging(
-                        false
-                      );
-                    }
-                  }
-                  onDrop={
-                    (event) => {
-                      event.preventDefault();
-
-                      setDragging(
-                        false
-                      );
-
-                      addFiles(
-                        event
-                          .dataTransfer
-                          .files
-                      );
-                    }
-                  }
-                  className={`flex w-full flex-col items-center justify-center rounded-xl border border-dashed px-4 py-7 text-center transition ${
+                }
+                className={`
+                  relative
+                  flex
+                  min-h-[117px]
+                  w-full
+                  flex-col
+                  items-center
+                  justify-center
+                  rounded-lg
+                  border
+                  border-dashed
+                  px-4
+                  text-center
+                  ${
                     dragging
                       ? "border-[#087A32] bg-[#EFF9F2]"
-                      : "border-[#CAD8CE] bg-[#FAFCFB] hover:border-[#087A32] hover:bg-[#F5FAF6]"
-                  }`}
+                      : "border-[#CAD8CE] bg-white hover:border-[#087A32] hover:bg-[#FAFCFB]"
+                  }
+                `}
+              >
+
+                <FileUp
+                  size={29}
+                  className="text-[#7C8790]"
+                />
+
+                <span
+                  className="
+                    mt-2
+                    text-[11px]
+                    font-medium
+                    text-[#3C4955]
+                  "
                 >
+                  Drag &amp; Drop files here or Browse
+                </span>
 
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
+                <span
+                  className="
+                    mt-1
+                    text-[10px]
+                    text-[#697680]
+                  "
+                >
+                  (Screenshots, PDFs, Audio records)
+                </span>
 
-                    <FileUp
-                      size={20}
-                      className="text-[#087A32]"
-                    />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept="
+                    .png,
+                    .jpg,
+                    .jpeg,
+                    .pdf,
+                    .mp3,
+                    .wav,
+                    .m4a,
+                    .txt,
+                    .csv
+                  "
+                  className="hidden"
+                  onChange={
+                    (event) => {
+                      addFiles(
+                        event.target.files
+                      );
 
-                  </div>
-
-                  <span className="mt-2.5 text-[11px] font-semibold text-[#26364D]">
-                    Drag &amp; Drop files here or Browse
-                  </span>
-
-                  <span className="mt-1 text-[9px] text-[#718096]">
-                    Screenshots, PDFs, audio records and system audit logs
-                  </span>
-
-                  <input
-                    ref={
-                      fileInputRef
+                      event.target.value =
+                        "";
                     }
-                    type="file"
-                    multiple
-                    className="hidden"
-                    onChange={
-                      (
-                        event
-                      ) => {
-                        addFiles(
-                          event.target.files
-                        );
+                  }
+                />
 
-                        event.target.value =
-                          "";
-                      }
-                    }
-                  />
-
-                </button>
-
-
-                {/* ===========================================
-                    SELECTED FILES
-                    =========================================== */}
-
-                {files.length >
-                  0 && (
-
-                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
-
-                    {files.map(
-                      (
-                        file,
-                        index
-                      ) => (
-
-                        <div
-                          key={`${file.name}-${file.size}-${file.lastModified}-${index}`}
-                          className="flex min-w-0 items-center gap-2 rounded-xl border border-[#E1E8E4] bg-white px-3 py-2.5"
-                        >
-
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#EFF7F1] text-[#087A32]">
-
-                            <Paperclip
-                              size={14}
-                            />
-
-                          </div>
-
-
-                          <div className="min-w-0 flex-1">
-
-                            <div className="truncate text-[10px] font-semibold text-[#26364D]">
-
-                              {
-                                file.name
-                              }
-
-                            </div>
-
-                            <div className="mt-0.5 text-[9px] text-[#8792A2]">
-
-                              {
-                                Math.max(
-                                  1,
-                                  Math.round(
-                                    file.size /
-                                      1024
-                                  )
-                                )
-                              }{" "}
-                              KB
-
-                            </div>
-
-                          </div>
-
-
-                          <button
-                            type="button"
-                            onClick={() =>
-                              removeFile(
-                                index
-                              )
-                            }
-                            disabled={
-                              saving
-                            }
-                            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[#8792A2] hover:bg-[#FFF1F1] hover:text-[#C62828]"
-                            aria-label={`Remove ${file.name}`}
-                          >
-
-                            <X
-                              size={13}
-                            />
-
-                          </button>
-
-                        </div>
-
-                      )
-                    )}
-
-                  </div>
-
-                )}
-
-              </section>
+              </button>
 
             </div>
+
+
+            {/* FILES */}
+
+            {files.length > 0 && (
+
+              <div
+                className="
+                  mt-3
+                  grid
+                  grid-cols-2
+                  gap-2
+                "
+              >
+
+                {files.map(
+                  (
+                    file,
+                    index
+                  ) => (
+
+                    <div
+                      key={`${file.name}-${file.size}-${file.lastModified}-${index}`}
+                      className="
+                        flex
+                        min-w-0
+                        items-center
+                        gap-2
+                        rounded-lg
+                        border
+                        border-[#DFE5E2]
+                        bg-white
+                        px-2
+                        py-2
+                      "
+                    >
+
+                      <div
+                        className="
+                          flex
+                          h-8
+                          w-8
+                          shrink-0
+                          items-center
+                          justify-center
+                          rounded-md
+                          bg-[#EFF7F1]
+                          text-[#087A32]
+                        "
+                      >
+                        <Paperclip size={15} />
+                      </div>
+
+
+                      <div
+                        className="
+                          min-w-0
+                          flex-1
+                        "
+                      >
+
+                        <div
+                          className="
+                            truncate
+                            text-[9px]
+                            font-semibold
+                            text-[#334252]
+                          "
+                        >
+                          {file.name}
+                        </div>
+
+                        <div
+                          className="
+                            text-[8px]
+                            text-[#77828C]
+                          "
+                        >
+                          {file.size >= 1024 * 1024
+                            ? `${(
+                                file.size /
+                                (1024 * 1024)
+                              ).toFixed(1)} MB`
+                            : `${Math.max(
+                                1,
+                                Math.round(
+                                  file.size /
+                                    1024
+                                )
+                              )} KB`}
+                        </div>
+
+                      </div>
+
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          removeFile(index)
+                        }
+                        disabled={saving}
+                        className="
+                          flex
+                          h-6
+                          w-6
+                          shrink-0
+                          items-center
+                          justify-center
+                          rounded-md
+                          text-[#7A858E]
+                          hover:bg-[#FFF1F1]
+                          hover:text-[#C62828]
+                        "
+                      >
+                        <X size={13} />
+                      </button>
+
+                    </div>
+
+                  )
+                )}
+
+              </div>
+
+            )}
+
+
+            {/* ERROR */}
+
+            {error && (
+
+              <div
+                className="
+                  mt-3
+                  rounded-lg
+                  border
+                  border-[#F0CCCC]
+                  bg-[#FFF4F4]
+                  px-3
+                  py-2.5
+                  text-[10px]
+                  leading-4
+                  text-[#B4232F]
+                "
+              >
+                {error}
+              </div>
+
+            )}
+
+
+            {/* SUCCESS */}
+
+            {success && (
+
+              <div
+                className="
+                  mt-3
+                  rounded-lg
+                  border
+                  border-[#CBE7D3]
+                  bg-[#EFFAF2]
+                  px-3
+                  py-2.5
+                  text-[10px]
+                  leading-4
+                  text-[#087A32]
+                "
+              >
+                {success}
+              </div>
+
+            )}
 
           </div>
 
 
           {/* =================================================
-              DRAWER FOOTER
-              ================================================= */}
+              FOOTER
+          ================================================= */}
 
-          <div className="border-t border-[#E7ECE9] bg-white px-5 py-4">
+          <div
+            className="
+              border-t
+              border-[#E7ECE9]
+              bg-white
+              px-5
+              py-4
+            "
+          >
 
             <div className="flex gap-2.5">
 
@@ -1069,18 +1265,37 @@ function ComplaintDrawer({
                 type="submit"
                 disabled={
                   saving ||
-                  !description.trim()
+                  !description.trim() ||
+                  !files.length
                 }
-                className="inline-flex min-h-[43px] flex-1 items-center justify-center gap-2 rounded-xl bg-[#087A32] px-4 text-[11px] font-semibold text-white shadow-[0_5px_14px_rgba(8,122,50,.18)] transition hover:bg-[#066A2B] disabled:cursor-not-allowed disabled:opacity-50"
+                className="
+                  inline-flex
+                  min-h-[45px]
+                  flex-1
+                  items-center
+                  justify-center
+                  gap-2
+                  rounded-lg
+                  bg-[#087D3F]
+                  px-3
+                  text-[11px]
+                  font-semibold
+                  text-white
+                  shadow-[0_3px_9px_rgba(8,125,63,.18)]
+                  transition
+                  hover:bg-[#076E38]
+                  disabled:cursor-not-allowed
+                  disabled:opacity-50
+                "
               >
 
-                <ShieldAlert
-                  size={14}
+                <ShieldCheck
+                  size={18}
                 />
 
                 {
                   saving
-                    ? "Submitting Complaint…"
+                    ? "Submitting..."
                     : "Submit Complaint & Proof to Admin"
                 }
 
@@ -1089,13 +1304,21 @@ function ComplaintDrawer({
 
               <button
                 type="button"
-                onClick={
-                  onClose
-                }
-                disabled={
-                  saving
-                }
-                className="min-h-[43px] rounded-xl border border-[#D9E1DD] bg-white px-5 text-[11px] font-semibold text-[#39495F] hover:bg-[#F7FAF8] disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={onClose}
+                disabled={saving}
+                className="
+                  min-h-[45px]
+                  rounded-lg
+                  border
+                  border-[#D9E1DD]
+                  bg-white
+                  px-5
+                  text-[11px]
+                  font-semibold
+                  text-[#39495F]
+                  hover:bg-[#F7FAF8]
+                  disabled:opacity-50
+                "
               >
                 Cancel
               </button>
@@ -1113,9 +1336,9 @@ function ComplaintDrawer({
 }
 
 
-// ============================================================
-// MAIN AGENT OVERSIGHT
-// ============================================================
+/* ============================================================
+   MAIN AGENT OVERSIGHT
+============================================================ */
 
 export default function AgentOversight({
   agents = [],
@@ -1139,9 +1362,9 @@ export default function AgentOversight({
   ] = useState("");
 
 
-  // ==========================================================
-  // BUILD AGENT COMPLIANCE DATA
-  // ==========================================================
+  /* ==========================================================
+     BUILD COMPLIANCE ROWS
+  ========================================================== */
 
   const rows =
     useMemo(
@@ -1149,39 +1372,18 @@ export default function AgentOversight({
         const currentWeek =
           currentWeekKey();
 
-        /*
-         * Four most recently completed
-         * reporting weeks.
-         */
-
         const historyWeeks =
-          previousWeekKeys(
-            4
-          );
-
-
-        /*
-         * Map:
-         *
-         * agent + week
-         *
-         * -> latest report
-         */
+          previousWeekKeys(4);
 
         const reportMap =
           new Map();
 
-
         (
-          Array.isArray(
-            reports
-          )
+          Array.isArray(reports)
             ? reports
             : []
         ).forEach(
-          (
-            report
-          ) => {
+          (report) => {
             const agentId =
               Number(
                 report?.agent_id
@@ -1245,10 +1447,6 @@ export default function AgentOversight({
         );
 
 
-        // ------------------------------------------------------
-        // CURRENT REPORTING DEADLINE
-        // ------------------------------------------------------
-
         const now =
           new Date();
 
@@ -1256,10 +1454,6 @@ export default function AgentOversight({
           startOfISOWeek(
             now
           );
-
-        /*
-         * Wednesday 23:59:59
-         */
 
         const dueAt =
           new Date(
@@ -1279,10 +1473,6 @@ export default function AgentOversight({
         );
 
 
-        // ------------------------------------------------------
-        // BUILD ROWS
-        // ------------------------------------------------------
-
         return (
           Array.isArray(
             agents
@@ -1290,19 +1480,12 @@ export default function AgentOversight({
             ? agents
             : []
         ).map(
-          (
-            agent
-          ) => {
+          (agent) => {
             const agentId =
               Number(
                 agent?.agent_id ??
                   agent?.id
               );
-
-
-            /*
-             * Current week submission.
-             */
 
             const currentReport =
               reportMap.get(
@@ -1316,19 +1499,11 @@ export default function AgentOversight({
 
             const currentOverdue =
               !currentSubmitted &&
-              now >
-                dueAt;
-
-
-            /*
-             * Four-week history.
-             */
+              now > dueAt;
 
             const history =
               historyWeeks.map(
-                (
-                  week
-                ) =>
+                (week) =>
                   Boolean(
                     reportMap.get(
                       `${agentId}-${week}`
@@ -1336,17 +1511,10 @@ export default function AgentOversight({
                   )
               );
 
-
             const monthlySubmitted =
               history.filter(
                 Boolean
               ).length;
-
-
-            /*
-             * Find latest actual report
-             * for Last Submission.
-             */
 
             const agentReports =
               (
@@ -1357,55 +1525,26 @@ export default function AgentOversight({
                   : []
               )
                 .filter(
-                  (
-                    report
-                  ) =>
+                  (report) =>
                     Number(
                       report?.agent_id
-                    ) ===
-                    agentId
+                    ) === agentId
                 )
                 .sort(
-                  (
-                    a,
-                    b
-                  ) => {
-                    const aTime =
-                      new Date(
-                        a?.created_at ||
-                          0
-                      ).getTime();
-
-                    const bTime =
-                      new Date(
-                        b?.created_at ||
-                          0
-                      ).getTime();
-
-                    return (
-                      bTime -
-                      aTime
-                    );
-                  }
+                  (a, b) =>
+                    new Date(
+                      b?.created_at ||
+                        0
+                    ).getTime() -
+                    new Date(
+                      a?.created_at ||
+                        0
+                    ).getTime()
                 );
-
 
             const lastReport =
               agentReports[0] ||
               null;
-
-
-            /*
-             * Determine status tag.
-             */
-
-            const status =
-              getStatusMeta({
-                currentSubmitted,
-                currentOverdue,
-                monthlySubmitted,
-              });
-
 
             return {
               ...agent,
@@ -1434,13 +1573,14 @@ export default function AgentOversight({
 
               history,
 
-              currentReport,
-
               lastSubmission:
                 lastReport?.created_at ||
                 null,
 
-              status,
+              status:
+                getStatusMeta({
+                  monthlySubmitted,
+                }),
             };
           }
         );
@@ -1452,250 +1592,329 @@ export default function AgentOversight({
     );
 
 
-  // ==========================================================
-  // KPI VALUES
-  // ==========================================================
+  /* ==========================================================
+     KPI
+  ========================================================== */
 
   const totalAgents =
     rows.length;
 
-
   const compliantAgents =
     rows.filter(
-      (
-        row
-      ) =>
-        row.monthlySubmitted ===
+      (row) =>
+        Number(row.monthlySubmitted) >=
         4
     ).length;
 
-
   const nonCompliantAgents =
     rows.filter(
-      (
-        row
-      ) =>
-        row.currentOverdue ||
-        row.monthlySubmitted <
-          4
+      (row) =>
+        Number(row.monthlySubmitted) < 4
     ).length;
 
 
-  // ==========================================================
-  // OPEN COMPLAINT
-  // ==========================================================
-
-  const openComplaint =
-    (
-      agent
-    ) => {
-      setSelectedAgent(
-        agent
-      );
-    };
-
-
-  const closeComplaint =
-    () => {
-      if (
-        !saving
-      ) {
-        setSelectedAgent(
-          null
-        );
-      }
-    };
-
-
-  // ==========================================================
-  // SUBMIT COMPLAINT
-  // ==========================================================
+  /* ==========================================================
+     SUBMIT
+  ========================================================== */
 
   const submitComplaint =
     async (
       payload
     ) => {
-      try {
-        setSaving(
-          true
-        );
+      if (saving) {
+        return;
+      }
 
+      if (
+        typeof onSubmitIssue !==
+        "function"
+      ) {
+        throw new Error(
+          "Complaint submission is not connected."
+        );
+      }
+
+      setSaving(true);
+
+      try {
         await onSubmitIssue(
           payload
-        );
-
-        setSelectedAgent(
-          null
         );
 
         setToast(
           "Complaint and proof submitted to System Admin."
         );
 
-      } catch (
-        error
-      ) {
-        setToast(
-          error?.message ||
-            "Unable to submit the complaint."
+        setSelectedAgent(
+          null
         );
 
       } finally {
-        setSaving(
-          false
-        );
+        setSaving(false);
       }
     };
 
 
-  // ==========================================================
-  // RENDER
-  // ==========================================================
+  /* ==========================================================
+     RENDER
+  ========================================================== */
 
   return (
-    <div className="space-y-5 pb-8">
+    <div
+      className="
+        relative
+        min-h-full
+        space-y-[18px]
+        pb-8
+      "
+    >
 
-      {/* ====================================================
-          PAGE HEADER
-          ==================================================== */}
+      {/* ======================================================
+          HERO
+      ====================================================== */}
 
-      <div className="relative overflow-hidden rounded-2xl bg-white px-1 py-1">
+      <section
+        className="
+          relative
+          h-[112px]
+          overflow-hidden
+          bg-white
+        "
+      >
 
-        <div className="relative z-10 max-w-[720px] px-1 py-4">
+        <div
+          className="
+            relative
+            z-10
+            px-[18px]
+            pt-[4px]
+          "
+        >
 
-          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.13em] text-[#087A32]">
-
-            <ShieldAlert
-              size={14}
-            />
-
-            Review &amp; Response
-
-          </div>
-
-
-          <h1 className="mt-1 text-[27px] font-semibold tracking-[-.035em] text-[#101B38]">
-
+          <h1
+            className="
+              m-0
+              text-[28px]
+              font-bold
+              leading-[34px]
+              tracking-[-.8px]
+              text-[#0D1725]
+            "
+          >
             Agent Oversight &amp; Weekly Compliance
-
           </h1>
 
-
-          <p className="mt-1 text-[12px] leading-5 text-[#5C687A]">
-
-            Monitor weekly agent reporting compliance and file complaints to System Admin.
-
+          <p
+            className="
+              mt-[9px]
+              text-[14px]
+              leading-[20px]
+              text-[#1B2939]
+            "
+          >
+            Monitor weekly agent reporting compliance (1 report/week cycle)
+            <br />
+            and file complaints to System Admin.
           </p>
 
         </div>
 
 
-        {/* Decorative background */}
+        {/* EXISTING MEDICAL SUPERVISOR HERO */}
 
-        <div className="pointer-events-none absolute right-5 top-1/2 hidden -translate-y-1/2 items-end gap-2 opacity-70 lg:flex">
+        <div
+          className="
+            pointer-events-none
+            absolute
+            right-0
+            top-0
+            h-[112px]
+            w-[48%]
+            overflow-hidden
+          "
+        >
 
-          <div className="h-16 w-28 rounded-t-[80px] bg-[#EFF7F1]" />
+          <div
+            className="
+              absolute
+              inset-y-0
+              left-0
+              z-[2]
+              w-[42%]
+              bg-gradient-to-r
+              from-white
+              via-white/80
+              to-transparent
+            "
+          />
 
-          <div className="h-24 w-36 rounded-t-[100px] bg-[#E7F3EA]" />
-
-          <div className="h-12 w-20 rounded-t-[70px] bg-[#F4F8F5]" />
+          <img
+            src={
+              medicalSupervisorHero
+            }
+            alt=""
+            className="
+              h-full
+              w-full
+              object-cover
+              object-right
+            "
+          />
 
         </div>
 
-      </div>
+      </section>
 
 
-      {/* ====================================================
+      {/* ======================================================
           KPI CARDS
-          ==================================================== */}
+      ====================================================== */}
 
-      <div className="grid gap-4 xl:grid-cols-3">
+      <section
+        className="
+          grid
+          gap-4
+          xl:grid-cols-3
+        "
+      >
 
         <KpiCard
           icon={
             <Users
-              size={23}
+              size={27}
+              strokeWidth={2}
             />
           }
-          tone="green"
           label="Total Field Agents"
-          value={
-            totalAgents
-          }
-          note="Agents assigned to this district"
+          value={totalAgents}
+          tone="green"
         />
-
 
         <KpiCard
           icon={
-            <CheckCircle2
-              size={23}
+            <ShieldCheck
+              size={27}
+              strokeWidth={2}
             />
           }
-          tone="green"
           label="Compliant (4/4 Weeks)"
-          value={
-            compliantAgents
-          }
-          note="Submitted in all four completed cycles"
+          value={compliantAgents}
+          tone="green"
         />
-
 
         <KpiCard
           icon={
             <AlertTriangle
-              size={23}
+              size={27}
+              strokeWidth={2}
             />
           }
-          tone="amber"
           label="Overdue / Non-Compliant"
           value={
             nonCompliantAgents
           }
-          note="Requires supervisor attention"
+          tone="amber"
         />
 
-      </div>
+      </section>
 
 
-      {/* ====================================================
-          COMPLIANCE ROSTER
-          ==================================================== */}
+      {/* ======================================================
+          ROSTER
+      ====================================================== */}
 
-      <Panel
-        title="Field Agent Weekly Compliance Roster"
-        subtitle="Current district agents and their recent reporting history"
+      <section
+        className="
+          overflow-hidden
+          rounded-[15px]
+          border
+          border-[#E0E6E2]
+          bg-white
+          shadow-[0_1px_3px_rgba(15,23,42,.025)]
+        "
       >
 
-        <div className="overflow-x-auto rounded-xl border border-[#E7ECE9]">
+        <div
+          className="
+            flex
+            h-[71px]
+            items-center
+            gap-3
+            border-b
+            border-[#E5E9E7]
+            px-[21px]
+          "
+        >
 
-          <table className="w-full min-w-[980px] text-left">
+          <FileText
+            size={22}
+            strokeWidth={2}
+            className="text-[#008842]"
+          />
 
-            <thead className="bg-[#FAFBFA] text-[9px] font-bold uppercase tracking-[.08em] text-[#768295]">
+          <h2
+            className="
+              m-0
+              text-[18px]
+              font-semibold
+              tracking-[-.15px]
+              text-[#102033]
+            "
+          >
+            Field Agent Weekly Compliance Roster
+          </h2>
 
-              <tr>
+        </div>
 
-                <th className="px-4 py-3.5">
+
+        <div
+          className="
+            overflow-x-auto
+          "
+        >
+
+          <table
+            className="
+              w-full
+              min-w-[980px]
+              border-collapse
+              text-left
+            "
+          >
+
+            <thead>
+
+              <tr
+                className="
+                  h-[43px]
+                  bg-[#FAFBFA]
+                  text-[10px]
+                  font-bold
+                  text-[#102033]
+                "
+              >
+
+                <th className="px-[18px]">
                   Agent Name
                 </th>
 
-                <th className="px-4 py-3.5">
+                <th className="px-[18px]">
                   Assigned Region
                 </th>
 
-                <th className="px-4 py-3.5">
+                <th className="px-[18px]">
                   Last Submission
                 </th>
 
-                <th className="px-4 py-3.5">
+                <th className="px-[18px]">
                   Monthly History
                 </th>
 
-                <th className="px-4 py-3.5">
+                <th className="px-[18px]">
                   Status Tag
                 </th>
 
-                <th className="px-4 py-3.5 text-right">
+                <th className="px-[18px] text-right">
                   Action
                 </th>
 
@@ -1707,75 +1926,91 @@ export default function AgentOversight({
             <tbody>
 
               {rows.map(
-                (
-                  agent
-                ) => {
+                (agent) => {
                   const StatusIcon =
-                    agent
-                      .status
-                      .icon;
+                    agent.status.icon;
 
                   return (
                     <tr
                       key={
                         agent.id
                       }
-                      className="border-t border-[#EEF1EF] transition hover:bg-[#FBFDFC]"
+                      className="
+                        h-[56px]
+                        border-t
+                        border-[#EDF0EF]
+                        transition
+                        hover:bg-[#FBFDFC]
+                      "
                     >
 
                       {/* AGENT */}
 
-                      <td className="px-4 py-3.5">
+                      <td className="px-[18px]">
 
-                        <div className="flex items-center gap-3">
+                        <div
+                          className="
+                            flex
+                            items-center
+                            gap-[10px]
+                          "
+                        >
 
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EAF1FF] text-[10px] font-bold text-[#356FD1]">
+                          <div
+                            className="
+                              flex
+                              h-[35px]
+                              w-[35px]
+                              shrink-0
+                              items-center
+                              justify-center
+                              rounded-full
+                              bg-[#EAF1FF]
+                              text-[10px]
+                              font-semibold
+                              text-[#356FD1]
+                            "
+                          >
+                            {getInitials(
+                              agent.full_name
+                            )}
+                          </div>
 
+                          <strong
+                            className="
+                              truncate
+                              text-[11px]
+                              font-semibold
+                              text-[#172536]
+                            "
+                          >
                             {
-                              getInitials(
-                                agent.full_name
-                              )
+                              agent.full_name
                             }
-
-                          </div>
-
-
-                          <div className="min-w-0">
-
-                            <div className="truncate text-[11px] font-semibold text-[#17233D]">
-
-                              {
-                                agent.full_name
-                              }
-
-                            </div>
-
-
-                            <div className="mt-0.5 truncate text-[9px] text-[#8792A2]">
-
-                              {
-                                agent.username ||
-                                `Agent ${agent.id}`
-                              }
-
-                            </div>
-
-                          </div>
+                          </strong>
 
                         </div>
 
                       </td>
 
 
-                      {/* TALUK */}
+                      {/* REGION */}
 
-                      <td className="px-4 py-3.5">
+                      <td className="px-[18px]">
 
-                        <div className="flex items-center gap-1.5 text-[10px] text-[#3E4C61]">
+                        <div
+                          className="
+                            flex
+                            items-center
+                            gap-[7px]
+                            text-[10px]
+                            text-[#546579]
+                          "
+                        >
 
                           <MapPin
-                            size={12}
-                            className="text-[#087A32]"
+                            size={15}
+                            className="text-[#008B45]"
                           />
 
                           {
@@ -1789,53 +2024,89 @@ export default function AgentOversight({
 
                       {/* LAST SUBMISSION */}
 
-                      <td className="px-4 py-3.5">
+                      <td className="px-[18px]">
 
-                        <div className="text-[10px] font-medium text-[#3E4C61]">
+                        {agent.lastSubmission ? (
 
-                          {
-                            agent.lastSubmission
-                              ? formatDate(
+                          <div className="flex flex-col">
+
+                            <strong
+                              className="
+                                text-[10px]
+                                font-medium
+                                text-[#172536]
+                              "
+                            >
+                              {
+                                formatDate(
                                   agent.lastSubmission
                                 )
-                              : "No submission"
-                          }
+                              }
+                            </strong>
 
-                        </div>
-
-
-                        {agent.lastSubmission && (
-                          <div className="mt-0.5 text-[9px] text-[#8792A2]">
-
-                            {
-                              formatTime(
-                                agent.lastSubmission
-                              )
-                            }
+                            <small
+                              className="
+                                text-[8px]
+                                text-[#8995A2]
+                              "
+                            >
+                              {
+                                formatTime(
+                                  agent.lastSubmission
+                                )
+                              }
+                            </small>
 
                           </div>
+
+                        ) : (
+
+                          <span
+                            className="
+                              text-[10px]
+                              text-[#8995A2]
+                            "
+                          >
+                            No submission
+                          </span>
+
                         )}
 
                       </td>
 
 
-                      {/* MONTHLY HISTORY */}
+                      {/* HISTORY */}
 
-                      <td className="px-4 py-3.5">
+                      <td className="px-[18px]">
 
-                        <div className="flex items-center gap-2">
+                        <div
+                          className="
+                            flex
+                            items-center
+                            gap-2
+                          "
+                        >
 
-                          <span className="text-[10px] font-semibold text-[#3E4C61]">
-
+                          <span
+                            className="
+                              whitespace-nowrap
+                              text-[10px]
+                              font-medium
+                              text-[#253547]
+                            "
+                          >
                             {
                               agent.monthlySubmitted
                             }
                             /4 Weeks
-
                           </span>
 
-
-                          <div className="flex items-center gap-1">
+                          <div
+                            className="
+                              flex
+                              gap-1
+                            "
+                          >
 
                             {agent.history.map(
                               (
@@ -1844,17 +2115,17 @@ export default function AgentOversight({
                               ) => (
 
                                 <span
-                                  key={`${agent.id}-history-${index}`}
-                                  className={`h-2.5 w-2.5 rounded-[3px] ${
-                                    submitted
-                                      ? "bg-[#087A32]"
-                                      : "bg-[#F1B6B6]"
-                                  }`}
-                                  title={
-                                    submitted
-                                      ? "Report submitted"
-                                      : "No report submitted"
-                                  }
+                                  key={`${agent.id}-${index}`}
+                                  className={`
+                                    h-[9px]
+                                    w-[9px]
+                                    rounded-[2px]
+                                    ${
+                                      submitted
+                                        ? "bg-[#078B45]"
+                                        : "bg-[#F0A4A9]"
+                                    }
+                                  `}
                                 />
 
                               )
@@ -1869,31 +2140,39 @@ export default function AgentOversight({
 
                       {/* STATUS */}
 
-                      <td className="px-4 py-3.5">
+                      <td className="px-[18px]">
 
                         <span
-                          className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-semibold ${
-                            agent.status.tone ===
-                            "green"
-                              ? "bg-[#E8F5EC] text-[#177341]"
-                              : agent.status.tone ===
-                                "amber"
-                              ? "bg-[#FFF3DD] text-[#D88B0D]"
-                              : agent.status.tone ===
-                                "blue"
-                              ? "bg-[#EAF1FF] text-[#356FD1]"
-                              : "bg-[#FDEBEC] text-[#D23A3A]"
-                          }`}
+                          className={`
+                            inline-flex
+                            items-center
+                            gap-1
+                            rounded-[8px]
+                            px-[10px]
+                            py-[7px]
+                            text-[9px]
+                            font-medium
+                            ${
+                              agent.status.tone ===
+                              "green"
+                                ? "bg-[#E8F5EC] text-[#177341]"
+                                : agent.status.tone ===
+                                  "amber"
+                                ? "bg-[#FFF0D5] text-[#CF8100]"
+                                : agent.status.tone ===
+                                  "blue"
+                                ? "bg-[#EAF1FF] text-[#356FD1]"
+                                : "bg-[#FDEBEC] text-[#D23A3A]"
+                            }
+                          `}
                         >
 
                           <StatusIcon
-                            size={11}
+                            size={12}
                           />
 
                           {
-                            agent
-                              .status
-                              .label
+                            agent.status.label
                           }
 
                         </span>
@@ -1901,26 +2180,39 @@ export default function AgentOversight({
                       </td>
 
 
-                      {/* ACTION */}
+                      {/* REPORT */}
 
-                      <td className="px-4 py-3.5 text-right">
+                      <td
+                        className="
+                          px-[18px]
+                          text-right
+                        "
+                      >
 
                         <button
                           type="button"
                           onClick={() =>
-                            openComplaint(
+                            setSelectedAgent(
                               agent
                             )
                           }
-                          className="inline-flex items-center gap-1.5 rounded-lg bg-[#087A32] px-3.5 py-2 text-[10px] font-semibold text-white shadow-[0_3px_9px_rgba(8,122,50,.15)] transition hover:bg-[#066A2B]"
+                          className="
+                            inline-flex
+                            h-[32px]
+                            w-[63px]
+                            items-center
+                            justify-center
+                            rounded-[7px]
+                            bg-[#00883F]
+                            text-[10px]
+                            font-semibold
+                            text-white
+                            shadow-[0_3px_7px_rgba(0,126,58,.18)]
+                            transition
+                            hover:bg-[#007637]
+                          "
                         >
-
                           Report
-
-                          <Send
-                            size={11}
-                          />
-
                         </button>
 
                       </td>
@@ -1937,11 +2229,15 @@ export default function AgentOversight({
 
                   <td
                     colSpan={6}
-                    className="px-4 py-12 text-center text-[11px] text-[#718096]"
+                    className="
+                      px-4
+                      py-12
+                      text-center
+                      text-[11px]
+                      text-[#718096]
+                    "
                   >
-
-                    No field agents are assigned to this Medical Supervisor's district.
-
+                    No field agents are assigned to this Medical Supervisor&apos;s district.
                   </td>
 
                 </tr>
@@ -1954,151 +2250,178 @@ export default function AgentOversight({
 
         </div>
 
-      </Panel>
+      </section>
 
 
-      {/* ====================================================
-          PREVIOUSLY FILED COMPLAINTS
-          ==================================================== */}
+      {/* ======================================================
+          PREVIOUS COMPLAINTS
+      ====================================================== */}
 
-      <Panel
-        title="Previously Filed Agent Complaints"
-        subtitle="Complaints already submitted by this Medical Supervisor"
+      <section
+        className="
+          overflow-hidden
+          rounded-[15px]
+          border
+          border-[#E0E6E2]
+          bg-white
+        "
       >
 
-        <div className="space-y-2.5">
+        <div
+          className="
+            border-b
+            border-[#E5E9E7]
+            px-[21px]
+            py-4
+          "
+        >
 
-          {issues.map(
-            (
-              issue
-            ) => (
+          <h2
+            className="
+              m-0
+              text-[17px]
+              font-semibold
+              text-[#102033]
+            "
+          >
+            Previously Filed Agent Complaints
+          </h2>
 
-              <div
-                key={
-                  issue.id
-                }
-                className="flex flex-col gap-3 rounded-xl border border-[#E7ECE9] bg-white p-3.5 sm:flex-row sm:items-center sm:justify-between"
-              >
+          <p
+            className="
+              mt-1
+              text-[10px]
+              text-[#8792A2]
+            "
+          >
+            Complaints already submitted by this Medical Supervisor
+          </p>
 
-                <div className="min-w-0">
+        </div>
 
-                  <div className="flex flex-wrap items-center gap-2">
 
-                    <span className="text-[11px] font-semibold text-[#17233D]">
+        <div className="p-4">
 
-                      {
-                        issue.agent_name ||
+          {issues.length ? (
+
+            <div className="space-y-2">
+
+              {issues.map(
+                (issue) => (
+
+                  <div
+                    key={
+                      issue.id
+                    }
+                    className="
+                      flex
+                      items-center
+                      justify-between
+                      gap-4
+                      rounded-lg
+                      border
+                      border-[#E7ECE9]
+                      px-3
+                      py-3
+                    "
+                  >
+
+                    <div className="min-w-0">
+
+                      <div
+                        className="
+                          text-[11px]
+                          font-semibold
+                          text-[#17233D]
+                        "
+                      >
+                        {
+                          issue.agent_name ||
                           "Unknown Agent"
-                      }
+                        }
+                      </div>
 
-                    </span>
+                      <div
+                        className="
+                          mt-1
+                          text-[10px]
+                          text-[#52627D]
+                        "
+                      >
+                        {
+                          issue.issue_type ||
+                          "Agent complaint"
+                        }
 
-
-                    <span className="text-[9px] text-[#A0A8B3]">
-                      •
-                    </span>
-
-
-                    <span className="text-[10px] text-[#718096]">
-
-                      {
-                        issue.taluk_name ||
-                          "Unknown Taluk"
-                      }
-
-                    </span>
-
-                  </div>
-
-
-                  <div className="mt-1 text-[10px] font-medium text-[#52627D]">
-
-                    {
-                      issue.issue_type ||
-                        "Agent complaint"
-                    }
-
-                    {
-                      issue.severity
-                        ? ` · ${issue.severity}`
-                        : ""
-                    }
-
-                  </div>
-
-
-                  {issue.description && (
-
-                    <div className="mt-1 line-clamp-2 text-[10px] leading-4 text-[#718096]">
-
-                      {
-                        issue.description
-                      }
+                        {
+                          issue.severity
+                            ? ` · ${issue.severity}`
+                            : ""
+                        }
+                      </div>
 
                     </div>
 
-                  )}
 
-                </div>
+                    <span
+                      className="
+                        shrink-0
+                        rounded-md
+                        bg-[#EAF1FF]
+                        px-2
+                        py-1
+                        text-[9px]
+                        font-semibold
+                        text-[#356FD1]
+                      "
+                    >
+                      {
+                        String(
+                          issue.status ||
+                            "Submitted"
+                        ).replaceAll(
+                          "_",
+                          " "
+                        )
+                      }
+                    </span>
 
+                  </div>
 
-                <StatusBadge
-                  tone={
-                    issue.status ===
-                    "PENDING_ADMIN_REVIEW"
-                      ? "blue"
-                      : issue.status ===
-                        "REJECTED"
-                      ? "red"
-                      : "green"
-                  }
-                >
+                )
+              )}
 
-                  {
-                    String(
-                      issue.status ||
-                        "Submitted"
-                    )
-                      .replaceAll(
-                        "_",
-                        " "
-                      )
-                      .toLowerCase()
-                      .replace(
-                        /\b\w/g,
-                        (
-                          letter
-                        ) =>
-                          letter.toUpperCase()
-                      )
-                  }
+            </div>
 
-                </StatusBadge>
+          ) : (
 
-              </div>
-
-            )
-          )}
-
-
-          {!issues.length && (
-
-            <div className="rounded-xl border border-dashed border-[#DDE5E0] bg-[#FAFCFB] px-4 py-9 text-center text-[11px] text-[#718096]">
-
+            <div
+              className="
+                rounded-lg
+                border
+                border-dashed
+                border-[#DDE5E0]
+                bg-[#FAFCFB]
+                px-4
+                py-8
+                text-center
+                text-[11px]
+                text-[#718096]
+              "
+            >
               No complaints have been filed yet.
-
             </div>
 
           )}
 
         </div>
 
-      </Panel>
+      </section>
 
 
-      {/* ====================================================
+      {/* ======================================================
           COMPLAINT DRAWER
-          ==================================================== */}
+      ====================================================== */}
 
       {selectedAgent && (
 
@@ -2106,9 +2429,13 @@ export default function AgentOversight({
           agent={
             selectedAgent
           }
-          onClose={
-            closeComplaint
-          }
+          onClose={() => {
+            if (!saving) {
+              setSelectedAgent(
+                null
+              );
+            }
+          }}
           onSubmit={
             submitComplaint
           }
@@ -2120,105 +2447,134 @@ export default function AgentOversight({
       )}
 
 
-      {/* ====================================================
-          TOAST
-          ==================================================== */}
+      {/* ======================================================
+          SUCCESS TOAST
+      ====================================================== */}
 
-      <Toast
-        message={
-          toast
-        }
-        onClose={() =>
-          setToast("")
-        }
-      />
+      {toast && (
+
+        <div
+          className="
+            fixed
+            bottom-6
+            right-6
+            z-[130]
+            flex
+            max-w-[380px]
+            items-center
+            gap-2
+            rounded-xl
+            border
+            border-[#CBE7D3]
+            bg-white
+            px-4
+            py-3
+            text-[11px]
+            font-semibold
+            text-[#087A32]
+            shadow-[0_10px_30px_rgba(15,23,42,.15)]
+          "
+        >
+
+          <ShieldCheck
+            size={17}
+          />
+
+          <span>
+            {toast}
+          </span>
+
+          <button
+            type="button"
+            onClick={() =>
+              setToast("")
+            }
+            className="
+              ml-2
+              text-[#718096]
+            "
+          >
+            <X size={14} />
+          </button>
+
+        </div>
+
+      )}
 
     </div>
   );
 }
 
 
-// ============================================================
-// KPI CARD
-// ============================================================
+/* ============================================================
+   KPI CARD
+============================================================ */
 
 function KpiCard({
   icon,
-  tone,
   label,
   value,
-  note,
+  tone,
 }) {
-  const styles = {
-    green: {
-      icon:
-        "bg-[#E8F5EC] text-[#087A32]",
-      value:
-        "text-[#101B38]",
-    },
-
-    amber: {
-      icon:
-        "bg-[#FFF3DD] text-[#D88B0D]",
-      value:
-        "text-[#101B38]",
-    },
-
-    red: {
-      icon:
-        "bg-[#FDEBEC] text-[#D23A3A]",
-      value:
-        "text-[#101B38]",
-    },
-  };
-
-  const selected =
-    styles[tone] ||
-    styles.green;
-
-
   return (
-    <div className="flex min-h-[128px] items-center gap-4 rounded-2xl border border-[#E6EBE8] bg-white px-5 py-5 shadow-[0_3px_14px_rgba(25,50,40,.035)]">
+    <div
+      className="
+        flex
+        min-h-[122px]
+        items-center
+        gap-[18px]
+        rounded-[15px]
+        border
+        border-[#E0E6E2]
+        bg-white
+        px-5
+        py-5
+        shadow-[0_1px_3px_rgba(15,23,42,.03)]
+      "
+    >
 
       <div
-        className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full ${selected.icon}`}
+        className={`
+          flex
+          h-[60px]
+          w-[60px]
+          shrink-0
+          items-center
+          justify-center
+          rounded-full
+          ${
+            tone === "amber"
+              ? "bg-[#FFF0D4] text-[#E88B00]"
+              : "bg-[#E5F4EB] text-[#07883F]"
+          }
+        `}
       >
-
-        {
-          icon
-        }
-
+        {icon}
       </div>
 
 
       <div className="min-w-0">
 
-        <div className="text-[11px] font-semibold text-[#536174]">
-
-          {
-            label
-          }
-
+        <div
+          className="
+            text-[13px]
+            font-normal
+            leading-5
+            text-[#172536]
+          "
+        >
+          {label}
         </div>
-
 
         <div
-          className={`mt-1 text-[29px] font-semibold tracking-[-.035em] ${selected.value}`}
+          className="
+            text-[27px]
+            font-bold
+            leading-[31px]
+            text-[#071426]
+          "
         >
-
-          {
-            value
-          }
-
-        </div>
-
-
-        <div className="mt-0.5 text-[9px] leading-4 text-[#8792A2]">
-
-          {
-            note
-          }
-
+          {value}
         </div>
 
       </div>

@@ -7,6 +7,7 @@ import {
   ChevronDown,
   MapPin,
   ShieldCheck,
+  Stethoscope,
   TrendingUp,
   User,
 } from "lucide-react";
@@ -14,12 +15,12 @@ import {
 import { api } from "../../api";
 import { getDiseaseVisual } from "../../data/diseaseVisuals";
 import HeroBg from "../../assets/hero-bg.png";
+import MedicalAssistantReference from "../../assets/ui/medical-assistant-reference.png";
 
 import TodaysUpdate from "./dashboard/TodaysUpdate";
 import RiskAroundYou from "./dashboard/RiskAroundYou";
 import PreventiveMeasures from "./dashboard/PreventiveMeasures";
 import QuickAccess from "./dashboard/QuickAccess";
-import DashboardChatbot from "./dashboard/DashboardChatbot.jsx";
 
 const RISK_ORDER = {
   Low: 0,
@@ -118,6 +119,15 @@ function calculateWeeklyChange(data) {
   return Math.round(
     ((current - previous) / previous) * 100
   );
+}
+
+function getGreeting() {
+  const hour = new Date().getHours();
+
+  if (hour < 12) return "Good Morning";
+  if (hour < 17) return "Good Afternoon";
+  if (hour < 21) return "Good Evening";
+  return "Good Night";
 }
 
 export default function Dashboard({
@@ -535,7 +545,7 @@ export default function Dashboard({
                 tracking-[-0.035em]
                 text-[#111315]
               ">
-                Good Afternoon, {username}
+                {getGreeting()}, {username}
               </h1>
 
               <span className="text-[22px]">
@@ -1374,36 +1384,84 @@ export default function Dashboard({
             </div>
 
 
-            {/* AI HEALTH ASSISTANT */}
+            {/* MEDICAL ASSISTANT */}
 
             <section className="
+              relative
               min-h-0
               h-full
-              max-h-full
               overflow-hidden
               rounded-[14px]
               border
               border-[#E5E2DC]
-              bg-white
+              bg-[#F5FBF8]
               shadow-[0_1px_5px_rgba(44,35,24,0.035)]
             ">
 
-              <DashboardChatbot
-                selectedLocation={
-                  selectedLocation
-                }
-                username={
-                  username
-                }
-                disease={
-                  riskDisease
-                }
-              />
+              <div className="relative h-full w-full overflow-hidden px-[24px] pt-[20px]">
+
+                {/* HEADER */}
+                <div className="relative z-20 flex items-center gap-[10px]">
+                  <div className="flex h-[39px] w-[39px] shrink-0 items-center justify-center rounded-full bg-[#E5F5EF]">
+                    <Stethoscope
+                      size={22}
+                      strokeWidth={1.8}
+                      className="text-[#15956D]"
+                    />
+                  </div>
+
+                  <h2 className="text-[16px] font-semibold tracking-[-0.02em] text-[#173042]">
+                    Medical Assistant
+                  </h2>
+                </div>
+
+                {/* CONTENT */}
+                <div className="relative z-20 mt-[21px] max-w-[250px]">
+                  <h3 className="text-[23px] font-semibold leading-[1.18] tracking-[-0.03em] text-[#163245]">
+                    Need Health Guidance?
+                  </h3>
+
+                  <p className="mt-[13px] text-[13px] leading-[1.65] text-[#536A79]">
+                    Get instant guidance, preventive tips and health information from our Medical Assistant.
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => onNavigate?.("medical-chat")}
+                    className="mt-[20px] inline-flex h-[45px] items-center gap-[12px] rounded-[7px] border border-[#1FA56F] bg-white px-[18px] text-[14px] font-semibold text-[#15965F] transition hover:bg-[#F2FBF6]"
+                  >
+                    <ShieldCheck
+                      size={20}
+                      strokeWidth={1.8}
+                    />
+                    <span>Click Here</span>
+                    <ArrowRight
+                      size={17}
+                      strokeWidth={1.8}
+                    />
+                  </button>
+                </div>
+
+                {/* REFERENCE ILLUSTRATION — IMAGE IS CLICKABLE */}
+                <button
+                  type="button"
+                  aria-label="Open Medical Assistant"
+                  onClick={() => onNavigate?.("medical-chat")}
+                  className="absolute bottom-[-2px] right-[-2px] z-10 h-[255px] w-[255px] cursor-pointer border-0 bg-transparent p-0"
+                >
+                  <img
+                    src={MedicalAssistantReference}
+                    alt="Medical Assistant"
+                    draggable="false"
+                    className="h-full w-full object-contain object-right-bottom"
+                  />
+                </button>
+
+              </div>
 
             </section>
 
           </section>
-
 
           {/* =================================================
               PRECAUTION + QUICK ACCESS
