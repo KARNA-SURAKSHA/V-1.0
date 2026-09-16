@@ -51,7 +51,7 @@ class User(Base):
 
     password_hash = Column(
         String,
-        nullable=False,
+        nullable=True,
     )
 
     full_name = Column(
@@ -76,6 +76,13 @@ class User(Base):
         ForeignKey("districts.id"),
         nullable=True,
         index=True,
+    )
+
+    firebase_uid = Column(
+        String,
+        unique=True,
+        index=True,
+        nullable=True,
     )
 
     # --------------------------------------------------------

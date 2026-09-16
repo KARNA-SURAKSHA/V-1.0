@@ -90,3 +90,5 @@ Thumbs.db
 # Python cache files
 __pycache__/
 *.py[cod]
+
+backend/karna-surashka-firebase-adminsdk-fbsvc-1a03919b01.json
