@@ -870,6 +870,19 @@ const api = {
   // ==========================================================
   // AGENT
   // ==========================================================
+    
+  getAgentStatus: async () => {
+    return request(
+      "/agent/status"
+    );
+  },
+
+  getAgentHistory: async () => {
+    return request(
+      "/agent/history"
+    );
+  },
+
 
   getAgentEmerging: async () => {
     return request(
