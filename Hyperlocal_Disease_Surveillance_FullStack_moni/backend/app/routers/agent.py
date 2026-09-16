@@ -53,7 +53,7 @@ def _get_agent_profile(
     return agent
 
 
-def _validate_report_items(items):
+def _validate_report_items(items, db=None):
     """
     Validate weekly disease report entries.
     """

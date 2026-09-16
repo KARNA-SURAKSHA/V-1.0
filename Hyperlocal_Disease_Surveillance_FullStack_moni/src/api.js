@@ -883,6 +883,25 @@ const api = {
     );
   },
 
+  getCurrentAgentReport: async () => {
+    return request(
+      "/agent/reports/current"
+    );
+  },
+
+      submitWeeklyReport: async (reports, weekNumber, year) => {
+    return request(
+      "/agent/reports",
+      {
+        method: "POST",
+        body: {
+          week_number: weekNumber,
+          year: year,
+          reports: reports,
+        },
+      }
+    );
+  },
 
   getAgentEmerging: async () => {
     return request(
