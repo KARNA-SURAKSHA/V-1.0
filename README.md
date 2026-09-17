@@ -1,4 +1,5 @@
-![Uploading Social-Preview.png…]()
+<img width="2912" height="1440" alt="Social-Preview" src="https://github.com/user-attachments/assets/f89b9b40-7c8c-4f9a-ac20-11f13e6bcf01" />
+
 # Hyperlocal Disease Surveillance Platform
 
 ## Overview
