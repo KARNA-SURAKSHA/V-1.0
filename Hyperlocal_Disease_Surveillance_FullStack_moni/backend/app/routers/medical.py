@@ -1532,32 +1532,22 @@ def medical_diseases(
     db: Session = Depends(get_db),
     user: models.User = Depends(supervisor_only),
 ):
-    diseases = (
-        db.query(
-            models.Disease
-        )
-        .order_by(
-            models.Disease.name.asc()
-        )
-        .all()
+    from ..firestore_db import db as firestore_db
+
+    docs = (
+        firestore_db.collection("diseases")
+        .order_by("name")
+        .stream()
     )
 
     return [
         {
-            "id": disease.id,
-            "name": disease.name,
-            "description": getattr(
-                disease,
-                "description",
-                None,
-            ),
-            "is_active": getattr(
-                disease,
-                "is_active",
-                True,
-            ),
+            "id": doc.to_dict().get("id"),
+            "name": doc.to_dict().get("name"),
+            "description": doc.to_dict().get("description"),
+            "is_active": doc.to_dict().get("is_active", True),
         }
-        for disease in diseases
+        for doc in docs
     ]
 
 

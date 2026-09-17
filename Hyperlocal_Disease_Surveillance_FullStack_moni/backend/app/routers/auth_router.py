@@ -18,12 +18,17 @@ from ..database import get_db
 from ..models import User
 from sqlalchemy.orm import Session
 
-cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-if not cred_path:
-    raise RuntimeError(
-        "GOOGLE_APPLICATION_CREDENTIALS env var is required to initialize Firebase Admin SDK"
-    )
-initialize_app(credentials.Certificate(cred_path))
+from firebase_admin import get_app
+
+try:
+    get_app()
+except ValueError:
+    cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+    if not cred_path:
+        raise RuntimeError(
+            "GOOGLE_APPLICATION_CREDENTIALS env var is required to initialize Firebase Admin SDK"
+        )
+    initialize_app(credentials.Certificate(cred_path))
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
