@@ -109,6 +109,13 @@ function mapFormToBackend(item) {
         ? 0
         : Number(item.confirmed_cases),
 
+    suspected_cases:
+      item.suspected_cases === "" ||
+      item.suspected_cases === null ||
+      item.suspected_cases === undefined
+        ? 0
+        : Number(item.suspected_cases),
+
     severity:
       item.severity || "",
 
@@ -588,6 +595,11 @@ export default function ReportForm({
               cases:
                 Number(
                   report.cases || 0
+                ),
+
+              suspected_cases:
+                Number(
+                  report.suspected_cases || 0
                 ),
 
               severity:

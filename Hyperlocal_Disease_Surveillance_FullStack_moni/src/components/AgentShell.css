@@ -1,0 +1,364 @@
+.agent-shell {
+  --agent-navy: #0d2d3d;
+  --agent-green: #087a32;
+  --agent-green-dark: #05682a;
+  --agent-sidebar: #fbfaf4;
+  --agent-border: #e6e7e0;
+  --agent-muted: #527086;
+  min-height: 100vh;
+  background: #fbfbf8;
+  color: var(--agent-navy);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.agent-header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 100;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 253, 0.98);
+  border-bottom: 1px solid var(--agent-border);
+}
+
+.agent-brand {
+  width: 273px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 32px;
+  box-sizing: border-box;
+  border-right: 1px solid var(--agent-border);
+}
+
+.agent-brand-mark {
+  position: relative;
+  width: 42px;
+  height: 48px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(50% 0%, 91% 15%, 88% 65%, 50% 100%, 12% 65%, 9% 15%);
+  background: #16854b;
+}
+
+.agent-brand-mark::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  clip-path: polygon(50% 0%, 91% 15%, 88% 65%, 50% 100%, 12% 65%, 9% 15%);
+  background: #fff;
+}
+
+.agent-brand-cross {
+  position: relative;
+  z-index: 2;
+  color: #16854b;
+  font-size: 25px;
+  line-height: 1;
+  font-weight: 800;
+  transform: translateY(-1px);
+}
+
+.agent-brand-copy { min-width: 0; }
+.agent-brand-name {
+  color: #0a2635;
+  font-size: 18px;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.agent-brand-subtitle {
+  margin-top: 4px;
+  color: #26485a;
+  font-size: 11px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.agent-header-right {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-right: 25px;
+}
+
+.agent-header-icon-button,
+.agent-mobile-menu {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: #35596a;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.agent-header-icon-button:hover,
+.agent-mobile-menu:hover { background: #f2f6f3; }
+
+.agent-notification-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #df4c43;
+  color: white;
+  border: 2px solid white;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.agent-theme-icon {
+  width: 22px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #66808e;
+}
+
+.agent-profile { position: relative; }
+.agent-profile-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  background: transparent;
+  padding: 5px 0 5px 5px;
+  cursor: pointer;
+  color: var(--agent-navy);
+}
+.agent-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #eef3f1;
+  border: 1px solid #dce5e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2f6171;
+  font-size: 14px;
+  font-weight: 700;
+}
+.agent-profile-copy { text-align: left; min-width: 92px; }
+.agent-profile-copy strong {
+  display: block;
+  font-size: 13px;
+  line-height: 1.1;
+  font-weight: 700;
+}
+.agent-profile-copy span {
+  display: block;
+  margin-top: 3px;
+  color: #607786;
+  font-size: 11px;
+  line-height: 1;
+}
+.agent-chevron-open { transform: rotate(180deg); }
+
+.agent-profile-menu {
+  position: absolute;
+  top: 51px;
+  right: 0;
+  width: 235px;
+  overflow: hidden;
+  background: white;
+  border: 1px solid #e0e7e2;
+  border-radius: 14px;
+  box-shadow: 0 18px 40px rgba(21, 52, 65, 0.14);
+}
+.agent-profile-menu-heading,
+.agent-profile-menu-location { padding: 14px 16px; }
+.agent-profile-menu-heading { background: #f7faf8; border-bottom: 1px solid #e8ece9; }
+.agent-profile-menu-heading strong,
+.agent-profile-menu-heading span,
+.agent-profile-menu-location span,
+.agent-profile-menu-location strong { display: block; }
+.agent-profile-menu-heading strong { font-size: 13px; }
+.agent-profile-menu-heading span,
+.agent-profile-menu-location span { margin-top: 3px; color: #72818b; font-size: 10px; }
+.agent-profile-menu-location strong { margin-top: 3px; font-size: 12px; }
+.agent-profile-menu > button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 0;
+  border-top: 1px solid #edf0ed;
+  background: white;
+  padding: 12px 16px;
+  color: #c83d3d;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.agent-profile-menu > button:hover { background: #fff6f6; }
+
+.agent-sidebar {
+  position: fixed;
+  z-index: 90;
+  top: 72px;
+  left: 0;
+  bottom: 0;
+  width: 273px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--agent-sidebar);
+  border-right: 1px solid var(--agent-border);
+}
+
+.agent-nav {
+  padding: 18px 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.agent-nav-item {
+  width: 100%;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #0f2e40;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 140ms ease, color 140ms ease, transform 140ms ease;
+}
+.agent-nav-item:hover { background: #f1f5f1; }
+.agent-nav-item.active {
+  background: #e7f1e6;
+  color: #087a32;
+  font-weight: 700;
+}
+.agent-nav-item svg { flex: 0 0 auto; }
+
+.agent-sidebar-illustration {
+  position: relative;
+  flex: 1;
+  min-height: 250px;
+  margin-top: 18px;
+  overflow: hidden;
+  opacity: 0.35;
+}
+.agent-mountain {
+  position: absolute;
+  bottom: 34px;
+  background: #e3e2d8;
+  border-radius: 50% 50% 0 0;
+}
+.agent-mountain-one { left: -20px; width: 190px; height: 125px; transform: rotate(-8deg); }
+.agent-mountain-two { right: -35px; width: 210px; height: 115px; transform: rotate(9deg); }
+.agent-tree {
+  position: absolute;
+  bottom: 22px;
+  width: 12px;
+  height: 54px;
+  background: #b9c9bf;
+  border-radius: 4px;
+}
+.agent-tree::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -28px;
+  width: 48px;
+  height: 48px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: #d2d9ce;
+}
+.agent-tree-one { left: 30px; }
+.agent-tree-two { left: 96px; height: 64px; }
+.agent-tree-three { right: 35px; height: 47px; }
+
+.agent-sidebar-message {
+  padding: 0 20px 45px;
+  color: #536a77;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.45;
+  letter-spacing: 0.005em;
+}
+.agent-sidebar-message p { margin: 0; }
+
+.agent-main {
+  min-height: 100vh;
+  padding-left: 273px;
+  padding-top: 72px;
+  background: #fbfbf8;
+  box-sizing: border-box;
+}
+.agent-main-inner {
+  max-width: 1536px;
+  margin: 0 auto;
+  padding: 19px 25px 30px;
+  box-sizing: border-box;
+}
+
+.agent-mobile-menu,
+.agent-mobile-backdrop { display: none; }
+
+@media (max-width: 1050px) {
+  .agent-brand { width: 245px; }
+  .agent-sidebar { width: 245px; }
+  .agent-main { padding-left: 245px; }
+  .agent-profile-copy { display: none; }
+}
+
+@media (max-width: 780px) {
+  .agent-brand { width: auto; border-right: 0; padding-left: 16px; }
+  .agent-brand-name { font-size: 16px; }
+  .agent-brand-subtitle { display: none; }
+  .agent-brand-mark { width: 34px; height: 40px; }
+  .agent-brand-cross { font-size: 21px; }
+  .agent-header-right { gap: 7px; padding-right: 12px; }
+  .agent-mobile-menu { display: inline-flex; }
+  .agent-sidebar {
+    transform: translateX(-100%);
+    transition: transform 180ms ease;
+    box-shadow: 12px 0 28px rgba(20, 45, 58, 0.12);
+  }
+  .agent-sidebar.agent-sidebar-open { transform: translateX(0); }
+  .agent-mobile-backdrop {
+    display: block;
+    position: fixed;
+    z-index: 80;
+    inset: 72px 0 0;
+    border: 0;
+    background: rgba(10, 32, 44, 0.16);
+  }
+  .agent-main { padding-left: 0; }
+  .agent-main-inner { padding: 15px; }
+  .agent-theme-icon { display: none; }
+  .agent-profile-copy { display: block; }
+}
+
+@media (max-width: 520px) {
+  .agent-profile-copy { display: none; }
+  .agent-header-icon-button { display: none; }
+  .agent-main-inner { padding: 12px; }
+}

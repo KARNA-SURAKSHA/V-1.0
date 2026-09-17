@@ -134,6 +134,7 @@ class AgentStatusOut(BaseModel):
 
     taluk_id: int
     taluk_name: Optional[str] = None
+    district_name: Optional[str] = None
 
     is_active: bool
 
@@ -223,6 +224,7 @@ class ReportOut(BaseModel):
     taluk_id: int
     disease: str
     cases: int
+    suspected_cases: Optional[int] = None
     week_number: int
     year: int
 
@@ -430,6 +432,7 @@ class DiseaseCard(BaseModel):
     disease: str
     cases: int
     risk_level: str
+    suspected_cases: Optional[int] = None
 
 
 class TrendPoint(BaseModel):

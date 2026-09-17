@@ -129,12 +129,17 @@ def _aggregate_reports_by_disease(reports):
 
             aggregated[disease] = {
                 "cases": 0,
+                "suspected_cases": 0,
                 "severity": report.severity,
                 "created_at": report.created_at,
             }
 
         aggregated[disease]["cases"] += (
             report.cases or 0
+        )
+
+        aggregated[disease]["suspected_cases"] += (
+            report.suspected_cases or 0
         )
 
         if report.created_at:
@@ -298,6 +303,9 @@ def get_dashboard(
                 cases=cases,
                 risk_level=classify_risk(
                     cases
+                ),
+                suspected_cases=int(
+                    info.get("suspected_cases", 0) or 0
                 ),
             )
         )
@@ -894,3 +902,4 @@ def get_notifications_for_taluk(
 
         for note in notes
     ]
+ 

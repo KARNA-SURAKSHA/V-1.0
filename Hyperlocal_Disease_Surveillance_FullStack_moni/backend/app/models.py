@@ -51,7 +51,7 @@ class User(Base):
 
     password_hash = Column(
         String,
-        nullable=True,
+        nullable=False,
     )
 
     full_name = Column(
@@ -76,13 +76,6 @@ class User(Base):
         ForeignKey("districts.id"),
         nullable=True,
         index=True,
-    )
-
-    firebase_uid = Column(
-        String,
-        unique=True,
-        index=True,
-        nullable=True,
     )
 
     # --------------------------------------------------------
@@ -357,6 +350,12 @@ class DiseaseReport(Base):
     )
 
     cases = Column(
+        Integer,
+        nullable=False,
+        default=0,
+    )
+
+    suspected_cases = Column(
         Integer,
         nullable=False,
         default=0,
@@ -992,4 +991,3 @@ class HomeReliefAuditLog(Base):
     old_value = Column(Text, nullable=True)
     new_value = Column(Text, nullable=True)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-

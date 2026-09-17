@@ -107,3 +107,21 @@ def ensure_schema_compatibility():
                     "ALTER TABLE users ADD COLUMN supervisor_district_id INTEGER"
                 )
             )
+
+    # Store suspected case counts for weekly disease reports.
+    # This is additive so existing SQLite databases remain usable.
+    inspector = inspect(engine)
+    if "disease_reports" in inspector.get_table_names():
+        report_columns = {
+            column["name"]
+            for column in inspector.get_columns("disease_reports")
+        }
+
+        if "suspected_cases" not in report_columns:
+            with engine.begin() as connection:
+                connection.execute(
+                    text(
+                        "ALTER TABLE disease_reports "
+                        "ADD COLUMN suspected_cases INTEGER NOT NULL DEFAULT 0"
+                    )
+                )

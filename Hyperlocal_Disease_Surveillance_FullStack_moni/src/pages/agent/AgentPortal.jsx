@@ -1,45 +1,70 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
-  MapPin,
+  AlertCircle,
+  ArrowRight,
+  Bell,
   CalendarDays,
   CheckCircle2,
   Clock3,
   FileText,
+  History as HistoryIcon,
+  Info,
+  MapPin,
   Plus,
-  ArrowRight,
+  RefreshCw,
+  ShieldAlert,
 } from "lucide-react";
 
-import PortalShell from "../../components/PortalShell";
+import AgentShell from "../../components/AgentShell";
 import { useAuth } from "../../context/AuthContext";
 import { api } from "../../api";
+import "../../api/agentApi";
+import "./AgentPortal.css";
 
 import ReportForm from "./ReportForm";
 import EmergingDiseaseReport from "./EmergingDiseaseReport";
+import History from "./History";
 
 const TABS = [
-  {
-    key: "report",
-    label: "Weekly Report",
-  },
-  {
-    key: "history",
-    label: "Submission History",
-  },
-  {
-    key: "emerging",
-    label: "Emerging Disease",
-  },
+  { key: "dashboard", label: "Dashboard" },
+  { key: "report", label: "Weekly Disease Report" },
+  { key: "emerging", label: "Emerging Disease" },
+  { key: "history", label: "Submission History" },
+  { key: "notifications", label: "Notifications" },
 ];
 
+const RISK_CLASS = {
+  Low: "low",
+  Moderate: "moderate",
+  High: "high",
+  Critical: "critical",
+};
+
+function getWeekDates() {
+  const today = new Date();
+  const date = new Date(today);
+  const day = date.getDay();
+  const diffToMonday = day === 0 ? -6 : 1 - day;
+
+  date.setDate(date.getDate() + diffToMonday);
+  const monday = new Date(date);
+  const sunday = new Date(date);
+  sunday.setDate(monday.getDate() + 6);
+
+  const format = (value, includeYear = false) =>
+    value.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      ...(includeYear ? { year: "numeric" } : {}),
+    });
+
+  return `${format(monday)} – ${format(sunday, true)}`;
+}
+
 function formatDate(dateValue) {
-  if (!dateValue) return null;
-
+  if (!dateValue) return "—";
   const date = new Date(dateValue);
-
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-
+  if (Number.isNaN(date.getTime())) return "—";
   return date.toLocaleDateString("en-IN", {
     day: "2-digit",
     month: "long",
@@ -48,612 +73,591 @@ function formatDate(dateValue) {
 }
 
 function formatTime(dateValue) {
-  if (!dateValue) return null;
-
+  if (!dateValue) return "";
   const date = new Date(dateValue);
-
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-
+  if (Number.isNaN(date.getTime())) return "";
   return date.toLocaleTimeString("en-IN", {
     hour: "2-digit",
     minute: "2-digit",
   });
 }
 
+function notificationTone(type = "info") {
+  const value = String(type).toLowerCase();
+  if (value.includes("alert") || value.includes("warning")) return "alert";
+  if (value.includes("success") || value.includes("verified")) return "success";
+  return "info";
+}
+
+function NotificationIcon({ type }) {
+  const tone = notificationTone(type);
+  if (tone === "alert") return <AlertCircle size={18} />;
+  if (tone === "success") return <CheckCircle2 size={18} />;
+  return <Info size={18} />;
+}
+
 export default function AgentPortal({ onExit }) {
   const { session } = useAuth();
 
-  const [tab, setTab] = useState("report");
-
-  /*
-   * Controls whether the report editor is visible.
-   */
+  const [tab, setTab] = useState("dashboard");
   const [showReportEditor, setShowReportEditor] = useState(false);
-
-  /*
-   * IMPORTANT:
-   *
-   * "edit" = load the previously submitted report.
-   * "add"  = start with a completely empty disease entry.
-   */
   const [reportMode, setReportMode] = useState(null);
-
-  /*
-   * This key forces ReportForm to completely remount whenever
-   * the agent switches between Edit and Add Another Disease.
-   */
   const [reportFormKey, setReportFormKey] = useState(0);
 
   const [status, setStatus] = useState(null);
   const [reports, setReports] = useState([]);
+  const [dashboard, setDashboard] = useState(null);
+  const [notifications, setNotifications] = useState([]);
 
-  const [loadingStatus, setLoadingStatus] = useState(true);
-  const [statusError, setStatusError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
+
+  const loadDashboardData = async (isRefresh = false) => {
+    if (!session) return;
+
+    try {
+      if (isRefresh) setRefreshing(true);
+      else setLoading(true);
+      setError("");
+
+      const statusData = await api.getAgentStatus();
+      const talukId = statusData?.taluk_id ?? session?.taluk_id;
+
+      const requests = [
+        Promise.resolve(statusData),
+        api.getAgentHistory(),
+      ];
+
+      if (talukId) {
+        requests.push(api.getDashboard(talukId));
+        requests.push(api.getNotifications(talukId));
+      }
+
+      const [statusResult, historyResult, dashboardResult, notificationResult] =
+        await Promise.all(requests);
+
+      setStatus(statusResult);
+      setReports(historyResult || []);
+      setDashboard(dashboardResult || null);
+      setNotifications(notificationResult || []);
+    } catch (err) {
+      setError(err.message || "Unable to load the Agent Portal.");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
-    let mounted = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadDashboardData();
+    // The logged-in session determines the API scope.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.username]);
 
-    const loadAgentData = async () => {
-      try {
-        setLoadingStatus(true);
-        setStatusError("");
+  const talukName = status?.taluk_name || session?.taluk_name || "Assigned Taluk";
+  const districtName = status?.district_name || "Assigned District";
+  const alreadySubmitted = Boolean(status?.already_submitted);
+  const weekNumber = status?.current_week ? status.current_week % 100 : null;
+  const cycleDates = getWeekDates();
 
-        const [statusData, historyData] = await Promise.all([
-          api.getAgentStatus(),
-          api.getAgentHistory(),
-        ]);
-
-        if (mounted) {
-          setStatus(statusData);
-          setReports(historyData || []);
-        }
-      } catch (err) {
-        if (mounted) {
-          setStatusError(
-            err.message || "Unable to load agent status."
-          );
-        }
-      } finally {
-        if (mounted) {
-          setLoadingStatus(false);
-        }
-      }
-    };
-
-    loadAgentData();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  if (!session) {
-    return null;
-  }
-
-  const talukName =
-    status?.taluk_name ||
-    session.taluk_name ||
-    "Assigned Taluk";
-
-  const alreadySubmitted =
-    status?.already_submitted ?? false;
-
-  /*
-   * Find the most recent submitted record.
-   */
-  const latestSubmission =
-    reports.length > 0
-      ? reports.reduce((latest, report) => {
-          if (!latest) return report;
-
-          const latestDate = new Date(latest.created_at);
-          const currentDate = new Date(report.created_at);
-
-          return currentDate > latestDate
-            ? report
-            : latest;
-        }, null)
+  const latestSubmissionDate = status?.last_submitted_at
+    ? formatDate(status.last_submitted_at)
+    : reports.length
+      ? formatDate(
+          reports.reduce((latest, item) => {
+            if (!latest) return item.created_at;
+            return new Date(item.created_at) > new Date(latest)
+              ? item.created_at
+              : latest;
+          }, null)
+        )
       : null;
 
-  const lastSubmissionDate = latestSubmission
-    ? formatDate(latestSubmission.created_at)
-    : null;
+  const latestSubmissionTime = status?.last_submitted_at
+    ? formatTime(status.last_submitted_at)
+    : "";
 
-  const lastSubmissionTime = latestSubmission
-    ? formatTime(latestSubmission.created_at)
-    : null;
+  const totalThisMonth = useMemo(() => {
+    const now = new Date();
+    return reports.filter((report) => {
+      const date = new Date(report.created_at);
+      return (
+        !Number.isNaN(date.getTime()) &&
+        date.getMonth() === now.getMonth() &&
+        date.getFullYear() === now.getFullYear()
+      );
+    }).length;
+  }, [reports]);
 
-  /*
-   * ============================================================
-   * TAB CHANGE
-   * ============================================================
-   */
+  const snapshot = useMemo(() => {
+    const cards = Array.isArray(dashboard?.cards) ? dashboard.cards : [];
+    const currentReports = Array.isArray(reports) ? reports : [];
+
+    return cards.map((card) => {
+      const matching = currentReports.find(
+        (report) =>
+          String(report.disease || "").trim().toLowerCase() ===
+          String(card.disease || "").trim().toLowerCase()
+      );
+
+      return {
+        ...card,
+        suspected_cases:
+          matching?.suspected_cases ?? card.suspected_cases ?? "—",
+      };
+    });
+  }, [dashboard, reports]);
+
+  const openReport = (mode) => {
+    setTab("report");
+    setReportMode(mode);
+    setReportFormKey((value) => value + 1);
+    setShowReportEditor(true);
+  };
+
+  const openWeeklyReport = () => {
+    openReport(alreadySubmitted ? "edit" : "add");
+  };
 
   const handleTabChange = (nextTab) => {
     setTab(nextTab);
-
-    /*
-     * Whenever the agent leaves the report tab,
-     * close the report editor.
-     */
     if (nextTab !== "report") {
       setShowReportEditor(false);
       setReportMode(null);
     }
   };
 
-  /*
-   * ============================================================
-   * EDIT WEEKLY REPORT
-   * ============================================================
-   *
-   * This is the ONLY action that loads previously submitted
-   * disease information.
-   */
-
-  const openEditReport = () => {
-    setTab("report");
-
-    setReportMode("edit");
-
-    /*
-     * Force ReportForm to remount.
-     */
-    setReportFormKey((previous) => previous + 1);
-
-    setShowReportEditor(true);
-  };
-
-  /*
-   * ============================================================
-   * ADD ANOTHER DISEASE
-   * ============================================================
-   *
-   * IMPORTANT:
-   * This does NOT load the previous report.
-   *
-   * ReportForm receives mode="add" and therefore starts with
-   * a completely empty disease entry.
-   */
-
-  const openAddDisease = () => {
-    setTab("report");
-
-    setReportMode("add");
-
-    /*
-     * Force a completely fresh ReportForm instance.
-     */
-    setReportFormKey((previous) => previous + 1);
-
-    setShowReportEditor(true);
-  };
-
-  /*
-   * ============================================================
-   * CLOSE REPORT EDITOR
-   * ============================================================
-   */
-
-  const closeReportEditor = () => {
+  const closeEditor = () => {
     setShowReportEditor(false);
     setReportMode(null);
+    loadDashboardData(true);
   };
 
+  if (!session) return null;
+
   return (
-    <PortalShell
-      title="Karna Suraksha — Agent Portal"
-      subtitle={`Assigned Taluk: ${talukName}`}
+    <AgentShell
       tabs={TABS}
       activeTab={tab}
       onTabChange={handleTabChange}
       onExit={onExit}
+      notificationCount={notifications.length}
     >
-      {/* ========================================================
-          WELCOME SECTION
-      ======================================================== */}
-
-      {tab === "report" && !showReportEditor && (
-        <>
-          <section className="mb-7">
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-              <div>
-                <p className="text-[13px] font-medium text-[#087A32] mb-1">
-                  Agent Dashboard
-                </p>
-
-                <h2 className="text-[28px] md:text-[32px] font-semibold text-[#102A43] tracking-tight">
-                  Welcome back, {session.full_name}!
-                </h2>
-
-                <p className="text-[14px] text-[#52606D] mt-1">
-                  Here's your weekly disease surveillance overview.
-                </p>
-              </div>
-
-              <div className="bg-white border border-[#E3E9E5] rounded-2xl px-5 py-4 shadow-sm min-w-[280px]">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full bg-[#EAF6EE] flex items-center justify-center">
-                    <CalendarDays className="w-5 h-5 text-[#087A32]" />
-                  </div>
-
-                  <div>
-                    <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-[#7B8794]">
-                      Current Surveillance Cycle
-                    </p>
-
-                    <p className="text-[16px] font-semibold text-[#087A32] mt-1">
-                      Weekly Reporting
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* ======================================================
-              ERROR
-          ====================================================== */}
-
-          {statusError && (
-            <div className="mb-6 rounded-xl border border-[#F0CACA] bg-[#FFF5F5] px-4 py-3">
-              <p className="text-[13px] text-[#C62828]">
-                {statusError}
-              </p>
-            </div>
-          )}
-
-          {/* ======================================================
-              OVERVIEW CARDS
-          ====================================================== */}
-
-          <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-7">
-
-            {/* ASSIGNED TALUK */}
-
-            <div className="bg-white rounded-2xl border border-[#E3E9E5] p-5 shadow-sm">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-[#EAF6EE] flex items-center justify-center shrink-0">
-                  <MapPin className="w-6 h-6 text-[#087A32]" />
-                </div>
-
-                <div>
-                  <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-[#52606D]">
-                    Assigned Taluk
-                  </p>
-
-                  <h3 className="text-[21px] font-semibold text-[#087A32] mt-2">
-                    {loadingStatus
-                      ? "Loading..."
-                      : talukName}
-                  </h3>
-
-                  <p className="text-[13px] text-[#52606D] mt-1">
-                    Your designated surveillance area
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* LAST SUBMISSION */}
-
-            <div className="bg-white rounded-2xl border border-[#E3E9E5] p-5 shadow-sm">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-[#EEF4FB] flex items-center justify-center shrink-0">
-                  <CalendarDays className="w-6 h-6 text-[#145DA0]" />
-                </div>
-
-                <div>
-                  <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-[#52606D]">
-                    Last Submission
-                  </p>
-
-                  {loadingStatus ? (
-                    <h3 className="text-[20px] font-semibold text-[#102A43] mt-2">
-                      Loading...
-                    </h3>
-                  ) : lastSubmissionDate ? (
-                    <>
-                      <h3 className="text-[20px] font-semibold text-[#102A43] mt-2">
-                        {lastSubmissionDate}
-                      </h3>
-
-                      <p className="text-[13px] text-[#52606D] mt-1">
-                        Submitted at {lastSubmissionTime}
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <h3 className="text-[20px] font-semibold text-[#102A43] mt-2">
-                        No submission yet
-                      </h3>
-
-                      <p className="text-[13px] text-[#52606D] mt-1">
-                        Your first report is pending
-                      </p>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* REPORT STATUS */}
-
-            <div className="bg-white rounded-2xl border border-[#E3E9E5] p-5 shadow-sm">
-              <div className="flex items-start gap-4">
-                <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${
-                    alreadySubmitted
-                      ? "bg-[#EAF6EE]"
-                      : "bg-[#FFF5DD]"
-                  }`}
-                >
-                  {alreadySubmitted ? (
-                    <CheckCircle2 className="w-6 h-6 text-[#087A32]" />
-                  ) : (
-                    <Clock3 className="w-6 h-6 text-[#C57A00]" />
-                  )}
-                </div>
-
-                <div>
-                  <p className="text-[11px] uppercase tracking-[0.08em] font-semibold text-[#52606D]">
-                    Report Status
-                  </p>
-
-                  {loadingStatus ? (
-                    <h3 className="text-[21px] font-semibold text-[#102A43] mt-2">
-                      Loading...
-                    </h3>
-                  ) : (
-                    <h3
-                      className={`text-[21px] font-semibold mt-2 ${
-                        alreadySubmitted
-                          ? "text-[#087A32]"
-                          : "text-[#C57A00]"
-                      }`}
-                    >
-                      {alreadySubmitted
-                        ? "Submitted"
-                        : "Pending"}
-                    </h3>
-                  )}
-
-                  <p className="text-[13px] text-[#52606D] mt-1">
-                    {alreadySubmitted
-                      ? "This week's report has been received"
-                      : "Weekly report requires submission"}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* ======================================================
-              SUBMITTED / PENDING BANNER
-          ====================================================== */}
-
-          <section className="mb-4">
-            <div className="rounded-2xl border border-[#B8DEC6] bg-[#F0FAF3] p-6">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#D9F1E1] flex items-center justify-center shrink-0">
-                    {alreadySubmitted ? (
-                      <CheckCircle2 className="w-6 h-6 text-[#087A32]" />
-                    ) : (
-                      <Clock3 className="w-6 h-6 text-[#C57A00]" />
-                    )}
-                  </div>
-
-                  <div>
-                    <p className="text-[11px] uppercase tracking-[0.1em] font-semibold text-[#087A32]">
-                      Weekly Disease Report
-                    </p>
-
-                    <h3 className="text-[21px] font-semibold text-[#087A32] mt-1">
-                      {alreadySubmitted
-                        ? "This week's report has been submitted"
-                        : "This week's report is pending"}
-                    </h3>
-
-                    <p className="text-[13px] text-[#334E68] mt-2 max-w-2xl">
-                      {alreadySubmitted
-                        ? "Your current reporting cycle is complete. You can edit the submitted information if required, or add a new disease."
-                        : "Submit the verified disease information for your assigned taluk."}
-                    </p>
-
-                    {alreadySubmitted && (
-                      <p className="text-[12px] text-[#087A32] font-semibold mt-2">
-                        Reporting cycle: Week{" "}
-                        {status?.current_week}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={
-                    alreadySubmitted
-                      ? openEditReport
-                      : openAddDisease
-                  }
-                  className="shrink-0 rounded-xl bg-[#087A32] px-6 py-3 text-[13px] font-semibold text-white hover:bg-[#076B2C] transition flex items-center justify-center gap-2"
-                >
-                  {alreadySubmitted ? (
-                    <>
-                      <FileText className="w-4 h-4" />
-                      Edit Weekly Report
-                    </>
-                  ) : (
-                    <>
-                      <FileText className="w-4 h-4" />
-                      Submit Weekly Report
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </section>
-
-          {/* ======================================================
-              ADD ANOTHER DISEASE
-          ====================================================== */}
-
-          {alreadySubmitted && (
-            <section className="mb-8">
-              <button
-                type="button"
-                onClick={openAddDisease}
-                className="w-full group rounded-2xl border border-dashed border-[#55A978] bg-white hover:bg-[#F7FCF9] transition p-5 text-left"
-              >
-                <div className="flex items-center gap-4">
-
-                  <div className="w-12 h-12 rounded-full bg-[#EAF6EE] flex items-center justify-center shrink-0">
-                    <Plus className="w-6 h-6 text-[#087A32]" />
-                  </div>
-
-                  <div className="flex-1">
-                    <h3 className="text-[19px] font-semibold text-[#087A32]">
-                      Add Another Disease
-                    </h3>
-
-                    <p className="text-[13px] text-[#52606D] mt-1">
-                      Add a new disease to the current reporting cycle.
-                    </p>
-                  </div>
-
-                  <ArrowRight className="w-5 h-5 text-[#087A32] group-hover:translate-x-1 transition" />
-                </div>
-              </button>
-            </section>
-          )}
-        </>
+      {tab === "dashboard" && (
+        <DashboardView
+          session={session}
+          status={status}
+          talukName={talukName}
+          districtName={districtName}
+          weekNumber={weekNumber}
+          cycleDates={cycleDates}
+          alreadySubmitted={alreadySubmitted}
+          loading={loading}
+          refreshing={refreshing}
+          error={error}
+          latestSubmissionDate={latestSubmissionDate}
+          latestSubmissionTime={latestSubmissionTime}
+          totalThisMonth={totalThisMonth}
+          snapshot={snapshot}
+          notifications={notifications}
+          onRefresh={() => loadDashboardData(true)}
+          onWeeklyReport={openWeeklyReport}
+          onEmerging={() => setTab("emerging")}
+          onHistory={() => setTab("history")}
+          onNotifications={() => setTab("notifications")}
+        />
       )}
 
-      {/* ========================================================
-          REPORT EDITOR
-      ======================================================== */}
-
-      {tab === "report" && showReportEditor && (
-        <section>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
-
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#EAF6EE] flex items-center justify-center">
-                {reportMode === "add" ? (
-                  <Plus className="w-5 h-5 text-[#087A32]" />
-                ) : (
-                  <FileText className="w-5 h-5 text-[#087A32]" />
-                )}
+      {tab === "report" && (
+        showReportEditor ? (
+          <section className="agent-editor-page">
+            <div className="agent-page-heading agent-editor-heading">
+              <div className="agent-heading-icon">
+                {reportMode === "add" ? <Plus size={20} /> : <FileText size={20} />}
               </div>
-
               <div>
-                <h3 className="text-[20px] font-semibold text-[#102A43]">
+                <h2>{reportMode === "add" ? "Submit Weekly Disease Report" : "Edit Weekly Disease Report"}</h2>
+                <p>
                   {reportMode === "add"
-                    ? "Add Another Disease"
-                    : "Edit Weekly Disease Report"}
-                </h3>
-
-                <p className="text-[13px] text-[#7B8794] mt-1">
-                  {reportMode === "add"
-                    ? "Enter the details for the new disease."
-                    : "Update your previously submitted disease information."}
+                    ? "Enter the disease information collected for your assigned taluk."
+                    : "Update the information submitted for the current surveillance cycle."}
                 </p>
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={closeReportEditor}
-              className="rounded-xl border border-[#D9E2DC] bg-white px-5 py-2.5 text-[13px] font-medium text-[#334E68] hover:bg-[#F7F9F8] transition"
-            >
+            <button type="button" className="agent-secondary-button" onClick={closeEditor}>
               Cancel
             </button>
-          </div>
 
-          {/*
-           * KEY POINT:
-           *
-           * reportMode="edit"
-           *     -> ReportForm loads previous data.
-           *
-           * reportMode="add"
-           *     -> ReportForm starts empty.
-           *
-           * key={reportFormKey}
-           *     -> completely resets the form when switching mode.
-           */}
-
-          <ReportForm
-            key={reportFormKey}
-            mode={reportMode}
+            <div className="agent-form-card">
+              <ReportForm key={reportFormKey} mode={reportMode} />
+            </div>
+          </section>
+        ) : (
+          <WeeklyReportLanding
+            alreadySubmitted={alreadySubmitted}
+            weekNumber={weekNumber}
+            cycleDates={cycleDates}
+            onSubmit={openWeeklyReport}
           />
-        </section>
+        )
       )}
 
-      {tab === "emerging" && (
-        <EmergingDiseaseReport />
+      {tab === "emerging" && <EmergingDiseaseReport />}
+
+      {tab === "history" && <History />}
+
+      {tab === "notifications" && (
+        <NotificationsView
+          notifications={notifications}
+          loading={loading}
+          onRefresh={() => loadDashboardData(true)}
+        />
       )}
-
-      {/* ========================================================
-          HISTORY TAB
-      ======================================================== */}
-
-      {tab === "history" && (
-        <section>
-          {/*
-           * Keep your existing History component/page here.
-           * Submission History is intentionally NOT displayed
-           * on the Weekly Report dashboard.
-           */}
-
-          {/*
-           * IMPORTANT:
-           * Import History at the top if your existing project
-           * requires it.
-           */}
-
-          <HistorySection />
-        </section>
-      )}
-    </PortalShell>
+    </AgentShell>
   );
 }
 
-/*
- * Small lazy-safe wrapper so the dashboard itself does not
- * contain a Submission History preview.
- *
- * Replace this import with the normal History import if your
- * project already has it.
- */
-
-import History from "./History";
-
-function HistorySection() {
+function DashboardView({
+  session,
+  talukName,
+  districtName,
+  weekNumber,
+  cycleDates,
+  alreadySubmitted,
+  loading,
+  refreshing,
+  error,
+  latestSubmissionDate,
+  latestSubmissionTime,
+  totalThisMonth,
+  snapshot,
+  notifications,
+  onRefresh,
+  onWeeklyReport,
+  onEmerging,
+  onHistory,
+  onNotifications,
+}) {
   return (
-    <>
-      <div className="flex items-center gap-3 mb-5">
-        <div className="w-10 h-10 rounded-xl bg-[#EEF4FB] flex items-center justify-center">
-          <Clock3 className="w-5 h-5 text-[#315C88]" />
+    <div className="agent-dashboard">
+      <section className="agent-hero">
+        <div className="agent-hero-overlay" />
+        <div className="agent-hero-content">
+          <h1>Welcome back, {session.full_name || session.username}! <span>👋</span></h1>
+          <p>Field surveillance overview for {talukName}</p>
+
+          <div className="agent-cycle">
+            <div className="agent-cycle-icon"><CalendarDays size={22} /></div>
+            <div>
+              <strong>Current Surveillance Cycle</strong>
+              <span>
+                Week {weekNumber ?? "—"} <b>•</b> {cycleDates}
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div>
-          <h3 className="text-[20px] font-semibold text-[#102A43]">
-            Submission History
-          </h3>
+        <div className="agent-assignment-card">
+          <div className="agent-assignment-icon"><MapPin size={22} /></div>
+          <div>
+            <strong>Assigned Location</strong>
+            <div><span>Taluk</span><b>:</b><em>{talukName}</em></div>
+            <div><span>District</span><b>:</b><em>{districtName}</em></div>
+            <div><span>Role</span><b>:</b><em>Field Surveillance Agent</em></div>
+          </div>
+        </div>
+      </section>
 
-          <p className="text-[13px] text-[#7B8794]">
-            Previously submitted disease reports
-          </p>
+      {error && (
+        <div className="agent-error-banner">
+          <AlertCircle size={17} />
+          <span>{error}</span>
+          <button type="button" onClick={onRefresh}>Retry</button>
+        </div>
+      )}
+
+      <section className="agent-stat-grid">
+        <StatCard
+          className="status-card"
+          icon={alreadySubmitted ? <CheckCircle2 size={22} /> : <Clock3 size={22} />}
+          title="Report Status"
+          value={loading ? "Loading..." : alreadySubmitted ? "Submitted" : "Pending"}
+          detail={alreadySubmitted ? "This week's report has been submitted" : "Weekly report requires submission"}
+        />
+        <StatCard
+          className="submission-card"
+          icon={<CalendarDays size={22} />}
+          title="Last Submission"
+          value={loading ? "Loading..." : latestSubmissionDate || "No submission yet"}
+          detail={latestSubmissionDate && latestSubmissionTime ? latestSubmissionTime : "Your first report is pending"}
+        />
+        <StatCard
+          className="cycle-card"
+          icon={<RefreshCw size={22} />}
+          title="Current Cycle"
+          value={`Week ${weekNumber ?? "—"}`}
+          detail={cycleDates}
+        />
+        <StatCard
+          className="total-card"
+          icon={<FileText size={22} />}
+          title="Total Reports Submitted"
+          value={loading ? "—" : String(totalThisMonth)}
+          detail="This month"
+        />
+      </section>
+
+      <section className="agent-section-heading">
+        <h2>Quick Actions</h2>
+      </section>
+
+      <section className="agent-quick-grid">
+        <QuickAction
+          tone="blue"
+          icon={<FileText size={21} />}
+          title="Submit Weekly Report"
+          description="Report disease cases and field observations for the current week"
+          onClick={onWeeklyReport}
+        />
+        <QuickAction
+          tone="red"
+          icon={<ShieldAlert size={21} />}
+          title="Report Emerging Disease"
+          description="Report unusual or unknown disease patterns"
+          onClick={onEmerging}
+        />
+        <QuickAction
+          tone="green"
+          icon={<HistoryIcon size={21} />}
+          title="View Submission History"
+          description="Check your past reports and submissions"
+          onClick={onHistory}
+        />
+      </section>
+
+      <section className="agent-bottom-grid">
+        <div className="agent-panel snapshot-panel">
+          <div className="agent-panel-heading">
+            <div className="agent-panel-title-wrap">
+              <MapPin size={21} />
+              <div>
+                <h3>Current Taluk Snapshot</h3>
+                <p>Latest surveillance data for {talukName}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="snapshot-table-wrap">
+            <table className="snapshot-table">
+              <thead>
+                <tr>
+                  <th>Disease</th>
+                  <th>Confirmed Cases</th>
+                  <th>Suspected Cases</th>
+                  <th>Severity</th>
+                </tr>
+              </thead>
+              <tbody>
+                {snapshot.map((item) => {
+                  const risk = item.risk_level || "Low";
+                  return (
+                    <tr key={item.disease}>
+                      <td>
+                        <span className={`disease-dot ${String(item.disease).toLowerCase().replace(/\s+/g, "-")}`} />
+                        {item.disease}
+                      </td>
+                      <td>{item.cases ?? 0}</td>
+                      <td>{item.suspected_cases ?? "—"}</td>
+                      <td>
+                        <span className={`risk-pill ${RISK_CLASS[risk] || "low"}`}>
+                          {risk}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {!snapshot.length && (
+                  <tr>
+                    <td colSpan="4" className="snapshot-empty">
+                      No surveillance reports are available for this taluk yet.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="snapshot-note">
+            <Info size={16} />
+            <span>This is a read-only snapshot of the current taluk situation.</span>
+          </div>
+        </div>
+
+        <div className="agent-panel notification-panel">
+          <div className="agent-panel-heading">
+            <div className="agent-panel-title-wrap">
+              <Bell size={19} />
+              <h3>Recent Notifications</h3>
+            </div>
+            <button type="button" onClick={onNotifications}>View All</button>
+          </div>
+
+          <NotificationList notifications={notifications.slice(0, 4)} />
+        </div>
+      </section>
+
+      <div className="agent-refresh-line">
+        <button type="button" onClick={onRefresh} disabled={refreshing}>
+          <RefreshCw size={14} className={refreshing ? "spin" : ""} />
+          {refreshing ? "Refreshing..." : "Refresh surveillance data"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ className = "", icon, title, value, detail }) {
+  const isStatus = className.includes("status-card");
+  const isSubmitted = String(value).toLowerCase() === "submitted";
+
+  return (
+    <article className={`agent-stat-card ${className}`}>
+      <div className="agent-stat-icon">{icon}</div>
+      <div className="agent-stat-copy">
+        <span className="agent-stat-title">{title}</span>
+        {isStatus && (isSubmitted || String(value).toLowerCase() === "pending") ? (
+          <span className={`agent-status-pill ${isSubmitted ? "submitted" : "pending"}`}>
+            {value}
+          </span>
+        ) : (
+          <strong>{value}</strong>
+        )}
+        <p>{detail}</p>
+      </div>
+    </article>
+  );
+}
+
+function QuickAction({ tone, icon, title, description, onClick }) {
+  return (
+    <button type="button" className={`agent-quick-card ${tone}`} onClick={onClick}>
+      <div className="agent-quick-icon">{icon}</div>
+      <div className="agent-quick-copy">
+        <h3>{title}</h3>
+        <p>{description}</p>
+      </div>
+      <ArrowRight size={22} className="agent-quick-arrow" />
+    </button>
+  );
+}
+
+function NotificationList({ notifications }) {
+  if (!notifications.length) {
+    return (
+      <div className="agent-empty-notifications">
+        <Bell size={22} />
+        <p>No notifications yet.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="agent-notification-list">
+      {notifications.map((notification) => {
+        const tone = notificationTone(notification.type);
+        return (
+          <div className="agent-notification-row" key={notification.id}>
+            <div className={`agent-notification-icon ${tone}`}>
+              <NotificationIcon type={notification.type} />
+            </div>
+            <div className="agent-notification-copy">
+              <strong>{notification.title}</strong>
+              <p>{notification.message}</p>
+            </div>
+            <time>{formatRelativeDate(notification.created_at)}</time>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function formatRelativeDate(dateValue) {
+  if (!dateValue) return "";
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return "";
+
+  const diff = Math.max(0, Date.now() - date.getTime());
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(hours / 24);
+
+  if (hours < 1) return "just now";
+  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  if (days < 7) return `${days} day${days === 1 ? "" : "s"} ago`;
+  return formatDate(dateValue);
+}
+
+function WeeklyReportLanding({ alreadySubmitted, weekNumber, cycleDates, onSubmit }) {
+  return (
+    <section className="agent-report-landing">
+      <div className="agent-page-heading">
+        <div className="agent-heading-icon"><FileText size={20} /></div>
+        <div>
+          <h2>Weekly Disease Report</h2>
+          <p>Submit the latest disease surveillance information from your assigned taluk.</p>
         </div>
       </div>
 
-      <History />
-    </>
+      <div className={`agent-report-status-banner ${alreadySubmitted ? "submitted" : "pending"}`}>
+        <div className="agent-report-status-icon">
+          {alreadySubmitted ? <CheckCircle2 size={23} /> : <Clock3 size={23} />}
+        </div>
+        <div>
+          <span>Week {weekNumber ?? "—"} · {cycleDates}</span>
+          <h3>{alreadySubmitted ? "This week's report has been submitted" : "This week's report is pending"}</h3>
+          <p>
+            {alreadySubmitted
+              ? "You can edit the submitted information whenever a correction is required."
+              : "Submit the verified disease information collected for your assigned taluk."}
+          </p>
+        </div>
+        <button type="button" onClick={onSubmit}>
+          <FileText size={16} />
+          {alreadySubmitted ? "Edit Weekly Report" : "Submit Weekly Report"}
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function NotificationsView({ notifications, loading, onRefresh }) {
+  return (
+    <section className="agent-notifications-page">
+      <div className="agent-page-heading">
+        <div className="agent-heading-icon"><Bell size={20} /></div>
+        <div>
+          <h2>Notifications</h2>
+          <p>Updates and messages related to your field surveillance work.</p>
+        </div>
+        <button type="button" className="agent-refresh-button" onClick={onRefresh} disabled={loading}>
+          <RefreshCw size={15} className={loading ? "spin" : ""} />
+          Refresh
+        </button>
+      </div>
+
+      <div className="agent-full-notification-card">
+        <NotificationList notifications={notifications} />
+        {!notifications.length && (
+          <div className="agent-large-empty">
+            <Bell size={28} />
+            <h3>No notifications</h3>
+            <p>New surveillance reminders and updates will appear here.</p>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }

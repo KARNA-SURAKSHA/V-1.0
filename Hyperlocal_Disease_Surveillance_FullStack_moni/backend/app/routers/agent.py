@@ -53,7 +53,7 @@ def _get_agent_profile(
     return agent
 
 
-def _validate_report_items(items, db=None):
+def _validate_report_items(items):
     """
     Validate weekly disease report entries.
     """
@@ -232,6 +232,11 @@ def get_status(
         taluk_name=(
             agent.taluk.name
             if agent.taluk
+            else None
+        ),
+        district_name=(
+            agent.taluk.district.name
+            if agent.taluk and agent.taluk.district
             else None
         ),
         is_active=bool(user.is_active),
@@ -439,6 +444,10 @@ def submit_weekly_report(
                 int(item.cases)
             )
 
+            existing_report.suspected_cases = (
+                int(item.suspected_cases or 0)
+            )
+
             existing_report.severity = (
                 item.severity
             )
@@ -482,6 +491,10 @@ def submit_weekly_report(
 
                 cases=int(
                     item.cases
+                ),
+
+                suspected_cases=int(
+                    item.suspected_cases or 0
                 ),
 
                 severity=item.severity,
