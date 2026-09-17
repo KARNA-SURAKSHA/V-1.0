@@ -65,7 +65,7 @@ npm run dev
 ### 4. Use the Application
 
 - **Login**:  
-  - Admin → `admin / admin123`
+  - Admin → `admin / ChangeMe123!`
   - Citizen → `citizen / citizen123`
 - Explore dashboards, maps, disease reports, etc.
 
