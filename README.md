@@ -1,4 +1,4 @@
-<img width="2912" height="1440" alt="Social-Preview" src="https://github.com/user-attachments/assets/f89b9b40-7c8c-4f9a-ac20-11f13e6bcf01" />
+<img width="1280" height="640" alt="Social-Preview-1280x640" src="https://github.com/user-attachments/assets/bd99522b-f52e-491f-98b6-b029c7882a22" />
 
 # Hyperlocal Disease Surveillance Platform
 
