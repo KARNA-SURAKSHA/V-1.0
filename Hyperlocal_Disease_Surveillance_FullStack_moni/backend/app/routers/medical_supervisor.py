@@ -2430,14 +2430,14 @@ def review_emerging(
                 ),
             )
 
-        disease = (
-            db.query(models.Disease)
-            .filter(
-                models.Disease.id
-                == payload.mapped_disease_id
-            )
-            .first()
+        from ..firestore_db import db as firestore_db
+
+        disease_doc = (
+            firestore_db.collection("diseases")
+            .document(str(payload.mapped_disease_id))
+            .get()
         )
+        disease = disease_doc.to_dict() if disease_doc.exists else None
 
         if not disease:
             raise HTTPException(
@@ -2473,38 +2473,34 @@ def review_emerging(
                 ),
             )
 
-        disease = (
-            db.query(models.Disease)
-            .filter(
-                func.lower(
-                    models.Disease.name
-                )
-                == name.lower()
-            )
-            .first()
+        from ..firestore_db import db as firestore_db, get_next_id
+
+        all_docs = firestore_db.collection("diseases").stream()
+        disease_doc = next(
+            (
+                doc for doc in all_docs
+                if doc.to_dict().get("name", "").lower() == name.lower()
+            ),
+            None,
         )
 
-        if not disease:
-            disease = models.Disease(
-                name=name,
-                description=(
-                    payload.new_disease_description
-                ),
-                verification_status=(
-                    "VERIFIED"
-                ),
-                is_active=True,
-                verified_by_user_id=user.id,
-                verified_at=datetime.utcnow(),
-            )
+        if disease_doc:
+            disease_id = int(disease_doc.id)
+        else:
+            disease_id = get_next_id("diseases")
+            firestore_db.collection("diseases").document(str(disease_id)).set({
+                "id": disease_id,
+                "name": name,
+                "description": payload.new_disease_description,
+                "verification_status": "VERIFIED",
+                "is_active": True,
+                "created_by_user_id": None,
+                "verified_by_user_id": user.id,
+                "created_at": datetime.utcnow().isoformat(),
+                "verified_at": datetime.utcnow().isoformat(),
+            })
 
-            db.add(disease)
-            db.flush()
-
-        report.mapped_disease_id = (
-            disease.id
-        )
-
+        report.mapped_disease_id = disease_id
         report.status = "APPROVED"
 
     # --------------------------------------------------------

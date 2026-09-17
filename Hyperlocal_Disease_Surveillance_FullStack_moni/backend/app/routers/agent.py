@@ -127,15 +127,23 @@ def _validate_report_items(items):
         # --------------------------------------------------------
 
         if db is not None:
-            official = (
-                db.query(models.Disease)
-                .filter(
-                    models.Disease.name.ilike(disease_name),
-                    models.Disease.is_active == True,
-                    models.Disease.verification_status == "VERIFIED",
-                )
-                .first()
+            from ..firestore_db import db as firestore_db
+
+            matches = (
+                firestore_db.collection("diseases")
+                .where("is_active", "==", True)
+                .where("verification_status", "==", "VERIFIED")
+                .stream()
             )
+            official = next(
+                (
+                    doc for doc in matches
+                    if doc.to_dict().get("name", "").lower() == disease_name.lower()
+                ),
+                None,
+            )
+
+        if not official:
 
             if not official:
                 raise HTTPException(
