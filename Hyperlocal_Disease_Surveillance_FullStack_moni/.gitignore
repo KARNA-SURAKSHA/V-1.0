@@ -88,7 +88,8 @@ Thumbs.db
 /backend/venv/
 
 # Python cache files
-backend/app/__pycache__/
+/backend/app/__pycache__/
+/backend/app/services/__pycache__
 __pycache__/
 *.py[cod]
 
