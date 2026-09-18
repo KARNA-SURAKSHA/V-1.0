@@ -70,6 +70,13 @@ class User(Base):
         default=True,
     )
 
+    firebase_uid = Column(
+        String,
+        unique=True,
+        nullable=True,
+        index=True,
+    )
+
     # District assigned to a Medical Supervisor.
     supervisor_district_id = Column(
         Integer,
