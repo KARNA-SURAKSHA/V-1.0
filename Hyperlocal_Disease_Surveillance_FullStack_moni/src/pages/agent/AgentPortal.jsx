@@ -70,6 +70,39 @@ const RISK_CLASS = {
    CURRENT WEEK
 ============================================================ */
 
+function getDisplayWeekNumber(value) {
+  if (
+    value === undefined ||
+    value === null ||
+    value === ""
+  ) {
+    return null;
+  }
+
+  // Support values such as 202638.
+  const numericValue = Number(value);
+
+  if (!Number.isFinite(numericValue)) {
+    // Also support strings such as "2026-W38" if the API ever returns them.
+    const match = String(value).match(/(?:W|week\s*)0*(\d{1,2})$/i);
+    if (match) {
+      const week = Number(match[1]);
+      return week >= 1 && week <= 53 ? week : null;
+    }
+    return null;
+  }
+
+  if (numericValue >= 100000) {
+    const week = Math.trunc(numericValue) % 100;
+    return week >= 1 && week <= 53 ? week : null;
+  }
+
+  return numericValue >= 1 && numericValue <= 53
+    ? Math.trunc(numericValue)
+    : null;
+}
+
+
 function getWeekDates() {
   const today = new Date();
 
@@ -400,11 +433,19 @@ export default function AgentPortal({
      WEEK NUMBER
   ========================================================== */
 
+  /*
+     The backend stores the surveillance cycle as YYYYWW.
+     Example: 202638 means ISO Week 38 of 2026.
+     Keep the original value for API/report operations, but
+     convert it to the plain week number only for display.
+  */
+  const currentWeekKey =
+    status?.current_week ?? null;
+
   const weekNumber =
-    status?.current_week
-      ? status.current_week %
-        100
-      : null;
+    getDisplayWeekNumber(
+      currentWeekKey
+    );
 
 
   /* ==========================================================
@@ -683,6 +724,10 @@ export default function AgentPortal({
 
           weekNumber={
             weekNumber
+          }
+
+          currentWeek={
+            currentWeekKey
           }
 
           cycleDates={

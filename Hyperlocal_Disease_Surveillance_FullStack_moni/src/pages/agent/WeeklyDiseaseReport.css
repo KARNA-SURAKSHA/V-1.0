@@ -1,5 +1,6 @@
 /* ============================================================
    WEEKLY DISEASE REPORT
+   Reference-matched Agent Weekly Disease Report page
 ============================================================ */
 
 .weekly-report-page {
@@ -15,154 +16,109 @@
 
 .weekly-report-hero {
   position: relative;
-
-  min-height: 190px;
-
+  min-height: 168px;
   overflow: hidden;
-
   display: flex;
   align-items: stretch;
 
   border: 1px solid #dfe6e2;
-  border-radius: 10px;
+  border-radius: 9px;
 
   background:
     #e8f1ee
     url("../../assets/ui/admin-kodagu-banner-clean.jpg")
-    center center /
-    cover
-    no-repeat;
+    center center / cover no-repeat;
 
   box-shadow:
     0 2px 8px
     rgba(25, 57, 69, 0.035);
 }
 
-
-/* Fade image into white */
-
 .weekly-report-hero-overlay {
   position: absolute;
-
   inset: 0;
+  pointer-events: none;
 
   background:
     linear-gradient(
       90deg,
-      rgba(255,255,255,0.98) 0%,
-      rgba(255,255,255,0.91) 30%,
-      rgba(255,255,255,0.58) 54%,
-      rgba(255,255,255,0.10) 100%
+      rgba(255, 255, 255, 0.985) 0%,
+      rgba(255, 255, 255, 0.94) 28%,
+      rgba(255, 255, 255, 0.64) 54%,
+      rgba(255, 255, 255, 0.08) 100%
     );
-
-  pointer-events: none;
 }
-
 
 .weekly-report-hero-content {
   position: relative;
-
   z-index: 2;
 
   width: 68%;
-
   box-sizing: border-box;
 
-  padding:
-    13px 24px
-    18px;
+  padding: 15px 23px 17px;
 }
-
 
 .weekly-report-hero-content h1 {
   margin: 0;
 
   color: #073047;
-
-  font-size: 28px;
-
-  line-height: 1.2;
-
+  font-size: 27px;
+  line-height: 1.15;
   font-weight: 800;
-
   letter-spacing: -0.65px;
 }
 
-
 .weekly-report-hero-content > p {
-  margin:
-    6px 0 0;
+  margin: 6px 0 0;
 
   color: #204d64;
-
-  font-size: 14px;
-
+  font-size: 13px;
   line-height: 1.35;
 }
 
-
 .weekly-report-cycle {
   display: flex;
-
   align-items: center;
-
-  gap: 11px;
-
-  margin-top: 26px;
+  gap: 10px;
+  margin-top: 22px;
 }
 
-
 .weekly-report-cycle-icon {
-  width: 40px;
-
-  height: 40px;
+  width: 37px;
+  height: 37px;
+  flex: 0 0 37px;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
   border-radius: 50%;
-
-  background: #e0f2e6;
-
+  background: #dff2e5;
   color: #16854d;
 }
-
 
 .weekly-report-cycle strong {
   display: block;
 
   color: #12394c;
-
-  font-size: 13px;
-
+  font-size: 12px;
   line-height: 1.25;
-
   font-weight: 800;
 }
 
-
 .weekly-report-cycle span {
   display: block;
-
   margin-top: 5px;
 
   color: #12394c;
-
-  font-size: 13px;
-
+  font-size: 12px;
   line-height: 1.2;
-
   font-weight: 700;
 }
 
-
 .weekly-report-cycle b {
-  margin:
-    0 5px;
-
+  margin: 0 5px;
   font-weight: 700;
 }
 
@@ -173,244 +129,210 @@
 
 .weekly-report-location-card {
   position: absolute;
-
   z-index: 4;
 
-  top: 29px;
-
+  top: 25px;
   right: 16px;
 
-  width: 360px;
-
-  min-height: 140px;
-
+  width: 356px;
+  min-height: 119px;
   box-sizing: border-box;
 
   display: flex;
-
   align-items: flex-start;
+  gap: 12px;
 
-  gap: 13px;
+  padding: 15px 18px;
 
-  padding:
-    18px 20px;
+  border-radius: 10px;
 
-  border-radius: 11px;
-
-  background:
-    rgba(
-      255,
-      255,
-      255,
-      0.93
-    );
+  background: rgba(255, 255, 255, 0.95);
 
   border:
     1px solid
-    rgba(
-      225,
-      232,
-      228,
-      0.9
-    );
+    rgba(225, 232, 228, 0.95);
 
   box-shadow:
     0 5px 15px
-    rgba(
-      35,
-      62,
-      71,
-      0.08
-    );
+    rgba(35, 62, 71, 0.08);
 }
-
 
 .weekly-report-location-card > svg {
   flex: 0 0 auto;
-
   margin-top: 1px;
-
   color: #47788e;
 }
 
-
 .weekly-report-location-card strong {
   display: block;
-
-  margin-bottom: 9px;
+  margin-bottom: 8px;
 
   color: #123548;
-
-  font-size: 14px;
-
+  font-size: 13px;
   font-weight: 800;
 }
-
 
 .weekly-report-location-card > div {
   min-width: 0;
 }
 
-
 .weekly-report-location-card > div > div {
   display: grid;
-
-  grid-template-columns:
-    62px 12px minmax(0, 1fr);
-
+  grid-template-columns: 58px 10px minmax(0, 1fr);
   gap: 4px;
 
   margin-top: 5px;
 
   color: #234f65;
-
-  font-size: 12px;
-
+  font-size: 11px;
   line-height: 1.2;
 }
-
 
 .weekly-report-location-card span {
   color: #577487;
 }
 
-
 .weekly-report-location-card b {
+  color: #6b8089;
   font-weight: 500;
 }
 
-
 .weekly-report-location-card em {
   font-style: normal;
-
   color: #163f53;
-
-  font-weight: 600;
+  font-weight: 650;
 }
 
 
 /* ============================================================
-   FORM CARD
+   MAIN TWO-COLUMN LAYOUT
+============================================================ */
+
+.weekly-report-main-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: 14px;
+
+  margin-top: 14px;
+
+  align-items: start;
+}
+
+.weekly-report-right-column {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+
+/* ============================================================
+   NEW REPORT FORM
 ============================================================ */
 
 .weekly-report-form-card {
-  margin-top: 18px;
-
+  min-width: 0;
   overflow: hidden;
 
   border:
-    1px solid #e0e7e3;
+    1px solid #dfe7e3;
 
-  border-radius: 10px;
+  border-radius: 9px;
 
   background: #ffffff;
 
   box-shadow:
     0 2px 7px
-    rgba(
-      28,
-      57,
-      68,
-      0.025
-    );
+    rgba(28, 57, 68, 0.025);
 }
 
-
 .weekly-report-form-heading {
-  min-height: 64px;
-
+  min-height: 58px;
   box-sizing: border-box;
 
   display: flex;
-
   align-items: center;
+  justify-content: flex-start;
 
-  justify-content: space-between;
-
-  padding:
-    0 18px;
+  padding: 0 15px;
 
   border-bottom:
     1px solid #edf0ee;
 }
 
-
 .weekly-report-title-wrap {
   display: flex;
-
   align-items: center;
-
-  gap: 10px;
+  gap: 9px;
 }
-
 
 .weekly-report-title-icon {
   width: 30px;
-
   height: 30px;
+  flex: 0 0 30px;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
-  border-radius: 8px;
+  border-radius: 50%;
 
-  background: #e1f2ef;
-
-  color: #207d91;
+  background: #dff3e9;
+  color: #16874e;
 }
-
 
 .weekly-report-form-heading h2 {
   margin: 0;
 
   color: #10364a;
-
-  font-size: 18px;
-
+  font-size: 16px;
   line-height: 1.2;
-
   font-weight: 800;
 }
 
+.weekly-report-form-heading p {
+  margin: 3px 0 0;
 
-.weekly-submit-top-button {
-  display: inline-flex;
+  color: #5a7a8a;
+  font-size: 10px;
+  line-height: 1.2;
+}
 
+
+/* ============================================================
+   ALERTS
+============================================================ */
+
+.weekly-report-alert {
+  margin: 10px 14px 0;
+
+  display: flex;
   align-items: center;
-
   gap: 7px;
 
-  border: 0;
+  padding: 8px 10px;
 
-  border-radius: 9px;
+  border-radius: 7px;
 
-  padding:
-    9px 14px;
-
-  background: #cceedd;
-
-  color: #155e47;
-
-  font-size: 11px;
-
-  font-weight: 800;
-
-  cursor: pointer;
+  font-size: 10px;
+  line-height: 1.3;
 }
 
-
-.weekly-submit-top-button:hover {
-  background: #bde5d0;
+.weekly-report-alert.error {
+  border: 1px solid #f0caca;
+  background: #fff5f5;
+  color: #c62828;
 }
 
-
-.weekly-submit-top-button:disabled {
-  opacity: 0.6;
-
-  cursor: default;
+.weekly-report-alert.success {
+  border: 1px solid #b9dfc8;
+  background: #effaf3;
+  color: #087a32;
 }
 
 
@@ -419,8 +341,7 @@
 ============================================================ */
 
 .weekly-report-form-inner {
-  padding:
-    15px 15px 16px;
+  padding: 10px 13px 13px;
 
   background:
     linear-gradient(
@@ -431,43 +352,130 @@
 }
 
 
-.weekly-disease-entry {
-  padding: 0;
+/* ============================================================
+   DISEASE ENTRY CARD
+============================================================ */
+
+.weekly-disease-entry-card {
+  overflow: hidden;
+
+  border:
+    1px solid #dfeaf0;
+
+  border-radius: 9px;
+
+  background: #ffffff;
+}
+
+.weekly-entry-strip {
+  min-height: 35px;
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 0 11px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #edf7fb 0%,
+      #f7fbfd 100%
+    );
+
+  border-bottom:
+    1px solid #e1edf1;
+
+  color: #7a98a7;
+}
+
+.weekly-entry-number {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #7ca0b2;
+  color: #ffffff;
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.weekly-entry-remove {
+  width: 27px;
+  height: 27px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-left: auto;
 
   border: 0;
+  border-radius: 6px;
+
+  background: transparent;
+  color: #e14b4b;
+
+  cursor: pointer;
+}
+
+.weekly-entry-remove:hover {
+  background: #fff0ef;
+}
+
+.weekly-disease-entry-body {
+  padding: 12px 12px 13px;
 }
 
 
 /* ============================================================
-   GRID
+   FORM GRID
 ============================================================ */
 
 .weekly-form-grid {
   display: grid;
-
-  gap: 18px;
+  gap: 13px;
 }
-
 
 .weekly-form-grid.four-columns {
   grid-template-columns:
-    minmax(0, 1.1fr)
+    minmax(0, 1.05fr)
     minmax(0, 0.88fr)
     minmax(0, 0.88fr)
-    minmax(0, 1fr);
+    minmax(0, 0.98fr);
 }
-
 
 .weekly-form-observation-grid {
   display: grid;
 
   grid-template-columns:
-    minmax(0, 1.5fr)
-    minmax(350px, 0.7fr);
+    minmax(0, 1fr)
+    minmax(0, 1fr);
 
-  gap: 19px;
+  gap: 13px;
 
-  margin-top: 20px;
+  margin-top: 14px;
+}
+
+.weekly-date-time-row {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: 13px;
+
+  margin-top: 12px;
 }
 
 
@@ -479,32 +487,26 @@
   min-width: 0;
 }
 
-
 .weekly-field label {
   display: block;
 
-  margin-bottom: 7px;
+  margin-bottom: 6px;
 
   color: #173f54;
 
-  font-size: 11px;
-
+  font-size: 9px;
   line-height: 1.2;
-
-  font-weight: 650;
+  font-weight: 700;
 }
-
 
 .weekly-field label span {
   color: #e34b45;
 }
 
-
 .weekly-field input,
 .weekly-field select,
 .weekly-field textarea {
   width: 100%;
-
   box-sizing: border-box;
 
   border:
@@ -517,31 +519,26 @@
   color: #214b61;
 
   font-family: inherit;
-
-  font-size: 12px;
+  font-size: 10px;
 
   transition:
     border-color 140ms ease,
     box-shadow 140ms ease;
 }
 
-
 .weekly-field input,
 .weekly-field select {
-  height: 40px;
+  height: 37px;
 
   border-radius: 6px;
 
-  padding:
-    0 12px;
+  padding: 0 10px;
 }
-
 
 .weekly-field input::placeholder,
 .weekly-field textarea::placeholder {
-  color: #7190a0;
+  color: #7893a0;
 }
-
 
 .weekly-field input:focus,
 .weekly-field select:focus,
@@ -550,12 +547,7 @@
 
   box-shadow:
     0 0 0 3px
-    rgba(
-      43,
-      155,
-      105,
-      0.08
-    );
+    rgba(43, 155, 105, 0.08);
 }
 
 
@@ -567,23 +559,18 @@
   position: relative;
 }
 
-
 .weekly-select-wrapper select {
   appearance: none;
-
-  padding-right: 35px;
+  padding-right: 29px;
 }
-
 
 .weekly-select-wrapper > svg {
   position: absolute;
 
-  right: 11px;
-
+  right: 9px;
   top: 50%;
 
-  transform:
-    translateY(-50%);
+  transform: translateY(-50%);
 
   pointer-events: none;
 
@@ -599,31 +586,26 @@
   position: relative;
 }
 
-
 .weekly-field textarea {
-  min-height: 88px;
+  min-height: 82px;
 
   resize: vertical;
 
   border-radius: 6px;
 
-  padding:
-    10px 12px;
+  padding: 9px 10px 18px;
 
-  line-height: 1.45;
+  line-height: 1.4;
 }
-
 
 .weekly-textarea-wrapper > span {
   position: absolute;
 
-  right: 10px;
-
-  bottom: 8px;
+  right: 8px;
+  bottom: 6px;
 
   color: #668391;
-
-  font-size: 9px;
+  font-size: 8px;
 }
 
 
@@ -631,45 +613,25 @@
    DATE / TIME
 ============================================================ */
 
-.weekly-observation-side {
-  min-width: 0;
-}
-
-
-.weekly-date-time-grid {
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(0, 1fr);
-
-  gap: 15px;
-}
-
-
 .weekly-input-icon {
   position: relative;
 }
 
-
 .weekly-input-icon > svg {
   position: absolute;
 
-  left: 10px;
-
+  left: 9px;
   top: 50%;
 
-  transform:
-    translateY(-50%);
+  transform: translateY(-50%);
 
   color: #4d7789;
 
   pointer-events: none;
 }
 
-
 .weekly-input-icon input {
-  padding-left: 34px;
+  padding-left: 30px;
 }
 
 
@@ -679,21 +641,17 @@
 
 .weekly-add-disease {
   width: 100%;
-
-  min-height: 38px;
+  min-height: 36px;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
+  gap: 6px;
 
-  gap: 7px;
-
-  margin-top: 15px;
+  margin-top: 13px;
 
   border:
-    1px dashed #62aa84;
+    1px dashed #63b28c;
 
   border-radius: 7px;
 
@@ -701,13 +659,11 @@
 
   color: #087a32;
 
-  font-size: 11px;
-
+  font-size: 10px;
   font-weight: 700;
 
   cursor: pointer;
 }
-
 
 .weekly-add-disease:hover {
   background: #f6fcf8;
@@ -720,274 +676,118 @@
 
 .weekly-form-footer {
   display: flex;
-
   justify-content: flex-end;
 
-  margin-top: 13px;
+  margin-top: 12px;
 }
 
-
 .weekly-submit-button {
+  min-width: 138px;
+  height: 37px;
+
   display: inline-flex;
-
   align-items: center;
-
   justify-content: center;
+  gap: 6px;
 
-  gap: 7px;
-
-  min-width: 132px;
-
-  height: 38px;
-
-  padding:
-    0 17px;
+  padding: 0 15px;
 
   border: 0;
-
   border-radius: 7px;
 
   background: #087a32;
+  color: #ffffff;
 
-  color: white;
-
-  font-size: 11px;
-
-  font-weight: 750;
+  font-size: 10px;
+  font-weight: 800;
 
   cursor: pointer;
 }
-
 
 .weekly-submit-button:hover {
   background: #076c2d;
 }
 
-
 .weekly-submit-button:disabled {
   opacity: 0.6;
-
   cursor: default;
 }
 
 
 /* ============================================================
-   ALERTS
-============================================================ */
-
-.weekly-report-alert {
-  margin:
-    12px 15px 0;
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 7px;
-
-  padding:
-    9px 12px;
-
-  border-radius: 7px;
-
-  font-size: 11px;
-
-  line-height: 1.3;
-}
-
-
-.weekly-report-alert.error {
-  border:
-    1px solid #f0caca;
-
-  background: #fff5f5;
-
-  color: #c62828;
-}
-
-
-.weekly-report-alert.success {
-  border:
-    1px solid #b9dfc8;
-
-  background: #effaf3;
-
-  color: #087a32;
-}
-
-
-/* ============================================================
-   ENTRY HEADER
-============================================================ */
-
-.weekly-entry-header {
-  display: flex;
-
-  align-items: center;
-
-  justify-content: space-between;
-
-  margin-bottom: 14px;
-
-  padding-bottom: 9px;
-
-  border-bottom:
-    1px solid #edf1ef;
-}
-
-
-.weekly-entry-header strong {
-  color: #123b4f;
-
-  font-size: 13px;
-}
-
-
-.weekly-entry-header button {
-  display: inline-flex;
-
-  align-items: center;
-
-  gap: 5px;
-
-  border: 0;
-
-  background: transparent;
-
-  color: #c63f3f;
-
-  font-size: 10px;
-
-  font-weight: 700;
-
-  cursor: pointer;
-}
-
-
-/* ============================================================
-   BOTTOM GRID
-============================================================ */
-
-.weekly-report-bottom-grid {
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1.45fr)
-    minmax(390px, 0.75fr);
-
-  gap: 15px;
-
-  margin-top: 17px;
-}
-
-
-/* ============================================================
-   CARDS
+   REPORTS CARD
 ============================================================ */
 
 .weekly-reports-card,
-.weekly-summary-card {
+.weekly-inline-edit-card {
   min-width: 0;
-
   overflow: hidden;
 
   border:
-    1px solid #e0e7e3;
+    1px solid #dfe7e3;
 
-  border-radius: 10px;
+  border-radius: 9px;
 
   background: #ffffff;
 
   box-shadow:
     0 2px 7px
-    rgba(
-      28,
-      57,
-      68,
-      0.025
-    );
+    rgba(28, 57, 68, 0.025);
 }
-
 
 .weekly-card-header {
   height: 55px;
-
   box-sizing: border-box;
 
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
 
-  padding:
-    0 15px;
+  padding: 0 14px;
 
   border-bottom:
     1px solid #edf0ee;
 }
 
-
 .weekly-card-title {
   display: flex;
-
   align-items: center;
-
   gap: 9px;
 }
-
 
 .weekly-card-title h2 {
   margin: 0;
 
   color: #123b51;
-
   font-size: 15px;
-
   line-height: 1.2;
-
   font-weight: 800;
 }
 
-
 .weekly-card-icon {
-  width: 28px;
-
-  height: 28px;
+  width: 29px;
+  height: 29px;
+  flex: 0 0 29px;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
   border-radius: 50%;
 }
 
-
 .weekly-card-icon.green {
   background: #def3e6;
-
   color: #16854d;
 }
 
-
-.weekly-card-icon.summary {
-  background: #e4f4e8;
-
-  color: #24925d;
-}
-
-
 .weekly-card-header > button {
   border: 0;
-
   background: transparent;
 
   color: #0067cc;
 
-  font-size: 10px;
-
+  font-size: 9px;
   font-weight: 700;
 
   cursor: pointer;
@@ -995,170 +795,131 @@
 
 
 /* ============================================================
-   TABLE
+   REPORT TABLE
 ============================================================ */
 
 .weekly-reports-table-wrapper {
   width: 100%;
+  box-sizing: border-box;
 
   overflow-x: auto;
 
-  padding:
-    0 14px 10px;
-
-  box-sizing: border-box;
+  padding: 0 12px 7px;
 }
-
 
 .weekly-reports-table {
   width: 100%;
+  min-width: 630px;
 
-  min-width: 670px;
-
-  border-collapse:
-    separate;
-
+  border-collapse: separate;
   border-spacing: 0;
 
-  font-size: 10px;
+  font-size: 9px;
 }
-
 
 .weekly-reports-table thead {
-  background: #f6f8f7;
+  background: #f5f8f7;
 }
 
-
 .weekly-reports-table th {
-  height: 34px;
+  height: 31px;
 
-  padding:
-    0 8px;
+  padding: 0 7px;
 
   color: #426477;
 
-  font-size: 9px;
-
+  font-size: 8px;
   font-weight: 750;
 
   text-align: left;
-
   white-space: nowrap;
 }
 
-
 .weekly-reports-table td {
-  min-height: 47px;
+  min-height: 44px;
 
-  padding:
-    8px;
+  padding: 7px;
 
   border-bottom:
     1px solid #edf0ee;
 
   color: #173f54;
 
-  font-size: 10px;
-
+  font-size: 9px;
   font-weight: 600;
 
   vertical-align: middle;
 }
 
-
 .weekly-reports-table tr:last-child td {
   border-bottom: 0;
 }
 
-
 .weekly-date-cell {
   display: flex;
-
   flex-direction: column;
-
   gap: 2px;
 }
 
-
 .weekly-date-cell strong {
-  font-size: 10px;
-
-  font-weight: 700;
+  font-size: 9px;
+  font-weight: 750;
 }
-
 
 .weekly-date-cell span {
   color: #547486;
-
-  font-size: 9px;
-
+  font-size: 8px;
   font-weight: 500;
 }
 
 
 /* ============================================================
-   SEVERITY PILLS
+   PILLS
 ============================================================ */
 
 .weekly-severity-pill,
 .weekly-status-pill {
   display: inline-flex;
-
   align-items: center;
-
   justify-content: center;
 
-  min-width: 58px;
+  min-width: 56px;
 
-  padding:
-    5px 9px;
+  padding: 5px 8px;
 
   border-radius: 999px;
 
-  font-size: 9px;
-
+  font-size: 8px;
   font-weight: 800;
 }
 
-
 .weekly-severity-pill.low {
   background: #e0f2e5;
-
   color: #078342;
 }
 
-
 .weekly-severity-pill.moderate {
   background: #fff0cb;
-
   color: #db8b00;
 }
 
-
 .weekly-severity-pill.high {
   background: #ffe5e3;
-
   color: #ed4141;
 }
 
-
 .weekly-severity-pill.critical {
   background: #f7d9dd;
-
   color: #bd2637;
 }
 
-
 .weekly-status-pill.submitted {
   background: #dff2e6;
-
   color: #16844c;
 }
 
-
 .weekly-status-pill.draft {
   background: #e9eef0;
-
   color: #657d88;
 }
 
@@ -1169,35 +930,26 @@
 
 .weekly-action-buttons {
   display: flex;
-
   align-items: center;
-
-  gap: 5px;
+  gap: 4px;
 }
 
-
 .weekly-action-buttons button {
-  width: 25px;
-
-  height: 25px;
+  width: 24px;
+  height: 24px;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
   border: 0;
-
   border-radius: 6px;
 
   background: transparent;
-
   color: #0870ca;
 
   cursor: pointer;
 }
-
 
 .weekly-action-buttons button:hover {
   background: #eef7ff;
@@ -1209,266 +961,288 @@
 ============================================================ */
 
 .weekly-empty-table {
-  height: 150px;
+  height: 118px;
 
   text-align: center !important;
 
   color: #82939c !important;
 }
 
-
 .weekly-empty-table svg {
   display: block;
-
-  margin:
-    0 auto 8px;
-
+  margin: 0 auto 7px;
   color: #9aabb3;
 }
 
 
 /* ============================================================
-   SUMMARY
+   EDIT INFORMATION NOTE
 ============================================================ */
 
-.weekly-summary-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
-  gap: 12px;
-
-  padding: 13px;
-}
-
-
-.weekly-summary-tile {
-  min-height: 112px;
-
+.weekly-report-edit-note {
+  min-height: 48px;
   box-sizing: border-box;
 
   display: flex;
+  align-items: center;
+  gap: 9px;
 
-  align-items: flex-start;
-
-  gap: 10px;
-
-  padding:
-    14px 12px;
+  padding: 7px 11px;
 
   border:
-    1px solid #e2e9e5;
+    1px solid #cce5f8;
 
   border-radius: 8px;
 
-  background: #ffffff;
-}
-
-
-.weekly-summary-tile.confirmed {
   background:
     linear-gradient(
-      135deg,
-      #fffdfd,
-      #fff8f7
+      90deg,
+      #eef8ff 0%,
+      #f4faff 100%
     );
+
+  color: #3d7da7;
 }
 
-
-.weekly-summary-tile.suspected {
-  background:
-    linear-gradient(
-      135deg,
-      #fffef9,
-      #fffaf0
-    );
-}
-
-
-.weekly-summary-tile.disease {
-  background:
-    linear-gradient(
-      135deg,
-      #fbfffc,
-      #f4fbf7
-    );
-}
-
-
-.weekly-summary-tile.severity {
-  background:
-    linear-gradient(
-      135deg,
-      #fdfbff,
-      #f8f4ff
-    );
-}
-
-
-.weekly-summary-icon {
-  width: 30px;
-
-  height: 30px;
-
-  flex: 0 0 30px;
+.weekly-report-note-icon {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 19px;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
+  border: 1.5px solid #2e94d8;
   border-radius: 50%;
 
-  font-size: 15px;
+  color: #2e94d8;
 
+  font-size: 12px;
   font-weight: 800;
 }
 
+.weekly-report-edit-note p {
+  margin: 0;
 
-.confirmed
-.weekly-summary-icon {
-  background: #ffe6e3;
+  color: #5b8aab;
 
-  color: #ee5047;
-}
-
-
-.suspected
-.weekly-summary-icon {
-  background: #fff0c9;
-
-  color: #df9300;
-}
-
-
-.disease
-.weekly-summary-icon {
-  background: #dff3e6;
-
-  color: #16945b;
-}
-
-
-.severity
-.weekly-summary-icon {
-  background: #e9ddff;
-
-  color: #7040bd;
-}
-
-
-.weekly-summary-tile > div:last-child {
-  min-width: 0;
-}
-
-
-.weekly-summary-tile span {
-  display: block;
-
-  color: #244d61;
-
-  font-size: 9px;
-
-  line-height: 1.35;
-
-  font-weight: 650;
-}
-
-
-.weekly-summary-tile strong {
-  display: block;
-
-  margin-top: 5px;
-
-  color: #0e3548;
-
-  font-size: 24px;
-
-  line-height: 1;
-
-  font-weight: 800;
-}
-
-
-.weekly-summary-tile strong.summary-text {
-  font-size: 17px;
-
-  margin-top: 8px;
-
-  white-space: nowrap;
-
-  overflow: hidden;
-
-  text-overflow: ellipsis;
-}
-
-
-.weekly-summary-tile small {
-  display: block;
-
-  margin-top: 6px;
-
-  color: #617d8b;
-
-  font-size: 9px;
-
-  line-height: 1.2;
+  font-size: 8px;
+  line-height: 1.45;
 }
 
 
 /* ============================================================
-   LOADING
+   INLINE EDIT CARD
 ============================================================ */
 
-.weekly-report-loading {
-  min-height: 400px;
+.weekly-inline-edit-card {
+  border-color: #d6e8df;
+}
+
+.weekly-inline-edit-header {
+  min-height: 54px;
+  box-sizing: border-box;
 
   display: flex;
-
-  flex-direction: column;
-
   align-items: center;
 
+  padding: 0 14px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #f2faf5 0%,
+      #f9fcfa 100%
+    );
+
+  border-bottom:
+    1px solid #e0ece5;
+}
+
+.weekly-inline-edit-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weekly-inline-edit-icon {
+  width: 27px;
+  height: 27px;
+  flex: 0 0 27px;
+
+  display: flex;
+  align-items: center;
   justify-content: center;
 
-  gap: 10px;
+  border-radius: 7px;
 
-  color: #6c818c;
+  color: #168a50;
+  background: #dff3e7;
 }
 
-
-.weekly-report-loading p {
+.weekly-inline-edit-title h2 {
   margin: 0;
 
-  font-size: 12px;
+  color: #123c50;
+
+  font-size: 13px;
+  line-height: 1.2;
+  font-weight: 800;
 }
 
-
-.weekly-loading-spinner {
-  animation:
-    weekly-report-pulse
-    1.2s ease-in-out
-    infinite;
+.weekly-inline-edit-title h2 span {
+  font-size: 9px;
+  font-weight: 650;
 }
 
+.weekly-inline-edit-body {
+  padding: 10px 11px 11px;
+}
 
-@keyframes weekly-report-pulse {
-  0%,
-  100% {
-    opacity: 0.4;
+.weekly-inline-grid {
+  display: grid;
+  gap: 11px;
+}
 
-    transform:
-      scale(0.95);
-  }
+.weekly-inline-grid.four-columns {
+  grid-template-columns:
+    minmax(0, 1.05fr)
+    minmax(0, 0.9fr)
+    minmax(0, 0.9fr)
+    minmax(0, 0.98fr);
+}
 
-  50% {
-    opacity: 1;
+.weekly-inline-edit-body .weekly-field label {
+  font-size: 8px;
+  margin-bottom: 5px;
+}
 
-    transform:
-      scale(1);
-  }
+.weekly-inline-edit-body .weekly-field input,
+.weekly-inline-edit-body .weekly-field select {
+  height: 30px;
+  font-size: 9px;
+  padding-left: 9px;
+}
+
+.weekly-inline-edit-body
+  .weekly-select-wrapper
+  select {
+  padding-right: 25px;
+}
+
+.weekly-inline-edit-body
+  .weekly-select-wrapper
+  > svg {
+  right: 7px;
+}
+
+.weekly-inline-edit-body
+  .weekly-field
+  textarea {
+  min-height: 51px;
+  font-size: 9px;
+  padding: 7px 8px 15px;
+}
+
+.weekly-inline-edit-body
+  .weekly-input-icon
+  > svg {
+  left: 8px;
+}
+
+.weekly-inline-edit-body
+  .weekly-input-icon
+  input {
+  padding-left: 27px;
+}
+
+.weekly-inline-text-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: 11px;
+
+  margin-top: 9px;
+}
+
+.weekly-inline-bottom-row {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 0.78fr)
+    minmax(0, 0.78fr)
+    minmax(0, 1.55fr);
+
+  gap: 9px;
+
+  margin-top: 8px;
+
+  align-items: end;
+}
+
+.weekly-inline-actions {
+  min-width: 0;
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 7px;
+
+  padding-bottom: 0;
+}
+
+.weekly-cancel-button {
+  height: 30px;
+
+  padding: 0 13px;
+
+  border:
+    1px solid #cde4d7;
+
+  border-radius: 6px;
+
+  background: #f7fcf9;
+  color: #46705e;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.weekly-update-button {
+  height: 30px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  padding: 0 12px;
+
+  border: 0;
+  border-radius: 6px;
+
+  background: #087a32;
+  color: #ffffff;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.weekly-update-button:hover {
+  background: #076c2d;
+}
+
+.weekly-update-button:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 
@@ -1478,106 +1252,70 @@
 
 .weekly-report-modal-backdrop {
   position: fixed;
-
   z-index: 500;
-
   inset: 0;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
   padding: 20px;
 
-  background:
-    rgba(
-      15,
-      37,
-      47,
-      0.32
-    );
+  background: rgba(15, 37, 47, 0.32);
 }
 
-
 .weekly-report-modal {
-  width: min(
-    520px,
-    100%
-  );
+  width: min(520px, 100%);
 
   overflow: hidden;
 
   border-radius: 12px;
 
-  background: white;
+  background: #ffffff;
 
   box-shadow:
     0 24px 70px
-    rgba(
-      12,
-      36,
-      47,
-      0.22
-    );
+    rgba(12, 36, 47, 0.22);
 }
-
 
 .weekly-report-modal-header {
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
 
-  padding:
-    16px 18px;
+  padding: 16px 18px;
 
   border-bottom:
     1px solid #e7ece9;
 }
 
-
 .weekly-report-modal-header h3 {
   margin: 0;
-
   color: #123b50;
-
   font-size: 16px;
 }
 
-
 .weekly-report-modal-header p {
-  margin:
-    4px 0 0;
-
+  margin: 4px 0 0;
   color: #69808d;
-
   font-size: 11px;
 }
 
-
 .weekly-report-modal-header button {
   width: 30px;
-
   height: 30px;
 
   border: 0;
-
   border-radius: 50%;
 
   background: #f1f5f3;
-
   color: #496572;
 
   font-size: 21px;
-
   line-height: 1;
 
   cursor: pointer;
 }
-
 
 .weekly-report-modal-body {
   display: grid;
@@ -1590,51 +1328,35 @@
   padding: 18px;
 }
 
-
 .weekly-report-modal-body > div {
-  padding:
-    12px;
+  padding: 12px;
 
   border-radius: 8px;
 
   background: #f7faf8;
 }
 
-
 .weekly-report-modal-body > div.full {
-  grid-column:
-    1 / -1;
+  grid-column: 1 / -1;
 }
-
 
 .weekly-report-modal-body span {
   display: block;
-
   color: #69818d;
-
   font-size: 10px;
 }
 
-
 .weekly-report-modal-body strong {
   display: block;
-
   margin-top: 5px;
-
   color: #123c50;
-
   font-size: 15px;
 }
 
-
 .weekly-report-modal-body p {
-  margin:
-    7px 0 0;
-
+  margin: 7px 0 0;
   color: #486b7b;
-
   font-size: 11px;
-
   line-height: 1.5;
 }
 
@@ -1643,96 +1365,95 @@
    RESPONSIVE
 ============================================================ */
 
-@media (max-width: 1180px) {
+@media (max-width: 1200px) {
 
   .weekly-report-location-card {
     width: 320px;
   }
 
-  .weekly-report-hero-content {
-    width: 62%;
+  .weekly-report-main-grid {
+    grid-template-columns: 1fr;
   }
 
-  .weekly-form-grid.four-columns {
+  .weekly-report-right-column {
+    gap: 12px;
+  }
+
+  .weekly-inline-bottom-row {
     grid-template-columns:
-      repeat(2, minmax(0, 1fr));
+      minmax(0, 1fr)
+      minmax(0, 1fr)
+      minmax(0, 1.7fr);
   }
-
-  .weekly-form-observation-grid {
-    grid-template-columns:
-      1fr;
-  }
-
-  .weekly-report-bottom-grid {
-    grid-template-columns:
-      1fr;
-  }
-
 }
 
 
 @media (max-width: 850px) {
 
   .weekly-report-hero {
-    min-height: 330px;
+    min-height: 300px;
   }
 
   .weekly-report-hero-content {
     width: 100%;
-
     padding-right: 20px;
   }
 
   .weekly-report-location-card {
-    left: 16px;
-
-    right: 16px;
-
-    bottom: 16px;
-
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
     top: auto;
-
     width: auto;
   }
 
-  .weekly-report-cycle {
-    margin-top: 20px;
+  .weekly-form-grid.four-columns,
+  .weekly-inline-grid.four-columns {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
   }
 
+  .weekly-form-observation-grid,
+  .weekly-inline-text-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .weekly-inline-bottom-row {
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .weekly-inline-actions {
+    grid-column: 1 / -1;
+  }
 }
 
 
 @media (max-width: 650px) {
 
-  .weekly-form-grid.four-columns {
-    grid-template-columns:
-      1fr;
+  .weekly-form-grid.four-columns,
+  .weekly-inline-grid.four-columns {
+    grid-template-columns: 1fr;
   }
 
-  .weekly-date-time-grid {
-    grid-template-columns:
-      1fr;
+  .weekly-date-time-row,
+  .weekly-inline-bottom-row {
+    grid-template-columns: 1fr;
   }
 
-  .weekly-summary-grid {
-    grid-template-columns:
-      1fr;
+  .weekly-inline-actions {
+    grid-column: auto;
+    justify-content: stretch;
+  }
+
+  .weekly-cancel-button,
+  .weekly-update-button {
+    flex: 1;
   }
 
   .weekly-report-form-heading {
-    height: auto;
-
-    min-height: 64px;
-
-    gap: 10px;
-
-    padding:
-      12px 14px;
-  }
-
-  .weekly-submit-top-button {
-    padding:
-      8px 10px;
+    min-height: 58px;
+    padding: 10px 12px;
   }
 
   .weekly-report-hero-content h1 {
@@ -1740,23 +1461,23 @@
   }
 
   .weekly-report-location-card {
-    padding:
-      13px 15px;
+    padding: 13px 15px;
   }
 
+  .weekly-card-header {
+    padding: 0 11px;
+  }
 }
 
 
 @media (max-width: 480px) {
 
   .weekly-report-form-inner {
-    padding:
-      12px;
+    padding: 9px;
   }
 
   .weekly-report-hero-content {
-    padding:
-      13px 15px;
+    padding: 13px 15px;
   }
 
   .weekly-report-hero-content > p {
@@ -1767,21 +1488,8 @@
     margin-top: 16px;
   }
 
-  .weekly-report-location-card
-    > div
-    > div {
+  .weekly-report-location-card > div > div {
     grid-template-columns:
       55px 10px minmax(0, 1fr);
   }
-
-  .weekly-card-header {
-    padding:
-      0 12px;
-  }
-
-  .weekly-summary-grid {
-    padding:
-      10px;
-  }
-
 }

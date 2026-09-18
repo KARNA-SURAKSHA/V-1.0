@@ -53,9 +53,16 @@ def _get_agent_profile(
     return agent
 
 
-def _validate_report_items(items):
+def _validate_report_items(
+    items,
+    db: Session,
+):
     """
     Validate weekly disease report entries.
+
+    IMPORTANT:
+    The database session is required here because the
+    approved disease registry is stored in Firestore.
     """
 
     if not items:
@@ -66,11 +73,59 @@ def _validate_report_items(items):
 
     seen_diseases = set()
 
+    # ------------------------------------------------------------
+    # Load approved diseases once
+    # ------------------------------------------------------------
+
+    try:
+        from ..firestore_db import db as firestore_db
+
+        matches = (
+            firestore_db
+            .collection("diseases")
+            .where(
+                "is_active",
+                "==",
+                True,
+            )
+            .where(
+                "verification_status",
+                "==",
+                "VERIFIED",
+            )
+            .stream()
+        )
+
+        official_diseases = {
+            (
+                doc.to_dict()
+                .get("name", "")
+                .strip()
+                .lower()
+            )
+            for doc in matches
+            if doc.to_dict()
+            .get("name")
+        }
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                "Unable to verify the disease registry. "
+                f"Error: {str(exc)}"
+            ),
+        )
+
+    # ------------------------------------------------------------
+    # Validate every submitted disease
+    # ------------------------------------------------------------
+
     for item in items:
 
-        # --------------------------------------------------------
-        # Disease
-        # --------------------------------------------------------
+        # ========================================================
+        # DISEASE
+        # ========================================================
 
         disease_name = (
             item.disease or ""
@@ -82,9 +137,13 @@ def _validate_report_items(items):
                 detail="Disease name cannot be empty.",
             )
 
-        # --------------------------------------------------------
-        # Cases
-        # --------------------------------------------------------
+        disease_key = (
+            disease_name.lower()
+        )
+
+        # ========================================================
+        # CONFIRMED CASES
+        # ========================================================
 
         if item.cases is None:
             raise HTTPException(
@@ -95,7 +154,18 @@ def _validate_report_items(items):
                 ),
             )
 
-        if item.cases < 0:
+        try:
+            cases = int(item.cases)
+        except (TypeError, ValueError):
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Cases for '{disease_name}' "
+                    "must be a valid number."
+                ),
+            )
+
+        if cases < 0:
             raise HTTPException(
                 status_code=400,
                 detail=(
@@ -104,9 +174,41 @@ def _validate_report_items(items):
                 ),
             )
 
-        # --------------------------------------------------------
-        # Severity
-        # --------------------------------------------------------
+        # ========================================================
+        # SUSPECTED CASES
+        # ========================================================
+
+        suspected_cases = (
+            item.suspected_cases
+            if item.suspected_cases is not None
+            else 0
+        )
+
+        try:
+            suspected_cases = int(
+                suspected_cases
+            )
+        except (TypeError, ValueError):
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Suspected cases for '{disease_name}' "
+                    "must be a valid number."
+                ),
+            )
+
+        if suspected_cases < 0:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Suspected cases for '{disease_name}' "
+                    "must be zero or a positive number."
+                ),
+            )
+
+        # ========================================================
+        # SEVERITY
+        # ========================================================
 
         if item.severity not in (
             "Low",
@@ -122,43 +224,23 @@ def _validate_report_items(items):
                 ),
             )
 
-        # --------------------------------------------------------
-        # Official disease registry
-        # --------------------------------------------------------
+        # ========================================================
+        # OFFICIAL DISEASE REGISTRY
+        # ========================================================
 
-        if db is not None:
-            from ..firestore_db import db as firestore_db
-
-            matches = (
-                firestore_db.collection("diseases")
-                .where("is_active", "==", True)
-                .where("verification_status", "==", "VERIFIED")
-                .stream()
-            )
-            official = next(
-                (
-                    doc for doc in matches
-                    if doc.to_dict().get("name", "").lower() == disease_name.lower()
+        if disease_key not in official_diseases:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"'{disease_name}' is not an approved disease. "
+                    "Submit it through Emerging Disease Surveillance "
+                    "for medical verification."
                 ),
-                None,
             )
 
-        if not official:
-
-            if not official:
-                raise HTTPException(
-                    status_code=400,
-                    detail=(
-                        f"'{disease_name}' is not an approved disease. "
-                        "Submit it through Emerging Disease Surveillance for medical verification."
-                    ),
-                )
-
-        # --------------------------------------------------------
-        # Duplicate disease
-        # --------------------------------------------------------
-
-        disease_key = disease_name.lower()
+        # ========================================================
+        # DUPLICATE DISEASE
+        # ========================================================
 
         if disease_key in seen_diseases:
             raise HTTPException(
@@ -169,7 +251,9 @@ def _validate_report_items(items):
                 ),
             )
 
-        seen_diseases.add(disease_key)
+        seen_diseases.add(
+            disease_key
+        )
 
 
 # ============================================================================
@@ -244,10 +328,13 @@ def get_status(
         ),
         district_name=(
             agent.taluk.district.name
-            if agent.taluk and agent.taluk.district
+            if agent.taluk
+            and agent.taluk.district
             else None
         ),
-        is_active=bool(user.is_active),
+        is_active=bool(
+            user.is_active
+        ),
         current_week=week,
         already_submitted=already_submitted,
         last_submitted_at=(
@@ -339,10 +426,14 @@ def submit_weekly_report(
     # ------------------------------------------------------------
 
     current_week = current_week_number()
+
     current_year = datetime.utcnow().year
 
     # ------------------------------------------------------------
     # Validate incoming data
+    #
+    # IMPORTANT FIX:
+    # _validate_report_items() now accepts the db session.
     # ------------------------------------------------------------
 
     _validate_report_items(
@@ -351,10 +442,7 @@ def submit_weekly_report(
     )
 
     # ------------------------------------------------------------
-    # Validate submitted week if frontend provided one
-    #
-    # We allow the frontend to send the current week.
-    # We do not allow an old/future week to be submitted.
+    # Validate submitted week
     # ------------------------------------------------------------
 
     if payload.week_number != current_week:
@@ -453,7 +541,10 @@ def submit_weekly_report(
             )
 
             existing_report.suspected_cases = (
-                int(item.suspected_cases or 0)
+                int(
+                    item.suspected_cases
+                    or 0
+                )
             )
 
             existing_report.severity = (
@@ -514,11 +605,6 @@ def submit_weekly_report(
                 preventive_measures=(
                     item.preventive_measures or ""
                 ),
-
-                # ------------------------------------------------
-                # IMPORTANT:
-                # These fields were missing previously.
-                # ------------------------------------------------
 
                 week_number=current_week,
 
@@ -582,11 +668,13 @@ def submit_weekly_report(
     for report in updated_reports:
 
         try:
+
             db.refresh(
                 report
             )
 
         except Exception:
+
             pass
 
     return updated_reports

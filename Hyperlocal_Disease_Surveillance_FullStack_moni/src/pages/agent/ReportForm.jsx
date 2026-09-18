@@ -14,6 +14,7 @@ import {
   FileText,
   MapPin,
   Plus,
+  RefreshCw,
   Send,
   Trash2,
 } from "lucide-react";
@@ -56,16 +57,11 @@ const SEVERITIES = [
 ============================================================ */
 
 function createEmptyDisease() {
-  const now =
-    new Date();
+  const now = new Date();
 
-  const date =
-    now.toISOString()
-      .split("T")[0];
+  const date = now.toISOString().split("T")[0];
 
-  const time =
-    now.toTimeString()
-      .slice(0, 5);
+  const time = now.toTimeString().slice(0, 5);
 
   return {
     disease: "",
@@ -84,19 +80,14 @@ function createEmptyDisease() {
    MAP BACKEND -> FORM
 ============================================================ */
 
-function mapReportToForm(
-  report
-) {
+function mapReportToForm(report) {
   if (!report) {
     return createEmptyDisease();
   }
 
-  const createdAt =
-    report.created_at
-      ? new Date(
-          report.created_at
-        )
-      : new Date();
+  const createdAt = report.created_at
+    ? new Date(report.created_at)
+    : new Date();
 
   return {
     disease:
@@ -127,15 +118,11 @@ function mapReportToForm(
 
     observation_date:
       report.observation_date ||
-      createdAt
-        .toISOString()
-        .split("T")[0],
+      createdAt.toISOString().split("T")[0],
 
     observation_time:
       report.observation_time ||
-      createdAt
-        .toTimeString()
-        .slice(0, 5),
+      createdAt.toTimeString().slice(0, 5),
   };
 }
 
@@ -144,37 +131,25 @@ function mapReportToForm(
    MAP FORM -> BACKEND
 ============================================================ */
 
-function mapFormToBackend(
-  item
-) {
+function mapFormToBackend(item) {
   return {
     disease:
       item.disease?.trim() ||
       "",
 
     cases:
-      item.confirmed_cases ===
-        "" ||
-      item.confirmed_cases ===
-        null ||
-      item.confirmed_cases ===
-        undefined
+      item.confirmed_cases === "" ||
+      item.confirmed_cases === null ||
+      item.confirmed_cases === undefined
         ? 0
-        : Number(
-            item.confirmed_cases
-          ),
+        : Number(item.confirmed_cases),
 
     suspected_cases:
-      item.suspected_cases ===
-        "" ||
-      item.suspected_cases ===
-        null ||
-      item.suspected_cases ===
-        undefined
+      item.suspected_cases === "" ||
+      item.suspected_cases === null ||
+      item.suspected_cases === undefined
         ? 0
-        : Number(
-            item.suspected_cases
-          ),
+        : Number(item.suspected_cases),
 
     severity:
       item.severity ||
@@ -195,32 +170,35 @@ function mapFormToBackend(
    DATE FORMAT
 ============================================================ */
 
-function formatReportDate(
-  value
-) {
+function formatReportDate(value) {
   if (!value) {
     return "—";
   }
 
-  const date =
-    new Date(value);
+  const date = new Date(value);
 
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
+  if (Number.isNaN(date.getTime())) {
     return "—";
   }
 
-  return date.toLocaleDateString(
-    "en-IN",
-    {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    }
-  );
+  const day = String(date.getDate()).padStart(2, "0");
+
+  const month = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ][date.getMonth()];
+
+  return `${day} ${month} ${date.getFullYear()}`;
 }
 
 
@@ -228,31 +206,24 @@ function formatReportDate(
    TIME FORMAT
 ============================================================ */
 
-function formatReportTime(
-  value
-) {
+function formatReportTime(value) {
   if (!value) {
     return "";
   }
 
-  const date =
-    new Date(value);
+  const date = new Date(value);
 
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
+  if (Number.isNaN(date.getTime())) {
     return "";
   }
 
-  return date.toLocaleTimeString(
-    "en-IN",
-    {
+  return date
+    .toLocaleTimeString("en-IN", {
       hour: "2-digit",
       minute: "2-digit",
-    }
-  );
+      hour12: true,
+    })
+    .toUpperCase();
 }
 
 
@@ -261,368 +232,122 @@ function formatReportTime(
 ============================================================ */
 
 export default function ReportForm({
-  mode = "add",
   weekNumber,
   cycleDates,
   talukName = "Assigned Taluk",
   districtName = "Assigned District",
   onRefresh,
 }) {
-  const isEditMode =
-    mode === "edit";
 
 
   /* ==========================================================
      STATE
   ========================================================== */
 
-  const [
-    items,
-    setItems,
-  ] = useState([
+  const [items, setItems] = useState([
     createEmptyDisease(),
   ]);
 
-  const [
-    reports,
-    setReports,
-  ] = useState([]);
+  const [reports, setReports] = useState([]);
 
-  const [
-    loading,
-    setLoading,
-  ] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [
-    loadingExisting,
-    setLoadingExisting,
-  ] = useState(true);
+  const [loadingExisting, setLoadingExisting] =
+    useState(true);
 
-  const [
-    error,
-    setError,
-  ] = useState("");
+  const [error, setError] = useState("");
 
-  const [
-    success,
-    setSuccess,
-  ] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const [
-    selectedReport,
-    setSelectedReport,
-  ] = useState(null);
+  /* Used by the View icon/modal. */
+  const [viewReport, setViewReport] = useState(null);
 
-  const [
-    showAllReports,
-    setShowAllReports,
-  ] = useState(false);
+  /* Used by the inline Edit Weekly Report panel. */
+  const [editReport, setEditReport] = useState(null);
+
+  const [editDraft, setEditDraft] = useState(null);
+
+  const [showAllReports, setShowAllReports] =
+    useState(false);
 
 
   /* ==========================================================
      LOAD REPORTS
   ========================================================== */
 
-  const loadReports =
-    async () => {
-      try {
-        setLoadingExisting(
-          true
-        );
+  const loadReports = async () => {
+    try {
+      setLoadingExisting(true);
 
-        setError("");
+      setError("");
 
-        const history =
-          await api.getAgentHistory();
+      const history = await api.getAgentHistory();
 
-        const data =
-          Array.isArray(
-            history
-          )
-            ? history
-            : [];
+      const data = Array.isArray(history)
+        ? history
+        : [];
 
-        const sorted =
-          [...data].sort(
-            (a, b) =>
-              new Date(
-                b.created_at
-              ) -
-              new Date(
-                a.created_at
-              )
-          );
+      const sorted = [...data].sort(
+        (a, b) =>
+          new Date(b.created_at) -
+          new Date(a.created_at)
+      );
 
-        setReports(
-          sorted
-        );
+      setReports(sorted);
 
-
-        /* ------------------------------------------------------
-           EDIT MODE
-        ------------------------------------------------------ */
-
-        if (
-          isEditMode &&
-          sorted.length
-        ) {
-          const latest =
-            sorted[0];
-
-          const latestWeek =
-            latest.week_number ??
-            latest.week ??
-            latest.reporting_week ??
-            latest.current_week;
-
-          let currentCycle;
-
-          if (
-            latestWeek !==
-              undefined &&
-            latestWeek !==
-              null
-          ) {
-            currentCycle =
-              sorted.filter(
-                (report) =>
-                  (
-                    report.week_number ??
-                    report.week ??
-                    report.reporting_week ??
-                    report.current_week
-                  ) ===
-                  latestWeek
-              );
-          } else {
-            currentCycle =
-              [latest];
-          }
-
-          const mapped =
-            currentCycle.map(
-              mapReportToForm
-            );
-
-          if (
-            mapped.length
-          ) {
-            setItems(
-              mapped
-            );
-          }
-        }
-      } catch (err) {
-        setError(
-          err.message ||
-            "Unable to load weekly reports."
-        );
-      } finally {
-        setLoadingExisting(
-          false
-        );
-      }
-    };
+      /*
+       * Existing reports stay in the right-side table.
+       * The main form remains a fresh "New Weekly Report"
+       * form; editing is handled by the inline editor.
+       */
+    } catch (err) {
+      setError(
+        err.message ||
+          "Unable to load weekly reports."
+      );
+    } finally {
+      setLoadingExisting(false);
+    }
+  };
 
 
   useEffect(() => {
     loadReports();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEditMode]);
+  }, []);
 
 
   /* ==========================================================
      CURRENT WEEK REPORTS
   ========================================================== */
 
-  const currentWeekReports =
-    useMemo(() => {
-      if (!reports.length) {
-        return [];
-      }
+  const currentWeekReports = useMemo(() => {
+    if (!reports.length) {
+      return [];
+    }
 
-      if (
-        weekNumber ===
-        undefined ||
-        weekNumber ===
-          null
-      ) {
-        return reports.slice(
-          0,
-          4
-        );
-      }
+    if (
+      weekNumber === undefined ||
+      weekNumber === null
+    ) {
+      return reports.slice(0, 4);
+    }
 
-      const matching =
-        reports.filter(
-          (report) =>
-            Number(
-              report.week_number ??
-                report.week ??
-                report.reporting_week ??
-                report.current_week
-            ) ===
-            Number(
-              weekNumber
-            )
-        );
+    const matching = reports.filter(
+      (report) =>
+        Number(
+          report.week_number ??
+          report.week ??
+          report.reporting_week ??
+          report.current_week
+        ) === Number(weekNumber)
+    );
 
-      return matching.length
-        ? matching
-        : reports.slice(
-            0,
-            4
-          );
-    }, [
-      reports,
-      weekNumber,
-    ]);
-
-
-  /* ==========================================================
-     SUMMARY
-  ========================================================== */
-
-  const summary =
-    useMemo(() => {
-      const source =
-        currentWeekReports;
-
-      const confirmed =
-        source.reduce(
-          (
-            total,
-            item
-          ) =>
-            total +
-            Number(
-              item.confirmed_cases ??
-                item.cases ??
-                0
-            ),
-          0
-        );
-
-      const suspected =
-        source.reduce(
-          (
-            total,
-            item
-          ) =>
-            total +
-            Number(
-              item.suspected_cases ??
-                0
-            ),
-          0
-        );
-
-
-      const diseaseCounts =
-        {};
-
-      source.forEach(
-        (item) => {
-          const name =
-            item.disease ||
-            item.disease_name;
-
-          if (!name) {
-            return;
-          }
-
-          diseaseCounts[
-            name
-          ] =
-            (
-              diseaseCounts[
-                name
-              ] || 0
-            ) +
-            Number(
-              item.confirmed_cases ??
-                item.cases ??
-                0
-            );
-        }
-      );
-
-
-      let mostReported =
-        "—";
-
-      let mostReportedCases =
-        0;
-
-      Object.entries(
-        diseaseCounts
-      ).forEach(
-        ([
-          disease,
-          count,
-        ]) => {
-          if (
-            count >
-            mostReportedCases
-          ) {
-            mostReported =
-              disease;
-
-            mostReportedCases =
-              count;
-          }
-        }
-      );
-
-
-      const severityRank = {
-        Low: 1,
-        Moderate: 2,
-        High: 3,
-        Critical: 4,
-      };
-
-      let highestSeverity =
-        "—";
-
-      let highestRank =
-        0;
-
-      source.forEach(
-        (item) => {
-          const severity =
-            item.severity;
-
-          const rank =
-            severityRank[
-              severity
-            ] || 0;
-
-          if (
-            rank >
-            highestRank
-          ) {
-            highestRank =
-              rank;
-
-            highestSeverity =
-              severity;
-          }
-        }
-      );
-
-
-      return {
-        confirmed,
-        suspected,
-        mostReported,
-        mostReportedCases,
-        highestSeverity,
-      };
-    }, [
-      currentWeekReports,
-    ]);
+    return matching.length
+      ? matching
+      : reports.slice(0, 4);
+  }, [reports, weekNumber]);
 
 
   /* ==========================================================
@@ -634,22 +359,16 @@ export default function ReportForm({
     field,
     value
   ) => {
-    setItems(
-      (previous) =>
-        previous.map(
-          (
-            item,
-            itemIndex
-          ) =>
-            itemIndex ===
-            index
-              ? {
-                  ...item,
-                  [field]:
-                    value,
-                }
-              : item
-        )
+    setItems((previous) =>
+      previous.map(
+        (item, itemIndex) =>
+          itemIndex === index
+            ? {
+                ...item,
+                [field]: value,
+              }
+            : item
+      )
     );
   };
 
@@ -659,12 +378,10 @@ export default function ReportForm({
   ========================================================== */
 
   const addDisease = () => {
-    setItems(
-      (previous) => [
-        ...previous,
-        createEmptyDisease(),
-      ]
-    );
+    setItems((previous) => [
+      ...previous,
+      createEmptyDisease(),
+    ]);
   };
 
 
@@ -672,20 +389,17 @@ export default function ReportForm({
      REMOVE DISEASE
   ========================================================== */
 
-  const removeDisease = (
-    index
-  ) => {
-    setItems(
-      (previous) =>
-        previous.filter(
-          (
-            _,
-            itemIndex
-          ) =>
-            itemIndex !==
-            index
-        )
-    );
+  const removeDisease = (index) => {
+    setItems((previous) => {
+      if (previous.length === 1) {
+        return [createEmptyDisease()];
+      }
+
+      return previous.filter(
+        (_, itemIndex) =>
+          itemIndex !== index
+      );
+    });
   };
 
 
@@ -693,277 +407,325 @@ export default function ReportForm({
      VALIDATION
   ========================================================== */
 
-  const validate =
-    (validItems) => {
+  const validate = (validItems) => {
+    if (!validItems.length) {
+      return (
+        "Please enter at least one disease before submitting."
+      );
+    }
+
+    for (const item of validItems) {
+      if (!item.disease?.trim()) {
+        return (
+          "Please select a disease for every entry."
+        );
+      }
+
       if (
-        !validItems.length
+        item.confirmed_cases === "" ||
+        item.confirmed_cases === null ||
+        item.confirmed_cases === undefined
       ) {
-        return "Please enter at least one disease before submitting.";
+        return `Please enter confirmed cases for ${item.disease}.`;
       }
 
-      for (
-        const item of validItems
+      if (Number(item.confirmed_cases) < 0) {
+        return `Confirmed cases for ${item.disease} cannot be negative.`;
+      }
+
+      if (
+        item.suspected_cases !== "" &&
+        Number(item.suspected_cases) < 0
       ) {
-        if (
-          !item.disease?.trim()
-        ) {
-          return "Please select a disease for every entry.";
-        }
-
-        if (
-          item.confirmed_cases ===
-            "" ||
-          item.confirmed_cases ===
-            null ||
-          item.confirmed_cases ===
-            undefined
-        ) {
-          return `Please enter confirmed cases for ${item.disease}.`;
-        }
-
-        if (
-          Number(
-            item.confirmed_cases
-          ) < 0
-        ) {
-          return `Confirmed cases for ${item.disease} cannot be negative.`;
-        }
-
-        if (
-          item.suspected_cases !==
-            "" &&
-          Number(
-            item.suspected_cases
-          ) < 0
-        ) {
-          return `Suspected cases for ${item.disease} cannot be negative.`;
-        }
-
-        if (
-          !item.severity
-        ) {
-          return `Please select severity for ${item.disease}.`;
-        }
+        return `Suspected cases for ${item.disease} cannot be negative.`;
       }
 
-      return "";
-    };
-
-
-  /* ==========================================================
-     SUBMIT
-  ========================================================== */
-
-  const handleSubmit =
-    async (event) => {
-      event.preventDefault();
-
-      setError("");
-      setSuccess("");
-
-      const validItems =
-        items.filter(
-          (item) =>
-            item.disease?.trim() ||
-            item.confirmed_cases !==
-              "" ||
-            item.suspected_cases !==
-              "" ||
-            item.severity ||
-            item.remarks?.trim() ||
-            item.preventive_measures?.trim()
-        );
-
-      const validation =
-        validate(
-          validItems
-        );
-
-      if (validation) {
-        setError(
-          validation
-        );
-
-        return;
+      if (!item.severity) {
+        return `Please select severity for ${item.disease}.`;
       }
 
-      try {
-        setLoading(true);
+      if (!item.observation_date) {
+        return `Please enter the observation date for ${item.disease}.`;
+      }
+
+      if (!item.observation_time) {
+        return `Please enter the observation time for ${item.disease}.`;
+      }
+    }
+
+    return "";
+  };
 
 
-        /* ------------------------------------------------------
-           CURRENT WEEK
-        ------------------------------------------------------ */
+  /* ============================================================
+     SUBMIT MAIN WEEKLY REPORT
+  ============================================================ */
 
-        const status =
-          await api.getAgentStatus();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-        const currentWeek =
-          status?.current_week;
+    setError("");
 
-        if (
-          currentWeek ===
-            undefined ||
-          currentWeek ===
-            null
-        ) {
-          throw new Error(
-            "Unable to determine the current surveillance week."
-          );
-        }
+    setSuccess("");
 
-        const currentYear =
-          new Date().getFullYear();
+    const validItems = items.filter(
+      (item) =>
+        item.disease?.trim() ||
+        item.confirmed_cases !== "" ||
+        item.suspected_cases !== "" ||
+        item.severity ||
+        item.remarks?.trim() ||
+        item.preventive_measures?.trim()
+    );
+
+    const validation =
+      validate(validItems);
+
+    if (validation) {
+      setError(validation);
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const status =
+        await api.getAgentStatus();
+
+      const currentWeek =
+        status?.current_week;
+
+      if (
+        currentWeek === undefined ||
+        currentWeek === null
+      ) {
+        throw new Error(
+          "Unable to determine the current surveillance week."
+        );
+      }
+
+      const currentYear =
+        new Date().getFullYear();
+
+      const backendItems =
+        validItems.map(mapFormToBackend);
+
+      /*
+       * The backend endpoint already performs
+       * create/update/removal for the entire
+       * current-week set.
+       */
+
+      await api.submitWeeklyReport(
+        backendItems,
+        currentWeek,
+        currentYear
+      );
+
+      setSuccess(
+        "Weekly report submitted successfully."
+      );
+
+      setItems([
+        createEmptyDisease(),
+      ]);
+
+      await loadReports();
+
+      onRefresh?.();
+
+    } catch (err) {
+      setError(
+        err.message ||
+          "Unable to submit the weekly report."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
-        /* ------------------------------------------------------
-           EDIT
-        ------------------------------------------------------ */
+  /* ============================================================
+     INLINE EDIT PANEL
+  ============================================================ */
 
-        if (isEditMode) {
-          const backendItems =
-            validItems.map(
-              mapFormToBackend
-            );
+  const openEditReport = (report) => {
+    setViewReport(null);
 
-          await api.submitWeeklyReport(
-            backendItems,
-            currentWeek,
-            currentYear
-          );
+    setEditReport(report);
 
-          setSuccess(
-            "Weekly report updated successfully."
-          );
+    setEditDraft(
+      mapReportToForm(report)
+    );
 
-          await loadReports();
+    /*
+     * Move the inline editor into view so the user
+     * immediately sees the panel represented in
+     * the reference design.
+     */
 
-          onRefresh?.();
+    window.requestAnimationFrame(() => {
+      document
+        .querySelector(
+          ".weekly-inline-edit-card"
+        )
+        ?.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+        });
+    });
+  };
 
-          return;
-        }
+
+  const updateEditDraft = (
+    field,
+    value
+  ) => {
+    setEditDraft((previous) =>
+      previous
+        ? {
+            ...previous,
+            [field]: value,
+          }
+        : previous
+    );
+  };
 
 
-        /* ------------------------------------------------------
-           ADD
-        ------------------------------------------------------ */
+  const handleInlineEdit = async (
+    event
+  ) => {
+    event.preventDefault();
 
-        const currentReports =
-          await api.getCurrentAgentReport();
+    if (!editDraft || !editReport) {
+      return;
+    }
 
-        const existing =
-          Array.isArray(
-            currentReports
-          )
-            ? currentReports.map(
-                (report) => ({
-                  disease:
-                    report.disease ||
-                    "",
+    setError("");
 
-                  cases:
-                    Number(
-                      report.cases ||
-                        0
-                    ),
+    setSuccess("");
 
-                  suspected_cases:
-                    Number(
-                      report.suspected_cases ||
-                        0
-                    ),
+    const validation =
+      validate([editDraft]);
 
-                  severity:
-                    report.severity ||
-                    "Low",
+    if (validation) {
+      setError(validation);
+      return;
+    }
 
-                  remarks:
-                    report.remarks ||
-                    "",
+    try {
+      setLoading(true);
 
-                  preventive_measures:
-                    report.preventive_measures ||
-                    "",
-                })
+      const status =
+        await api.getAgentStatus();
+
+      const currentWeek =
+        status?.current_week;
+
+      if (
+        currentWeek === undefined ||
+        currentWeek === null
+      ) {
+        throw new Error(
+          "Unable to determine the current surveillance week."
+        );
+      }
+
+      const currentYear =
+        new Date().getFullYear();
+
+      /*
+       * The API accepts the complete current-week
+       * collection and reconciles it by disease.
+       *
+       * Preserve every other report while replacing
+       * the edited entry.
+       */
+
+      const editedId =
+        editReport.id;
+
+      const editedOriginalDisease =
+        (
+          editReport.disease ||
+          editReport.disease_name ||
+          ""
+        )
+          .trim()
+          .toLowerCase();
+
+      const preserved =
+        currentWeekReports
+          .filter(
+            (report) =>
+              report.id !== editedId &&
+              (
+                report.disease ||
+                report.disease_name ||
+                ""
               )
-            : [];
-
-
-        const incoming =
-          validItems.map(
-            mapFormToBackend
-          );
-
-
-        const merged =
-          new Map();
-
-        existing.forEach(
-          (item) => {
-            const key =
-              item.disease
                 .trim()
-                .toLowerCase();
+                .toLowerCase() !==
+              editedOriginalDisease
+          )
+          .map(mapReportToForm)
+          .map(mapFormToBackend);
 
-            merged.set(
-              key,
-              item
-            );
-          }
+      const newDiseaseKey =
+        editDraft.disease
+          .trim()
+          .toLowerCase();
+
+      const duplicate =
+        preserved.some(
+          (report) =>
+            report.disease
+              .trim()
+              .toLowerCase() ===
+            newDiseaseKey
         );
 
-        incoming.forEach(
-          (item) => {
-            const key =
-              item.disease
-                .trim()
-                .toLowerCase();
-
-            merged.set(
-              key,
-              item
-            );
-          }
+      if (duplicate) {
+        throw new Error(
+          "That disease already exists in this week's report. Edit the existing entry instead."
         );
-
-
-        await api.submitWeeklyReport(
-          Array.from(
-            merged.values()
-          ),
-          currentWeek,
-          currentYear
-        );
-
-
-        setSuccess(
-          "Weekly report submitted successfully."
-        );
-
-
-        setItems([
-          createEmptyDisease(),
-        ]);
-
-
-        await loadReports();
-
-        onRefresh?.();
-
-      } catch (err) {
-        setError(
-          err.message ||
-            "Unable to submit the weekly report."
-        );
-      } finally {
-        setLoading(false);
       }
-    };
+
+      await api.submitWeeklyReport(
+        [
+          ...preserved,
+          mapFormToBackend(editDraft),
+        ],
+        currentWeek,
+        currentYear
+      );
+
+      setSuccess(
+        "Weekly report updated successfully."
+      );
+
+      setEditReport(null);
+
+      setEditDraft(null);
+
+      await loadReports();
+
+      onRefresh?.();
+
+    } catch (err) {
+      setError(
+        err.message ||
+          "Unable to update the weekly report."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
-  /* ==========================================================
+  /* ============================================================
      LOADING
-  ========================================================== */
+  ============================================================ */
 
   if (loadingExisting) {
     return (
@@ -971,11 +733,10 @@ export default function ReportForm({
 
         <div className="weekly-report-loading">
 
-          <RefreshIcon />
+          <RefreshCw size={22} />
 
           <p>
-            Loading weekly
-            disease report...
+            Loading weekly disease report...
           </p>
 
         </div>
@@ -985,9 +746,9 @@ export default function ReportForm({
   }
 
 
-  /* ==========================================================
+  /* ============================================================
      REPORTS TO DISPLAY
-  ========================================================== */
+  ============================================================ */
 
   const displayReports =
     showAllReports
@@ -998,13 +759,12 @@ export default function ReportForm({
         );
 
 
-  /* ==========================================================
+  /* ============================================================
      RENDER
-  ========================================================== */
+  ============================================================ */
 
   return (
     <section className="weekly-report-page">
-
 
       {/* ======================================================
           HERO
@@ -1021,31 +781,28 @@ export default function ReportForm({
           </h1>
 
           <p>
-            Report disease cases
-            and field observations
-            for the current week
+            Report disease cases and field observations for the current week
           </p>
-
 
           <div className="weekly-report-cycle">
 
             <div className="weekly-report-cycle-icon">
+
               <CalendarDays
-                size={21}
+                size={20}
               />
+
             </div>
 
             <div>
 
               <strong>
-                Current Surveillance
-                Cycle
+                Current Surveillance Cycle
               </strong>
 
               <span>
                 Week{" "}
-                {weekNumber ??
-                  "—"}{" "}
+                {weekNumber ?? "—"}{" "}
                 <b>•</b>{" "}
                 {cycleDates ||
                   "Current surveillance cycle"}
@@ -1060,7 +817,7 @@ export default function ReportForm({
 
         <div className="weekly-report-location-card">
 
-          <MapPin size={23} />
+          <MapPin size={22} />
 
           <div>
 
@@ -1073,7 +830,9 @@ export default function ReportForm({
                 Taluk
               </span>
 
-              <b>:</b>
+              <b>
+                :
+              </b>
 
               <em>
                 {talukName}
@@ -1085,7 +844,9 @@ export default function ReportForm({
                 District
               </span>
 
-              <b>:</b>
+              <b>
+                :
+              </b>
 
               <em>
                 {districtName}
@@ -1097,11 +858,12 @@ export default function ReportForm({
                 Role
               </span>
 
-              <b>:</b>
+              <b>
+                :
+              </b>
 
               <em>
-                Field Surveillance
-                Agent
+                Field Surveillance Agent
               </em>
             </div>
 
@@ -1113,122 +875,872 @@ export default function ReportForm({
 
 
       {/* ======================================================
-          NEW REPORT
+          MAIN TWO-COLUMN CONTENT
       ====================================================== */}
 
-      <form
-        className="weekly-report-form-card"
-        onSubmit={
-          handleSubmit
-        }
-      >
+      <div className="weekly-report-main-grid">
 
-        <div className="weekly-report-form-heading">
+        {/* ====================================================
+            LEFT: NEW WEEKLY REPORT
+        ==================================================== */}
 
-          <div className="weekly-report-title-wrap">
+        <form
+          className="weekly-report-form-card"
+          onSubmit={handleSubmit}
+        >
 
-            <div className="weekly-report-title-icon">
-              <FileText
-                size={19}
-              />
+          <div className="weekly-report-form-heading">
+
+            <div className="weekly-report-title-wrap">
+
+              <div className="weekly-report-title-icon">
+
+                <FileText
+                  size={18}
+                />
+
+              </div>
+
+              <div>
+
+                <h2>
+                  New Weekly Report
+                </h2>
+
+                <p>
+                  Add new disease(s) and submit your weekly report
+                </p>
+
+              </div>
+
             </div>
 
-            <h2>
-              New Weekly Report
-            </h2>
-
           </div>
 
 
-          <button
-            type="submit"
-            className="weekly-submit-top-button"
-            disabled={loading}
-          >
+          {/* ALERTS */}
 
-            <Plus size={17} />
+          {error && (
+            <div className="weekly-report-alert error">
 
-            {loading
-              ? "Submitting..."
-              : "Submit Report"}
+              <span>
+                {error}
+              </span>
 
-          </button>
-
-        </div>
+            </div>
+          )}
 
 
-        {/* ERROR */}
+          {success && (
+            <div className="weekly-report-alert success">
 
-        {error && (
-          <div className="weekly-report-alert error">
-            <span>
-              {error}
-            </span>
-          </div>
-        )}
+              <CheckCircle2
+                size={16}
+              />
 
+              <span>
+                {success}
+              </span>
 
-        {/* SUCCESS */}
-
-        {success && (
-          <div className="weekly-report-alert success">
-
-            <CheckCircle2
-              size={17}
-            />
-
-            <span>
-              {success}
-            </span>
-
-          </div>
-        )}
+            </div>
+          )}
 
 
-        <div className="weekly-report-form-inner">
+          <div className="weekly-report-form-inner">
 
-          {items.map(
-            (
-              item,
-              index
-            ) => (
+            {items.map(
+              (item, index) => (
 
-              <div
-                className="weekly-disease-entry"
-                key={index}
-              >
+                <div
+                  className="weekly-disease-entry-card"
+                  key={index}
+                >
 
-                {items.length >
-                  1 && (
-                  <div className="weekly-entry-header">
+                  <div className="weekly-entry-strip">
 
-                    <strong>
-                      Disease{" "}
+                    <div className="weekly-entry-number">
                       {index + 1}
-                    </strong>
+                    </div>
+
+                    <RefreshCw
+                      size={12}
+                    />
 
                     <button
                       type="button"
+                      className="weekly-entry-remove"
+                      title="Clear disease entry"
                       onClick={() =>
-                        removeDisease(
-                          index
-                        )
+                        removeDisease(index)
                       }
                     >
+
                       <Trash2
-                        size={14}
+                        size={15}
                       />
 
-                      Remove
                     </button>
 
                   </div>
-                )}
 
 
-                {/* TOP FIELDS */}
+                  <div className="weekly-disease-entry-body">
 
-                <div className="weekly-form-grid four-columns">
+                    {/* TOP FIELDS */}
+
+                    <div className="weekly-form-grid four-columns">
+
+                      {/* DISEASE */}
+
+                      <div className="weekly-field">
+
+                        <label>
+                          Disease{" "}
+                          <span>*</span>
+                        </label>
+
+                        <div className="weekly-select-wrapper">
+
+                          <select
+                            value={
+                              item.disease
+                            }
+                            onChange={(
+                              event
+                            ) =>
+                              updateDisease(
+                                index,
+                                "disease",
+                                event.target
+                                  .value
+                              )
+                            }
+                          >
+
+                            <option value="">
+                              Select disease
+                            </option>
+
+                            {DISEASES.map(
+                              (
+                                disease
+                              ) => (
+                                <option
+                                  key={
+                                    disease
+                                  }
+                                  value={
+                                    disease
+                                  }
+                                >
+                                  {disease}
+                                </option>
+                              )
+                            )}
+
+                          </select>
+
+                          <ChevronDown
+                            size={15}
+                          />
+
+                        </div>
+
+                      </div>
+
+
+                      {/* CONFIRMED */}
+
+                      <div className="weekly-field">
+
+                        <label>
+                          Confirmed Cases{" "}
+                          <span>*</span>
+                        </label>
+
+                        <input
+                          type="number"
+                          min="0"
+                          value={
+                            item.confirmed_cases
+                          }
+                          onChange={(
+                            event
+                          ) =>
+                            updateDisease(
+                              index,
+                              "confirmed_cases",
+                              event.target
+                                .value
+                            )
+                          }
+                          placeholder="0"
+                        />
+
+                      </div>
+
+
+                      {/* SUSPECTED */}
+
+                      <div className="weekly-field">
+
+                        <label>
+                          Suspected Cases{" "}
+                          <span>*</span>
+                        </label>
+
+                        <input
+                          type="number"
+                          min="0"
+                          value={
+                            item.suspected_cases
+                          }
+                          onChange={(
+                            event
+                          ) =>
+                            updateDisease(
+                              index,
+                              "suspected_cases",
+                              event.target
+                                .value
+                            )
+                          }
+                          placeholder="0"
+                        />
+
+                      </div>
+
+
+                      {/* SEVERITY */}
+
+                      <div className="weekly-field">
+
+                        <label>
+                          Severity{" "}
+                          <span>*</span>
+                        </label>
+
+                        <div className="weekly-select-wrapper">
+
+                          <select
+                            value={
+                              item.severity
+                            }
+                            onChange={(
+                              event
+                            ) =>
+                              updateDisease(
+                                index,
+                                "severity",
+                                event.target
+                                  .value
+                              )
+                            }
+                          >
+
+                            <option value="">
+                              Select severity
+                            </option>
+
+                            {SEVERITIES.map(
+                              (
+                                severity
+                              ) => (
+                                <option
+                                  key={
+                                    severity
+                                  }
+                                  value={
+                                    severity
+                                  }
+                                >
+                                  {severity}
+                                </option>
+                              )
+                            )}
+
+                          </select>
+
+                          <ChevronDown
+                            size={15}
+                          />
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+
+                    {/* OBSERVATIONS + PRECAUTIONS */}
+
+                    <div className="weekly-form-observation-grid">
+
+                      {/* REMARKS */}
+
+                      <div className="weekly-field">
+
+                        <label>
+                          Field Observations / Remarks
+                        </label>
+
+                        <div className="weekly-textarea-wrapper">
+
+                          <textarea
+                            rows={4}
+                            maxLength={500}
+                            value={
+                              item.remarks
+                            }
+                            onChange={(
+                              event
+                            ) =>
+                              updateDisease(
+                                index,
+                                "remarks",
+                                event.target
+                                  .value
+                              )
+                            }
+                            placeholder="Enter field observations and remarks..."
+                          />
+
+                          <span>
+                            {
+                              item.remarks
+                                ?.length ||
+                              0
+                            }
+                            /500
+                          </span>
+
+                        </div>
+
+                      </div>
+
+
+                      {/* PRECAUTIONARY MEASURES */}
+
+                      <div className="weekly-field">
+
+                        <label>
+                          Precautionary Measures
+                        </label>
+
+                        <div className="weekly-textarea-wrapper">
+
+                          <textarea
+                            rows={4}
+                            maxLength={500}
+                            value={
+                              item.preventive_measures
+                            }
+                            onChange={(
+                              event
+                            ) =>
+                              updateDisease(
+                                index,
+                                "preventive_measures",
+                                event.target
+                                  .value
+                              )
+                            }
+                            placeholder="Enter precautionary measures for this disease..."
+                          />
+
+                          <span>
+                            {
+                              item
+                                .preventive_measures
+                                ?.length ||
+                              0
+                            }
+                            /500
+                          </span>
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+
+                    {/* OBSERVATION DATE + TIME */}
+
+                    <div className="weekly-date-time-row">
+
+                      {/* DATE */}
+
+                      <div className="weekly-field">
+
+                        <label>
+                          Observation Date{" "}
+                          <span>*</span>
+                        </label>
+
+                        <div className="weekly-input-icon">
+
+                          <CalendarDays
+                            size={16}
+                          />
+
+                          <input
+                            type="date"
+                            value={
+                              item.observation_date
+                            }
+                            onChange={(
+                              event
+                            ) =>
+                              updateDisease(
+                                index,
+                                "observation_date",
+                                event.target
+                                  .value
+                              )
+                            }
+                          />
+
+                        </div>
+
+                      </div>
+
+
+                      {/* TIME */}
+
+                      <div className="weekly-field">
+
+                        <label>
+                          Observation Time{" "}
+                          <span>*</span>
+                        </label>
+
+                        <div className="weekly-input-icon">
+
+                          <Clock3
+                            size={16}
+                          />
+
+                          <input
+                            type="time"
+                            value={
+                              item.observation_time
+                            }
+                            onChange={(
+                              event
+                            ) =>
+                              updateDisease(
+                                index,
+                                "observation_time",
+                                event.target
+                                  .value
+                              )
+                            }
+                          />
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              )
+            )}
+
+
+            {/* ADD DISEASE */}
+
+            <button
+              type="button"
+              className="weekly-add-disease"
+              onClick={
+                addDisease
+              }
+            >
+
+              <Plus
+                size={15}
+              />
+
+              Add Another Disease
+
+            </button>
+
+
+            {/* BOTTOM SUBMIT */}
+
+            <div className="weekly-form-footer">
+
+              <button
+                type="submit"
+                className="weekly-submit-button"
+                disabled={loading}
+              >
+
+                <Send
+                  size={15}
+                />
+
+                {loading
+                  ? "Submitting..."
+                  : "Submit Weekly Report"}
+
+              </button>
+
+            </div>
+
+          </div>
+
+        </form>
+
+
+        {/* ====================================================
+            RIGHT COLUMN
+        ==================================================== */}
+
+        <div className="weekly-report-right-column">
+
+          {/* ==================================================
+              THIS WEEK'S REPORTS
+          ================================================== */}
+
+          <div className="weekly-reports-card">
+
+            <div className="weekly-card-header">
+
+              <div className="weekly-card-title">
+
+                <div className="weekly-card-icon green">
+
+                  <FileText
+                    size={16}
+                  />
+
+                </div>
+
+                <h2>
+                  This Week's Reports
+                </h2>
+
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setShowAllReports(
+                    (value) =>
+                      !value
+                  )
+                }
+              >
+
+                {showAllReports
+                  ? "Show Less"
+                  : "View All"}
+
+              </button>
+
+            </div>
+
+
+            <div className="weekly-reports-table-wrapper">
+
+              <table className="weekly-reports-table">
+
+                <thead>
+
+                  <tr>
+
+                    <th>
+                      Date &amp; Time
+                    </th>
+
+                    <th>
+                      Disease
+                    </th>
+
+                    <th>
+                      Confirmed
+                    </th>
+
+                    <th>
+                      Suspected
+                    </th>
+
+                    <th>
+                      Severity
+                    </th>
+
+                    <th>
+                      Status
+                    </th>
+
+                    <th>
+                      Action
+                    </th>
+
+                  </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                  {displayReports.map(
+                    (
+                      report,
+                      index
+                    ) => {
+
+                      const reportDate =
+                        report.created_at;
+
+                      const severity =
+                        report.severity ||
+                        "Low";
+
+                      const status =
+                        report.status ||
+                        "Submitted";
+
+                      return (
+                        <tr
+                          key={
+                            report.id ??
+                            index
+                          }
+                        >
+
+                          <td>
+
+                            <div className="weekly-date-cell">
+
+                              <strong>
+                                {formatReportDate(
+                                  reportDate
+                                )}
+                              </strong>
+
+                              <span>
+                                {formatReportTime(
+                                  reportDate
+                                )}
+                              </span>
+
+                            </div>
+
+                          </td>
+
+
+                          <td>
+                            {
+                              report.disease ||
+                              report.disease_name ||
+                              "—"
+                            }
+                          </td>
+
+
+                          <td>
+                            {Number(
+                              report.confirmed_cases ??
+                              report.cases ??
+                              0
+                            )}
+                          </td>
+
+
+                          <td>
+                            {Number(
+                              report.suspected_cases ??
+                              0
+                            )}
+                          </td>
+
+
+                          <td>
+
+                            <span
+                              className={`weekly-severity-pill ${severity.toLowerCase()}`}
+                            >
+                              {severity}
+                            </span>
+
+                          </td>
+
+
+                          <td>
+
+                            <span
+                              className={`weekly-status-pill ${
+                                status
+                                  .toLowerCase()
+                                  .includes(
+                                    "draft"
+                                  )
+                                  ? "draft"
+                                  : "submitted"
+                              }`}
+                            >
+                              {status}
+                            </span>
+
+                          </td>
+
+
+                          <td>
+
+                            <div className="weekly-action-buttons">
+
+                              {/* VIEW */}
+
+                              <button
+                                type="button"
+                                title="View report"
+                                onClick={() =>
+                                  setViewReport(
+                                    report
+                                  )
+                                }
+                              >
+
+                                <Eye
+                                  size={15}
+                                />
+
+                              </button>
+
+
+                              {/* EDIT */}
+
+                              <button
+                                type="button"
+                                title="Edit report"
+                                onClick={() =>
+                                  openEditReport(
+                                    report
+                                  )
+                                }
+                              >
+
+                                <Edit3
+                                  size={15}
+                                />
+
+                              </button>
+
+                            </div>
+
+                          </td>
+
+                        </tr>
+                      );
+                    }
+                  )}
+
+
+                  {!displayReports.length && (
+                    <tr>
+
+                      <td
+                        colSpan="7"
+                        className="weekly-empty-table"
+                      >
+
+                        <FileText
+                          size={24}
+                        />
+
+                        <span>
+                          No reports have been submitted
+                          for this cycle yet.
+                        </span>
+
+                      </td>
+
+                    </tr>
+                  )}
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          </div>
+
+
+          {/* ==================================================
+              INFORMATION NOTE
+          ================================================== */}
+
+          <div className="weekly-report-edit-note">
+
+            <div className="weekly-report-note-icon">
+
+              <span>
+                i
+              </span>
+
+            </div>
+
+            <p>
+              Click on the edit icon to modify an existing report.
+              The form will be populated with the selected report details.
+            </p>
+
+          </div>
+
+
+          {/* ==================================================
+              INLINE EDIT PANEL
+          ================================================== */}
+
+          {editReport && editDraft && (
+            <form
+              className="weekly-inline-edit-card"
+              onSubmit={
+                handleInlineEdit
+              }
+            >
+
+              <div className="weekly-inline-edit-header">
+
+                <div className="weekly-inline-edit-title">
+
+                  <div className="weekly-inline-edit-icon">
+
+                    <Edit3
+                      size={17}
+                    />
+
+                  </div>
+
+                  <h2>
+
+                    Edit Weekly Report
+
+                    <span>
+                      {" "}
+                      (When Edit is Clicked)
+                    </span>
+
+                  </h2>
+
+                </div>
+
+              </div>
+
+
+              <div className="weekly-inline-edit-body">
+
+                {/* TOP EDIT FIELDS */}
+
+                <div className="weekly-inline-grid four-columns">
 
                   {/* DISEASE */}
 
@@ -1243,13 +1755,12 @@ export default function ReportForm({
 
                       <select
                         value={
-                          item.disease
+                          editDraft.disease
                         }
                         onChange={(
                           event
                         ) =>
-                          updateDisease(
-                            index,
+                          updateEditDraft(
                             "disease",
                             event.target
                               .value
@@ -1281,7 +1792,7 @@ export default function ReportForm({
                       </select>
 
                       <ChevronDown
-                        size={16}
+                        size={14}
                       />
 
                     </div>
@@ -1302,19 +1813,17 @@ export default function ReportForm({
                       type="number"
                       min="0"
                       value={
-                        item.confirmed_cases
+                        editDraft.confirmed_cases
                       }
                       onChange={(
                         event
                       ) =>
-                        updateDisease(
-                          index,
+                        updateEditDraft(
                           "confirmed_cases",
                           event.target
                             .value
                         )
                       }
-                      placeholder="0"
                     />
 
                   </div>
@@ -1333,19 +1842,17 @@ export default function ReportForm({
                       type="number"
                       min="0"
                       value={
-                        item.suspected_cases
+                        editDraft.suspected_cases
                       }
                       onChange={(
                         event
                       ) =>
-                        updateDisease(
-                          index,
+                        updateEditDraft(
                           "suspected_cases",
                           event.target
                             .value
                         )
                       }
-                      placeholder="0"
                     />
 
                   </div>
@@ -1364,13 +1871,12 @@ export default function ReportForm({
 
                       <select
                         value={
-                          item.severity
+                          editDraft.severity
                         }
                         onChange={(
                           event
                         ) =>
-                          updateDisease(
-                            index,
+                          updateEditDraft(
                             "severity",
                             event.target
                               .value
@@ -1402,7 +1908,7 @@ export default function ReportForm({
                       </select>
 
                       <ChevronDown
-                        size={16}
+                        size={14}
                       />
 
                     </div>
@@ -1412,43 +1918,40 @@ export default function ReportForm({
                 </div>
 
 
-                {/* SECOND ROW */}
+                {/* EDIT TEXT AREAS */}
 
-                <div className="weekly-form-observation-grid">
+                <div className="weekly-inline-text-grid">
 
                   {/* REMARKS */}
 
                   <div className="weekly-field">
 
                     <label>
-                      Field Observations
-                      {" / "}Remarks
+                      Field Observations / Remarks
                     </label>
 
                     <div className="weekly-textarea-wrapper">
 
                       <textarea
-                        rows={4}
+                        rows={2}
                         maxLength={500}
                         value={
-                          item.remarks
+                          editDraft.remarks
                         }
                         onChange={(
                           event
                         ) =>
-                          updateDisease(
-                            index,
+                          updateEditDraft(
                             "remarks",
                             event.target
                               .value
                           )
                         }
-                        placeholder="Enter any additional observations, symptoms, affected areas, etc."
                       />
 
                       <span>
                         {
-                          item.remarks
+                          editDraft.remarks
                             ?.length ||
                           0
                         }
@@ -1460,71 +1963,43 @@ export default function ReportForm({
                   </div>
 
 
-                  {/* DATE + TIME */}
+                  {/* PRECAUTIONS */}
 
-                  <div className="weekly-observation-side">
+                  <div className="weekly-field">
 
-                    <div className="weekly-field">
+                    <label>
+                      Precautionary Measures
+                    </label>
 
-                      <label>
-                        Observation Date
-                        {" & "}Time
-                      </label>
+                    <div className="weekly-textarea-wrapper">
 
-                      <div className="weekly-date-time-grid">
+                      <textarea
+                        rows={2}
+                        maxLength={500}
+                        value={
+                          editDraft
+                            .preventive_measures
+                        }
+                        onChange={(
+                          event
+                        ) =>
+                          updateEditDraft(
+                            "preventive_measures",
+                            event.target
+                              .value
+                          )
+                        }
+                      />
 
-                        <div className="weekly-input-icon">
-
-                          <CalendarDays
-                            size={17}
-                          />
-
-                          <input
-                            type="date"
-                            value={
-                              item.observation_date
-                            }
-                            onChange={(
-                              event
-                            ) =>
-                              updateDisease(
-                                index,
-                                "observation_date",
-                                event.target
-                                  .value
-                              )
-                            }
-                          />
-
-                        </div>
-
-
-                        <div className="weekly-input-icon">
-
-                          <Clock3
-                            size={17}
-                          />
-
-                          <input
-                            type="time"
-                            value={
-                              item.observation_time
-                            }
-                            onChange={(
-                              event
-                            ) =>
-                              updateDisease(
-                                index,
-                                "observation_time",
-                                event.target
-                                  .value
-                              )
-                            }
-                          />
-
-                        </div>
-
-                      </div>
+                      <span>
+                        {
+                          editDraft
+                            .preventive_measures
+                            ?.length ||
+                          0
+                        }
+                        /500
+                      </span>
 
                     </div>
 
@@ -1532,522 +2007,145 @@ export default function ReportForm({
 
                 </div>
 
-              </div>
 
-            )
-          )}
+                {/* DATE / TIME / BUTTONS */}
 
+                <div className="weekly-inline-bottom-row">
 
-          {/* ADD DISEASE */}
+                  {/* DATE */}
 
-          <button
-            type="button"
-            className="weekly-add-disease"
-            onClick={
-              addDisease
-            }
-          >
+                  <div className="weekly-field">
 
-            <Plus size={16} />
+                    <label>
+                      Observation Date{" "}
+                      <span>*</span>
+                    </label>
 
-            Add Another Disease
+                    <div className="weekly-input-icon">
 
-          </button>
-
-
-          {/* BOTTOM SUBMIT */}
-
-          <div className="weekly-form-footer">
-
-            <button
-              type="submit"
-              className="weekly-submit-button"
-              disabled={loading}
-            >
-
-              <Send size={16} />
-
-              {loading
-                ? isEditMode
-                  ? "Updating..."
-                  : "Submitting..."
-                : isEditMode
-                  ? "Update Weekly Report"
-                  : "Submit Report"}
-
-            </button>
-
-          </div>
-
-        </div>
-
-      </form>
-
-
-      {/* ======================================================
-          BOTTOM CONTENT
-      ====================================================== */}
-
-      <section className="weekly-report-bottom-grid">
-
-
-        {/* ====================================================
-            REPORT TABLE
-        ==================================================== */}
-
-        <div className="weekly-reports-card">
-
-          <div className="weekly-card-header">
-
-            <div className="weekly-card-title">
-
-              <div className="weekly-card-icon green">
-                <FileText
-                  size={17}
-                />
-              </div>
-
-              <h2>
-                This Week's Reports
-              </h2>
-
-            </div>
-
-            <button
-              type="button"
-              onClick={() =>
-                setShowAllReports(
-                  (value) =>
-                    !value
-                )
-              }
-            >
-              {showAllReports
-                ? "Show Less"
-                : "View All"}
-            </button>
-
-          </div>
-
-
-          <div className="weekly-reports-table-wrapper">
-
-            <table className="weekly-reports-table">
-
-              <thead>
-
-                <tr>
-
-                  <th>
-                    Date &amp; Time
-                  </th>
-
-                  <th>
-                    Disease
-                  </th>
-
-                  <th>
-                    Confirmed
-                  </th>
-
-                  <th>
-                    Suspected
-                  </th>
-
-                  <th>
-                    Severity
-                  </th>
-
-                  <th>
-                    Status
-                  </th>
-
-                  <th>
-                    Action
-                  </th>
-
-                </tr>
-
-              </thead>
-
-
-              <tbody>
-
-                {displayReports.map(
-                  (
-                    report,
-                    index
-                  ) => {
-
-                    const reportDate =
-                      report.created_at;
-
-                    const severity =
-                      report.severity ||
-                      "Low";
-
-                    const status =
-                      report.status ||
-                      "Submitted";
-
-                    return (
-                      <tr
-                        key={
-                          report.id ??
-                          index
-                        }
-                      >
-
-                        <td>
-
-                          <div className="weekly-date-cell">
-
-                            <strong>
-                              {formatReportDate(
-                                reportDate
-                              )}
-                            </strong>
-
-                            <span>
-                              {formatReportTime(
-                                reportDate
-                              )}
-                            </span>
-
-                          </div>
-
-                        </td>
-
-
-                        <td>
-                          {
-                            report.disease ||
-                            report.disease_name ||
-                            "—"
-                          }
-                        </td>
-
-
-                        <td>
-                          {Number(
-                            report.confirmed_cases ??
-                              report.cases ??
-                              0
-                          )}
-                        </td>
-
-
-                        <td>
-                          {Number(
-                            report.suspected_cases ??
-                              0
-                          )}
-                        </td>
-
-
-                        <td>
-
-                          <span
-                            className={`weekly-severity-pill ${severity.toLowerCase()}`}
-                          >
-                            {
-                              severity
-                            }
-                          </span>
-
-                        </td>
-
-
-                        <td>
-
-                          <span
-                            className={`weekly-status-pill ${
-                              status
-                                .toLowerCase()
-                                .includes(
-                                  "draft"
-                                )
-                                ? "draft"
-                                : "submitted"
-                            }`}
-                          >
-                            {
-                              status
-                            }
-                          </span>
-
-                        </td>
-
-
-                        <td>
-
-                          <div className="weekly-action-buttons">
-
-                            <button
-                              type="button"
-                              title="View report"
-                              onClick={() =>
-                                setSelectedReport(
-                                  report
-                                )
-                              }
-                            >
-                              <Eye
-                                size={15}
-                              />
-                            </button>
-
-                            <button
-                              type="button"
-                              title="Edit report"
-                              onClick={() => {
-                                const mapped =
-                                  mapReportToForm(
-                                    report
-                                  );
-
-                                setItems([
-                                  mapped,
-                                ]);
-
-                                setSelectedReport(
-                                  null
-                                );
-
-                                window.scrollTo(
-                                  {
-                                    top: 0,
-                                    behavior:
-                                      "smooth",
-                                  }
-                                );
-                              }}
-                            >
-                              <Edit3
-                                size={15}
-                              />
-                            </button>
-
-                          </div>
-
-                        </td>
-
-                      </tr>
-                    );
-                  }
-                )}
-
-
-                {!displayReports.length && (
-                  <tr>
-
-                    <td
-                      colSpan="7"
-                      className="weekly-empty-table"
-                    >
-
-                      <FileText
-                        size={25}
+                      <CalendarDays
+                        size={15}
                       />
 
-                      <span>
-                        No reports have
-                        been submitted
-                        for this cycle
-                        yet.
-                      </span>
+                      <input
+                        type="date"
+                        value={
+                          editDraft
+                            .observation_date
+                        }
+                        onChange={(
+                          event
+                        ) =>
+                          updateEditDraft(
+                            "observation_date",
+                            event.target
+                              .value
+                          )
+                        }
+                      />
 
-                    </td>
+                    </div>
 
-                  </tr>
-                )}
+                  </div>
 
-              </tbody>
 
-            </table>
+                  {/* TIME */}
 
-          </div>
+                  <div className="weekly-field">
+
+                    <label>
+                      Observation Time{" "}
+                      <span>*</span>
+                    </label>
+
+                    <div className="weekly-input-icon">
+
+                      <Clock3
+                        size={15}
+                      />
+
+                      <input
+                        type="time"
+                        value={
+                          editDraft
+                            .observation_time
+                        }
+                        onChange={(
+                          event
+                        ) =>
+                          updateEditDraft(
+                            "observation_time",
+                            event.target
+                              .value
+                          )
+                        }
+                      />
+
+                    </div>
+
+                  </div>
+
+
+                  {/* ACTIONS */}
+
+                  <div className="weekly-inline-actions">
+
+                    <button
+                      type="button"
+                      className="weekly-cancel-button"
+                      onClick={() => {
+                        setEditReport(null);
+                        setEditDraft(null);
+                      }}
+                    >
+                      Cancel
+                    </button>
+
+                    <button
+                      type="submit"
+                      className="weekly-update-button"
+                      disabled={loading}
+                    >
+
+                      <Send
+                        size={14}
+                      />
+
+                      {loading
+                        ? "Updating..."
+                        : "Update Weekly Report"}
+
+                    </button>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </form>
+          )}
 
         </div>
 
-
-        {/* ====================================================
-            QUICK SUMMARY
-        ==================================================== */}
-
-        <div className="weekly-summary-card">
-
-          <div className="weekly-card-header">
-
-            <div className="weekly-card-title">
-
-              <div className="weekly-card-icon summary">
-                <CheckCircle2
-                  size={17}
-                />
-              </div>
-
-              <h2>
-                Quick Summary
-              </h2>
-
-            </div>
-
-          </div>
-
-
-          <div className="weekly-summary-grid">
-
-            {/* CONFIRMED */}
-
-            <div className="weekly-summary-tile confirmed">
-
-              <div className="weekly-summary-icon">
-                <span>
-                  +
-                </span>
-              </div>
-
-              <div>
-
-                <span>
-                  Total Confirmed
-                  Cases
-                </span>
-
-                <strong>
-                  {
-                    summary.confirmed
-                  }
-                </strong>
-
-                <small>
-                  Current cycle
-                </small>
-
-              </div>
-
-            </div>
-
-
-            {/* SUSPECTED */}
-
-            <div className="weekly-summary-tile suspected">
-
-              <div className="weekly-summary-icon">
-                !
-              </div>
-
-              <div>
-
-                <span>
-                  Total Suspected
-                  Cases
-                </span>
-
-                <strong>
-                  {
-                    summary.suspected
-                  }
-                </strong>
-
-                <small>
-                  Current cycle
-                </small>
-
-              </div>
-
-            </div>
-
-
-            {/* MOST REPORTED */}
-
-            <div className="weekly-summary-tile disease">
-
-              <div className="weekly-summary-icon">
-                <CheckCircle2
-                  size={16}
-                />
-              </div>
-
-              <div>
-
-                <span>
-                  Most Reported
-                  Disease
-                </span>
-
-                <strong className="summary-text">
-                  {
-                    summary.mostReported
-                  }
-                </strong>
-
-                <small>
-                  {summary.mostReportedCases
-                    ? `(${summary.mostReportedCases} cases)`
-                    : "Current cycle"}
-                </small>
-
-              </div>
-
-            </div>
-
-
-            {/* HIGHEST SEVERITY */}
-
-            <div className="weekly-summary-tile severity">
-
-              <div className="weekly-summary-icon">
-                ↑
-              </div>
-
-              <div>
-
-                <span>
-                  Highest Severity
-                </span>
-
-                <strong className="summary-text">
-                  {
-                    summary.highestSeverity
-                  }
-                </strong>
-
-                <small>
-                  Current cycle
-                </small>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
+      </div>
 
 
       {/* ======================================================
           VIEW REPORT MODAL
       ====================================================== */}
 
-      {selectedReport && (
+      {viewReport && (
         <div
           className="weekly-report-modal-backdrop"
           onMouseDown={() =>
-            setSelectedReport(
-              null
-            )
+            setViewReport(null)
           }
         >
 
           <div
             className="weekly-report-modal"
-            onMouseDown={(
-              event
-            ) =>
+            onMouseDown={(event) =>
               event.stopPropagation()
             }
           >
@@ -2062,7 +2160,8 @@ export default function ReportForm({
 
                 <p>
                   {
-                    selectedReport.disease
+                    viewReport.disease ||
+                    viewReport.disease_name
                   }
                 </p>
 
@@ -2071,9 +2170,7 @@ export default function ReportForm({
               <button
                 type="button"
                 onClick={() =>
-                  setSelectedReport(
-                    null
-                  )
+                  setViewReport(null)
                 }
               >
                 ×
@@ -2085,43 +2182,51 @@ export default function ReportForm({
             <div className="weekly-report-modal-body">
 
               <div>
+
                 <span>
                   Confirmed Cases
                 </span>
 
                 <strong>
-                  {selectedReport.confirmed_cases ??
-                    selectedReport.cases ??
-                    0}
+                  {
+                    viewReport.confirmed_cases ??
+                    viewReport.cases ??
+                    0
+                  }
                 </strong>
+
               </div>
 
 
               <div>
+
                 <span>
                   Suspected Cases
                 </span>
 
                 <strong>
                   {
-                    selectedReport.suspected_cases ??
+                    viewReport.suspected_cases ??
                     0
                   }
                 </strong>
+
               </div>
 
 
               <div>
+
                 <span>
                   Severity
                 </span>
 
                 <strong>
                   {
-                    selectedReport.severity ||
+                    viewReport.severity ||
                     "—"
                   }
                 </strong>
+
               </div>
 
 
@@ -2133,8 +2238,24 @@ export default function ReportForm({
 
                 <p>
                   {
-                    selectedReport.remarks ||
+                    viewReport.remarks ||
                     "No observations provided."
+                  }
+                </p>
+
+              </div>
+
+
+              <div className="full">
+
+                <span>
+                  Precautionary Measures
+                </span>
+
+                <p>
+                  {
+                    viewReport.preventive_measures ||
+                    "No precautionary measures provided."
                   }
                 </p>
 
@@ -2148,18 +2269,5 @@ export default function ReportForm({
       )}
 
     </section>
-  );
-}
-
-
-/* ============================================================
-   LOADING ICON
-============================================================ */
-
-function RefreshIcon() {
-  return (
-    <div className="weekly-loading-spinner">
-      <Clock3 size={22} />
-    </div>
   );
 }
