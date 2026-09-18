@@ -9,7 +9,7 @@
   align-items: stretch;
   border: 1px solid #e1e6e2;
   border-radius: 11px;
-  background: #e8f0ed url("../../assets/ui/admin-kodagu-banner.jpg") center center / cover no-repeat;
+  background: #e8f0ed url("../../assets/ui/admin-kodagu-banner-clean.jpg") center center / cover no-repeat;
   box-shadow: 0 2px 9px rgba(26, 56, 69, 0.04);
 }
 .agent-hero-overlay {

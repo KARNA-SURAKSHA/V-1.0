@@ -1,0 +1,1787 @@
+/* ============================================================
+   WEEKLY DISEASE REPORT
+============================================================ */
+
+.weekly-report-page {
+  width: 100%;
+  box-sizing: border-box;
+  color: #0c3043;
+}
+
+
+/* ============================================================
+   HERO
+============================================================ */
+
+.weekly-report-hero {
+  position: relative;
+
+  min-height: 190px;
+
+  overflow: hidden;
+
+  display: flex;
+  align-items: stretch;
+
+  border: 1px solid #dfe6e2;
+  border-radius: 10px;
+
+  background:
+    #e8f1ee
+    url("../../assets/ui/admin-kodagu-banner-clean.jpg")
+    center center /
+    cover
+    no-repeat;
+
+  box-shadow:
+    0 2px 8px
+    rgba(25, 57, 69, 0.035);
+}
+
+
+/* Fade image into white */
+
+.weekly-report-hero-overlay {
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,0.98) 0%,
+      rgba(255,255,255,0.91) 30%,
+      rgba(255,255,255,0.58) 54%,
+      rgba(255,255,255,0.10) 100%
+    );
+
+  pointer-events: none;
+}
+
+
+.weekly-report-hero-content {
+  position: relative;
+
+  z-index: 2;
+
+  width: 68%;
+
+  box-sizing: border-box;
+
+  padding:
+    13px 24px
+    18px;
+}
+
+
+.weekly-report-hero-content h1 {
+  margin: 0;
+
+  color: #073047;
+
+  font-size: 28px;
+
+  line-height: 1.2;
+
+  font-weight: 800;
+
+  letter-spacing: -0.65px;
+}
+
+
+.weekly-report-hero-content > p {
+  margin:
+    6px 0 0;
+
+  color: #204d64;
+
+  font-size: 14px;
+
+  line-height: 1.35;
+}
+
+
+.weekly-report-cycle {
+  display: flex;
+
+  align-items: center;
+
+  gap: 11px;
+
+  margin-top: 26px;
+}
+
+
+.weekly-report-cycle-icon {
+  width: 40px;
+
+  height: 40px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #e0f2e6;
+
+  color: #16854d;
+}
+
+
+.weekly-report-cycle strong {
+  display: block;
+
+  color: #12394c;
+
+  font-size: 13px;
+
+  line-height: 1.25;
+
+  font-weight: 800;
+}
+
+
+.weekly-report-cycle span {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #12394c;
+
+  font-size: 13px;
+
+  line-height: 1.2;
+
+  font-weight: 700;
+}
+
+
+.weekly-report-cycle b {
+  margin:
+    0 5px;
+
+  font-weight: 700;
+}
+
+
+/* ============================================================
+   ASSIGNED LOCATION
+============================================================ */
+
+.weekly-report-location-card {
+  position: absolute;
+
+  z-index: 4;
+
+  top: 29px;
+
+  right: 16px;
+
+  width: 360px;
+
+  min-height: 140px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 13px;
+
+  padding:
+    18px 20px;
+
+  border-radius: 11px;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.93
+    );
+
+  border:
+    1px solid
+    rgba(
+      225,
+      232,
+      228,
+      0.9
+    );
+
+  box-shadow:
+    0 5px 15px
+    rgba(
+      35,
+      62,
+      71,
+      0.08
+    );
+}
+
+
+.weekly-report-location-card > svg {
+  flex: 0 0 auto;
+
+  margin-top: 1px;
+
+  color: #47788e;
+}
+
+
+.weekly-report-location-card strong {
+  display: block;
+
+  margin-bottom: 9px;
+
+  color: #123548;
+
+  font-size: 14px;
+
+  font-weight: 800;
+}
+
+
+.weekly-report-location-card > div {
+  min-width: 0;
+}
+
+
+.weekly-report-location-card > div > div {
+  display: grid;
+
+  grid-template-columns:
+    62px 12px minmax(0, 1fr);
+
+  gap: 4px;
+
+  margin-top: 5px;
+
+  color: #234f65;
+
+  font-size: 12px;
+
+  line-height: 1.2;
+}
+
+
+.weekly-report-location-card span {
+  color: #577487;
+}
+
+
+.weekly-report-location-card b {
+  font-weight: 500;
+}
+
+
+.weekly-report-location-card em {
+  font-style: normal;
+
+  color: #163f53;
+
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   FORM CARD
+============================================================ */
+
+.weekly-report-form-card {
+  margin-top: 18px;
+
+  overflow: hidden;
+
+  border:
+    1px solid #e0e7e3;
+
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 2px 7px
+    rgba(
+      28,
+      57,
+      68,
+      0.025
+    );
+}
+
+
+.weekly-report-form-heading {
+  min-height: 64px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding:
+    0 18px;
+
+  border-bottom:
+    1px solid #edf0ee;
+}
+
+
+.weekly-report-title-wrap {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+
+.weekly-report-title-icon {
+  width: 30px;
+
+  height: 30px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 8px;
+
+  background: #e1f2ef;
+
+  color: #207d91;
+}
+
+
+.weekly-report-form-heading h2 {
+  margin: 0;
+
+  color: #10364a;
+
+  font-size: 18px;
+
+  line-height: 1.2;
+
+  font-weight: 800;
+}
+
+
+.weekly-submit-top-button {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  border: 0;
+
+  border-radius: 9px;
+
+  padding:
+    9px 14px;
+
+  background: #cceedd;
+
+  color: #155e47;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+
+.weekly-submit-top-button:hover {
+  background: #bde5d0;
+}
+
+
+.weekly-submit-top-button:disabled {
+  opacity: 0.6;
+
+  cursor: default;
+}
+
+
+/* ============================================================
+   FORM INNER
+============================================================ */
+
+.weekly-report-form-inner {
+  padding:
+    15px 15px 16px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #fbfdfc 0%,
+      #ffffff 100%
+    );
+}
+
+
+.weekly-disease-entry {
+  padding: 0;
+
+  border: 0;
+}
+
+
+/* ============================================================
+   GRID
+============================================================ */
+
+.weekly-form-grid {
+  display: grid;
+
+  gap: 18px;
+}
+
+
+.weekly-form-grid.four-columns {
+  grid-template-columns:
+    minmax(0, 1.1fr)
+    minmax(0, 0.88fr)
+    minmax(0, 0.88fr)
+    minmax(0, 1fr);
+}
+
+
+.weekly-form-observation-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.5fr)
+    minmax(350px, 0.7fr);
+
+  gap: 19px;
+
+  margin-top: 20px;
+}
+
+
+/* ============================================================
+   FIELD
+============================================================ */
+
+.weekly-field {
+  min-width: 0;
+}
+
+
+.weekly-field label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #173f54;
+
+  font-size: 11px;
+
+  line-height: 1.2;
+
+  font-weight: 650;
+}
+
+
+.weekly-field label span {
+  color: #e34b45;
+}
+
+
+.weekly-field input,
+.weekly-field select,
+.weekly-field textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  border:
+    1px solid #d7e1dd;
+
+  outline: none;
+
+  background: #ffffff;
+
+  color: #214b61;
+
+  font-family: inherit;
+
+  font-size: 12px;
+
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+
+.weekly-field input,
+.weekly-field select {
+  height: 40px;
+
+  border-radius: 6px;
+
+  padding:
+    0 12px;
+}
+
+
+.weekly-field input::placeholder,
+.weekly-field textarea::placeholder {
+  color: #7190a0;
+}
+
+
+.weekly-field input:focus,
+.weekly-field select:focus,
+.weekly-field textarea:focus {
+  border-color: #68ad8a;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(
+      43,
+      155,
+      105,
+      0.08
+    );
+}
+
+
+/* ============================================================
+   SELECT
+============================================================ */
+
+.weekly-select-wrapper {
+  position: relative;
+}
+
+
+.weekly-select-wrapper select {
+  appearance: none;
+
+  padding-right: 35px;
+}
+
+
+.weekly-select-wrapper > svg {
+  position: absolute;
+
+  right: 11px;
+
+  top: 50%;
+
+  transform:
+    translateY(-50%);
+
+  pointer-events: none;
+
+  color: #527487;
+}
+
+
+/* ============================================================
+   TEXTAREA
+============================================================ */
+
+.weekly-textarea-wrapper {
+  position: relative;
+}
+
+
+.weekly-field textarea {
+  min-height: 88px;
+
+  resize: vertical;
+
+  border-radius: 6px;
+
+  padding:
+    10px 12px;
+
+  line-height: 1.45;
+}
+
+
+.weekly-textarea-wrapper > span {
+  position: absolute;
+
+  right: 10px;
+
+  bottom: 8px;
+
+  color: #668391;
+
+  font-size: 9px;
+}
+
+
+/* ============================================================
+   DATE / TIME
+============================================================ */
+
+.weekly-observation-side {
+  min-width: 0;
+}
+
+
+.weekly-date-time-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: 15px;
+}
+
+
+.weekly-input-icon {
+  position: relative;
+}
+
+
+.weekly-input-icon > svg {
+  position: absolute;
+
+  left: 10px;
+
+  top: 50%;
+
+  transform:
+    translateY(-50%);
+
+  color: #4d7789;
+
+  pointer-events: none;
+}
+
+
+.weekly-input-icon input {
+  padding-left: 34px;
+}
+
+
+/* ============================================================
+   ADD DISEASE
+============================================================ */
+
+.weekly-add-disease {
+  width: 100%;
+
+  min-height: 38px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 7px;
+
+  margin-top: 15px;
+
+  border:
+    1px dashed #62aa84;
+
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  color: #087a32;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+.weekly-add-disease:hover {
+  background: #f6fcf8;
+}
+
+
+/* ============================================================
+   FORM FOOTER
+============================================================ */
+
+.weekly-form-footer {
+  display: flex;
+
+  justify-content: flex-end;
+
+  margin-top: 13px;
+}
+
+
+.weekly-submit-button {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 7px;
+
+  min-width: 132px;
+
+  height: 38px;
+
+  padding:
+    0 17px;
+
+  border: 0;
+
+  border-radius: 7px;
+
+  background: #087a32;
+
+  color: white;
+
+  font-size: 11px;
+
+  font-weight: 750;
+
+  cursor: pointer;
+}
+
+
+.weekly-submit-button:hover {
+  background: #076c2d;
+}
+
+
+.weekly-submit-button:disabled {
+  opacity: 0.6;
+
+  cursor: default;
+}
+
+
+/* ============================================================
+   ALERTS
+============================================================ */
+
+.weekly-report-alert {
+  margin:
+    12px 15px 0;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  padding:
+    9px 12px;
+
+  border-radius: 7px;
+
+  font-size: 11px;
+
+  line-height: 1.3;
+}
+
+
+.weekly-report-alert.error {
+  border:
+    1px solid #f0caca;
+
+  background: #fff5f5;
+
+  color: #c62828;
+}
+
+
+.weekly-report-alert.success {
+  border:
+    1px solid #b9dfc8;
+
+  background: #effaf3;
+
+  color: #087a32;
+}
+
+
+/* ============================================================
+   ENTRY HEADER
+============================================================ */
+
+.weekly-entry-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-bottom: 14px;
+
+  padding-bottom: 9px;
+
+  border-bottom:
+    1px solid #edf1ef;
+}
+
+
+.weekly-entry-header strong {
+  color: #123b4f;
+
+  font-size: 13px;
+}
+
+
+.weekly-entry-header button {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #c63f3f;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+/* ============================================================
+   BOTTOM GRID
+============================================================ */
+
+.weekly-report-bottom-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.45fr)
+    minmax(390px, 0.75fr);
+
+  gap: 15px;
+
+  margin-top: 17px;
+}
+
+
+/* ============================================================
+   CARDS
+============================================================ */
+
+.weekly-reports-card,
+.weekly-summary-card {
+  min-width: 0;
+
+  overflow: hidden;
+
+  border:
+    1px solid #e0e7e3;
+
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 2px 7px
+    rgba(
+      28,
+      57,
+      68,
+      0.025
+    );
+}
+
+
+.weekly-card-header {
+  height: 55px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding:
+    0 15px;
+
+  border-bottom:
+    1px solid #edf0ee;
+}
+
+
+.weekly-card-title {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+}
+
+
+.weekly-card-title h2 {
+  margin: 0;
+
+  color: #123b51;
+
+  font-size: 15px;
+
+  line-height: 1.2;
+
+  font-weight: 800;
+}
+
+
+.weekly-card-icon {
+  width: 28px;
+
+  height: 28px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+}
+
+
+.weekly-card-icon.green {
+  background: #def3e6;
+
+  color: #16854d;
+}
+
+
+.weekly-card-icon.summary {
+  background: #e4f4e8;
+
+  color: #24925d;
+}
+
+
+.weekly-card-header > button {
+  border: 0;
+
+  background: transparent;
+
+  color: #0067cc;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+/* ============================================================
+   TABLE
+============================================================ */
+
+.weekly-reports-table-wrapper {
+  width: 100%;
+
+  overflow-x: auto;
+
+  padding:
+    0 14px 10px;
+
+  box-sizing: border-box;
+}
+
+
+.weekly-reports-table {
+  width: 100%;
+
+  min-width: 670px;
+
+  border-collapse:
+    separate;
+
+  border-spacing: 0;
+
+  font-size: 10px;
+}
+
+
+.weekly-reports-table thead {
+  background: #f6f8f7;
+}
+
+
+.weekly-reports-table th {
+  height: 34px;
+
+  padding:
+    0 8px;
+
+  color: #426477;
+
+  font-size: 9px;
+
+  font-weight: 750;
+
+  text-align: left;
+
+  white-space: nowrap;
+}
+
+
+.weekly-reports-table td {
+  min-height: 47px;
+
+  padding:
+    8px;
+
+  border-bottom:
+    1px solid #edf0ee;
+
+  color: #173f54;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  vertical-align: middle;
+}
+
+
+.weekly-reports-table tr:last-child td {
+  border-bottom: 0;
+}
+
+
+.weekly-date-cell {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+
+.weekly-date-cell strong {
+  font-size: 10px;
+
+  font-weight: 700;
+}
+
+
+.weekly-date-cell span {
+  color: #547486;
+
+  font-size: 9px;
+
+  font-weight: 500;
+}
+
+
+/* ============================================================
+   SEVERITY PILLS
+============================================================ */
+
+.weekly-severity-pill,
+.weekly-status-pill {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-width: 58px;
+
+  padding:
+    5px 9px;
+
+  border-radius: 999px;
+
+  font-size: 9px;
+
+  font-weight: 800;
+}
+
+
+.weekly-severity-pill.low {
+  background: #e0f2e5;
+
+  color: #078342;
+}
+
+
+.weekly-severity-pill.moderate {
+  background: #fff0cb;
+
+  color: #db8b00;
+}
+
+
+.weekly-severity-pill.high {
+  background: #ffe5e3;
+
+  color: #ed4141;
+}
+
+
+.weekly-severity-pill.critical {
+  background: #f7d9dd;
+
+  color: #bd2637;
+}
+
+
+.weekly-status-pill.submitted {
+  background: #dff2e6;
+
+  color: #16844c;
+}
+
+
+.weekly-status-pill.draft {
+  background: #e9eef0;
+
+  color: #657d88;
+}
+
+
+/* ============================================================
+   ACTIONS
+============================================================ */
+
+.weekly-action-buttons {
+  display: flex;
+
+  align-items: center;
+
+  gap: 5px;
+}
+
+
+.weekly-action-buttons button {
+  width: 25px;
+
+  height: 25px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border: 0;
+
+  border-radius: 6px;
+
+  background: transparent;
+
+  color: #0870ca;
+
+  cursor: pointer;
+}
+
+
+.weekly-action-buttons button:hover {
+  background: #eef7ff;
+}
+
+
+/* ============================================================
+   EMPTY
+============================================================ */
+
+.weekly-empty-table {
+  height: 150px;
+
+  text-align: center !important;
+
+  color: #82939c !important;
+}
+
+
+.weekly-empty-table svg {
+  display: block;
+
+  margin:
+    0 auto 8px;
+
+  color: #9aabb3;
+}
+
+
+/* ============================================================
+   SUMMARY
+============================================================ */
+
+.weekly-summary-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 12px;
+
+  padding: 13px;
+}
+
+
+.weekly-summary-tile {
+  min-height: 112px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 10px;
+
+  padding:
+    14px 12px;
+
+  border:
+    1px solid #e2e9e5;
+
+  border-radius: 8px;
+
+  background: #ffffff;
+}
+
+
+.weekly-summary-tile.confirmed {
+  background:
+    linear-gradient(
+      135deg,
+      #fffdfd,
+      #fff8f7
+    );
+}
+
+
+.weekly-summary-tile.suspected {
+  background:
+    linear-gradient(
+      135deg,
+      #fffef9,
+      #fffaf0
+    );
+}
+
+
+.weekly-summary-tile.disease {
+  background:
+    linear-gradient(
+      135deg,
+      #fbfffc,
+      #f4fbf7
+    );
+}
+
+
+.weekly-summary-tile.severity {
+  background:
+    linear-gradient(
+      135deg,
+      #fdfbff,
+      #f8f4ff
+    );
+}
+
+
+.weekly-summary-icon {
+  width: 30px;
+
+  height: 30px;
+
+  flex: 0 0 30px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  font-size: 15px;
+
+  font-weight: 800;
+}
+
+
+.confirmed
+.weekly-summary-icon {
+  background: #ffe6e3;
+
+  color: #ee5047;
+}
+
+
+.suspected
+.weekly-summary-icon {
+  background: #fff0c9;
+
+  color: #df9300;
+}
+
+
+.disease
+.weekly-summary-icon {
+  background: #dff3e6;
+
+  color: #16945b;
+}
+
+
+.severity
+.weekly-summary-icon {
+  background: #e9ddff;
+
+  color: #7040bd;
+}
+
+
+.weekly-summary-tile > div:last-child {
+  min-width: 0;
+}
+
+
+.weekly-summary-tile span {
+  display: block;
+
+  color: #244d61;
+
+  font-size: 9px;
+
+  line-height: 1.35;
+
+  font-weight: 650;
+}
+
+
+.weekly-summary-tile strong {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #0e3548;
+
+  font-size: 24px;
+
+  line-height: 1;
+
+  font-weight: 800;
+}
+
+
+.weekly-summary-tile strong.summary-text {
+  font-size: 17px;
+
+  margin-top: 8px;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+
+.weekly-summary-tile small {
+  display: block;
+
+  margin-top: 6px;
+
+  color: #617d8b;
+
+  font-size: 9px;
+
+  line-height: 1.2;
+}
+
+
+/* ============================================================
+   LOADING
+============================================================ */
+
+.weekly-report-loading {
+  min-height: 400px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  color: #6c818c;
+}
+
+
+.weekly-report-loading p {
+  margin: 0;
+
+  font-size: 12px;
+}
+
+
+.weekly-loading-spinner {
+  animation:
+    weekly-report-pulse
+    1.2s ease-in-out
+    infinite;
+}
+
+
+@keyframes weekly-report-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+
+    transform:
+      scale(0.95);
+  }
+
+  50% {
+    opacity: 1;
+
+    transform:
+      scale(1);
+  }
+}
+
+
+/* ============================================================
+   MODAL
+============================================================ */
+
+.weekly-report-modal-backdrop {
+  position: fixed;
+
+  z-index: 500;
+
+  inset: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 20px;
+
+  background:
+    rgba(
+      15,
+      37,
+      47,
+      0.32
+    );
+}
+
+
+.weekly-report-modal {
+  width: min(
+    520px,
+    100%
+  );
+
+  overflow: hidden;
+
+  border-radius: 12px;
+
+  background: white;
+
+  box-shadow:
+    0 24px 70px
+    rgba(
+      12,
+      36,
+      47,
+      0.22
+    );
+}
+
+
+.weekly-report-modal-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding:
+    16px 18px;
+
+  border-bottom:
+    1px solid #e7ece9;
+}
+
+
+.weekly-report-modal-header h3 {
+  margin: 0;
+
+  color: #123b50;
+
+  font-size: 16px;
+}
+
+
+.weekly-report-modal-header p {
+  margin:
+    4px 0 0;
+
+  color: #69808d;
+
+  font-size: 11px;
+}
+
+
+.weekly-report-modal-header button {
+  width: 30px;
+
+  height: 30px;
+
+  border: 0;
+
+  border-radius: 50%;
+
+  background: #f1f5f3;
+
+  color: #496572;
+
+  font-size: 21px;
+
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+
+.weekly-report-modal-body {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 12px;
+
+  padding: 18px;
+}
+
+
+.weekly-report-modal-body > div {
+  padding:
+    12px;
+
+  border-radius: 8px;
+
+  background: #f7faf8;
+}
+
+
+.weekly-report-modal-body > div.full {
+  grid-column:
+    1 / -1;
+}
+
+
+.weekly-report-modal-body span {
+  display: block;
+
+  color: #69818d;
+
+  font-size: 10px;
+}
+
+
+.weekly-report-modal-body strong {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #123c50;
+
+  font-size: 15px;
+}
+
+
+.weekly-report-modal-body p {
+  margin:
+    7px 0 0;
+
+  color: #486b7b;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 1180px) {
+
+  .weekly-report-location-card {
+    width: 320px;
+  }
+
+  .weekly-report-hero-content {
+    width: 62%;
+  }
+
+  .weekly-form-grid.four-columns {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .weekly-form-observation-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .weekly-report-bottom-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+}
+
+
+@media (max-width: 850px) {
+
+  .weekly-report-hero {
+    min-height: 330px;
+  }
+
+  .weekly-report-hero-content {
+    width: 100%;
+
+    padding-right: 20px;
+  }
+
+  .weekly-report-location-card {
+    left: 16px;
+
+    right: 16px;
+
+    bottom: 16px;
+
+    top: auto;
+
+    width: auto;
+  }
+
+  .weekly-report-cycle {
+    margin-top: 20px;
+  }
+
+}
+
+
+@media (max-width: 650px) {
+
+  .weekly-form-grid.four-columns {
+    grid-template-columns:
+      1fr;
+  }
+
+  .weekly-date-time-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .weekly-summary-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .weekly-report-form-heading {
+    height: auto;
+
+    min-height: 64px;
+
+    gap: 10px;
+
+    padding:
+      12px 14px;
+  }
+
+  .weekly-submit-top-button {
+    padding:
+      8px 10px;
+  }
+
+  .weekly-report-hero-content h1 {
+    font-size: 23px;
+  }
+
+  .weekly-report-location-card {
+    padding:
+      13px 15px;
+  }
+
+}
+
+
+@media (max-width: 480px) {
+
+  .weekly-report-form-inner {
+    padding:
+      12px;
+  }
+
+  .weekly-report-hero-content {
+    padding:
+      13px 15px;
+  }
+
+  .weekly-report-hero-content > p {
+    font-size: 12px;
+  }
+
+  .weekly-report-cycle {
+    margin-top: 16px;
+  }
+
+  .weekly-report-location-card
+    > div
+    > div {
+    grid-template-columns:
+      55px 10px minmax(0, 1fr);
+  }
+
+  .weekly-card-header {
+    padding:
+      0 12px;
+  }
+
+  .weekly-summary-grid {
+    padding:
+      10px;
+  }
+
+}
