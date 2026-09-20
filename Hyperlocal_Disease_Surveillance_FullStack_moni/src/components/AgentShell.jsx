@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 
+import { api } from "../api";
 import { useAuth } from "../context/AuthContext";
 
 import "./AgentShell.css";
@@ -34,39 +35,104 @@ export default function AgentShell({
 }) {
   const { session } = useAuth();
 
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] =
+    useState(false);
 
-  const profileRef = useRef(null);
+  const [profileOpen, setProfileOpen] =
+    useState(false);
+
+  /*
+   * Registered agent assignment.
+   *
+   * This comes from /agent/status and is the
+   * authoritative source for the agent's
+   * registered Taluk and District.
+   */
+  const [agentStatus, setAgentStatus] =
+    useState(null);
+
+  const profileRef =
+    useRef(null);
 
   const fullName =
     session?.full_name ||
     session?.username ||
     "Agent";
 
+  /*
+   * Use the registered assignment returned
+   * by /agent/status.
+   *
+   * Session values are retained only as
+   * fallbacks for older login/session data.
+   */
   const talukName =
+    agentStatus?.taluk_name ||
     session?.taluk_name ||
+    session?.taluk ||
+    session?.assigned_taluk ||
     "Assigned Taluk";
 
   const districtName =
+    agentStatus?.district_name ||
     session?.district_name ||
     session?.district ||
     session?.assigned_district ||
     "Assigned District";
 
   /* ==========================================================
+     LOAD REGISTERED AGENT LOCATION
+  ========================================================== */
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadAgentAssignment =
+      async () => {
+        try {
+          const data =
+            await api.getAgentStatus();
+
+          if (!cancelled) {
+            setAgentStatus(data);
+          }
+        } catch (error) {
+          console.error(
+            "Unable to load agent assignment:",
+            error
+          );
+        }
+      };
+
+    /*
+     * Only try to load the status after
+     * the logged-in session is available.
+     */
+    if (session?.username) {
+      loadAgentAssignment();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [session?.username]);
+
+  /* ==========================================================
      CLOSE PROFILE WHEN CLICKING OUTSIDE
   ========================================================== */
 
   useEffect(() => {
-    const handlePointerDown = (event) => {
-      if (
-        profileRef.current &&
-        !profileRef.current.contains(event.target)
-      ) {
-        setProfileOpen(false);
-      }
-    };
+    const handlePointerDown =
+      (event) => {
+        if (
+          profileRef.current &&
+          !profileRef.current.contains(
+            event.target
+          )
+        ) {
+          setProfileOpen(false);
+        }
+      };
 
     document.addEventListener(
       "mousedown",
@@ -86,12 +152,13 @@ export default function AgentShell({
   ========================================================== */
 
   useEffect(() => {
-    const handleEscape = (event) => {
-      if (event.key === "Escape") {
-        setMobileOpen(false);
-        setProfileOpen(false);
-      }
-    };
+    const handleEscape =
+      (event) => {
+        if (event.key === "Escape") {
+          setMobileOpen(false);
+          setProfileOpen(false);
+        }
+      };
 
     document.addEventListener(
       "keydown",
@@ -112,6 +179,7 @@ export default function AgentShell({
 
   const selectTab = (key) => {
     onTabChange?.(key);
+
     setMobileOpen(false);
     setProfileOpen(false);
   };
@@ -202,16 +270,20 @@ export default function AgentShell({
             type="button"
             className="agent-header-icon-button"
             onClick={() =>
-              selectTab("notifications")
+              selectTab(
+                "notifications"
+              )
             }
             aria-label="Open notifications"
           >
 
             <Bell size={21} />
 
-            {notificationCount > 0 && (
+            {notificationCount >
+              0 && (
               <span className="agent-notification-badge">
-                {notificationCount > 9
+                {notificationCount >
+                9
                   ? "9+"
                   : notificationCount}
               </span>
@@ -236,7 +308,9 @@ export default function AgentShell({
                   (value) => !value
                 )
               }
-              aria-expanded={profileOpen}
+              aria-expanded={
+                profileOpen
+              }
               aria-haspopup="menu"
             >
 
@@ -279,7 +353,6 @@ export default function AgentShell({
             ================================================= */}
 
             {profileOpen && (
-
               <div
                 className="agent-profile-menu"
                 role="menu"
@@ -335,7 +408,9 @@ export default function AgentShell({
                 <button
                   type="button"
                   className="agent-profile-logout"
-                  onClick={handleLogout}
+                  onClick={
+                    handleLogout
+                  }
                   role="menuitem"
                 >
 
@@ -348,7 +423,6 @@ export default function AgentShell({
                 </button>
 
               </div>
-
             )}
 
           </div>
@@ -382,10 +456,10 @@ export default function AgentShell({
               ClipboardList;
 
             const active =
-              activeTab === tab.key;
+              activeTab ===
+              tab.key;
 
             return (
-
               <button
                 key={tab.key}
                 type="button"
@@ -395,7 +469,9 @@ export default function AgentShell({
                     : ""
                 }`}
                 onClick={() =>
-                  selectTab(tab.key)
+                  selectTab(
+                    tab.key
+                  )
                 }
               >
 
@@ -409,9 +485,7 @@ export default function AgentShell({
                 </span>
 
               </button>
-
             );
-
           })}
 
         </nav>
@@ -454,7 +528,6 @@ export default function AgentShell({
       ===================================================== */}
 
       {mobileOpen && (
-
         <button
           type="button"
           className="agent-mobile-backdrop"
@@ -463,7 +536,6 @@ export default function AgentShell({
             setMobileOpen(false)
           }
         />
-
       )}
 
       {/* =====================================================

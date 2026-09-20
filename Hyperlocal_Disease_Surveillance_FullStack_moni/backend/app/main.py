@@ -52,6 +52,11 @@ from .routers.home_relief import (
 )
 
 
+from .routers.emerging import (
+    router as emerging_router,
+)
+
+
 # Medical Supervisor Management
 from .routers.admin_supervisors import (
     router as admin_supervisors_router,
@@ -219,6 +224,13 @@ app.include_router(
 
 app.include_router(
     home_relief_router
+)
+
+
+# Emerging Disease Surveillance
+
+app.include_router(
+    emerging_router
 )
 
 
