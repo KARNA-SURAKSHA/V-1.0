@@ -1,0 +1,811 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+
+/* ============================================================
+   KARNA SURAKSHA - USER PORTAL ENTRY PAGE
+   Built against a 1536 x 1024 design reference. Layout scales
+   fluidly for other desktop sizes and stacks on tablet / mobile.
+   ============================================================ */
+
+.ku-page,
+.ku-page *,
+.ku-page *::before,
+.ku-page *::after {
+  box-sizing: border-box;
+}
+
+
+/* ============================================================
+   PAGE
+   ============================================================ */
+
+.ku-page {
+  position: relative;
+
+  width: 100%;
+  min-height: 100vh;
+
+  overflow-x: hidden;
+
+  isolation: isolate;
+
+  background: #f8f8f0;
+
+  color: #0a2e4d;
+
+  font-family:
+    "Plus Jakarta Sans",
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+}
+
+
+/* ============================================================
+   BACKGROUND LANDSCAPE (bottom-left watercolour hills + map)
+   ============================================================ */
+
+.ku-landscape {
+  position: absolute;
+
+  left: 0;
+  bottom: 0;
+
+  z-index: 0;
+
+  display: block;
+
+  width: min(53.6vw, 900px);
+  height: auto;
+
+  pointer-events: none;
+  user-select: none;
+
+  -webkit-mask-image:
+    linear-gradient(to right, #000 0%, #000 78%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 14%, #000 100%);
+  -webkit-mask-composite: source-in;
+
+  mask-image:
+    linear-gradient(to right, #000 0%, #000 78%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 14%, #000 100%);
+  mask-composite: intersect;
+}
+
+
+/* ============================================================
+   SHELL
+   ============================================================ */
+
+.ku-shell {
+  position: relative;
+
+  z-index: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  max-width: 1536px;
+  min-height: 100vh;
+
+  margin: 0 auto;
+
+  padding:
+    40px
+    clamp(24px, 4.95vw, 76px)
+    96px
+    clamp(24px, 6.45vw, 99px);
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.ku-header {
+  display: flex;
+
+  min-height: 82px;
+
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 24px;
+}
+
+
+.ku-brand {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 21px;
+
+  margin: 0;
+  padding: 0;
+
+  border: 0;
+  border-radius: 10px;
+
+  background: none;
+
+  font-family: inherit;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.ku-brand:focus-visible {
+  outline: 3px solid rgba(46, 149, 107, 0.4);
+  outline-offset: 6px;
+}
+
+
+.ku-brand-shield {
+  flex: none;
+
+  width: 70px;
+  height: 80px;
+}
+
+
+.ku-brand-text {
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.ku-brand-name {
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 44px;
+  letter-spacing: -0.005em;
+
+  color: #0a6b42;
+}
+
+.ku-brand-sub {
+  font-size: 21px;
+  font-weight: 400;
+  line-height: 25px;
+
+  color: #0c7166;
+}
+
+
+.ku-tagline {
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  margin: 9px 0 0;
+
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+
+  color: #2a6590;
+
+  white-space: nowrap;
+}
+
+.ku-tagline i {
+  width: 4px;
+  height: 4px;
+
+  border-radius: 50%;
+
+  background: #2a6590;
+}
+
+
+/* ============================================================
+   MAIN GRID
+   ============================================================ */
+
+.ku-main {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 622px);
+
+  align-items: start;
+
+  margin-top: 18px;
+}
+
+
+/* ============================================================
+   HERO (LEFT)
+   ============================================================ */
+
+.ku-hero {
+  min-width: 0;
+
+  padding-top: 26px;
+  padding-right: 24px;
+}
+
+
+.ku-headline {
+  margin: 0;
+
+  font-size: clamp(36px, 3vw, 46px);
+  font-weight: 700;
+  line-height: 1.195;
+  letter-spacing: -0.005em;
+
+  color: #0a2e4d;
+}
+
+.ku-headline span {
+  display: block;
+}
+
+
+.ku-lead {
+  max-width: 540px;
+
+  margin: 8px 0 0;
+
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 29px;
+
+  color: #1f5678;
+}
+
+
+/* ------------------------------------------------------------
+   FEATURE ROW
+   ------------------------------------------------------------ */
+
+.ku-features {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  align-items: flex-start;
+
+  gap: 20px 49px;
+
+  margin: 27px 0 0 -11px;
+  padding: 0;
+
+  list-style: none;
+}
+
+.ku-feature {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 9px;
+
+  min-width: 78px;
+}
+
+
+.ku-feature-icon {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 78px;
+  height: 78px;
+
+  border-radius: 50%;
+}
+
+.ku-feature-icon svg {
+  width: 48px;
+  height: 48px;
+}
+
+.ku-tone-green {
+  background:
+    radial-gradient(circle at 35% 30%, #e6f5ec 0%, #cdebd9 100%);
+}
+
+.ku-tone-mint {
+  background:
+    radial-gradient(circle at 35% 30%, #e0f5ec 0%, #c6e8d8 100%);
+}
+
+.ku-tone-violet {
+  background:
+    radial-gradient(circle at 35% 30%, #e8e8f8 0%, #d2d4f0 100%);
+}
+
+.ku-tone-sky {
+  background:
+    radial-gradient(circle at 35% 30%, #e3f1f8 0%, #cbe5f2 100%);
+}
+
+.ku-tone-leaf {
+  background:
+    radial-gradient(circle at 35% 30%, #e6f5e6 0%, #d0eacf 100%);
+}
+
+
+.ku-feature-label {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 24px;
+
+  text-align: center;
+
+  color: #0b3252;
+
+  white-space: nowrap;
+}
+
+.ku-feature-note {
+  font-size: 13.5px;
+  font-weight: 400;
+  line-height: 24px;
+
+  color: #26688a;
+}
+
+
+/* ============================================================
+   CARD (RIGHT)
+   ============================================================ */
+
+.ku-card {
+  width: 100%;
+  min-width: 0;
+
+  padding: 35px 44px 38px 50px;
+
+  border-radius: 20px;
+
+  background: #fefefd;
+
+  box-shadow:
+    0 1px 2px rgba(41, 64, 58, 0.05),
+    0 14px 44px rgba(55, 77, 66, 0.1);
+}
+
+
+.ku-avatar {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 68px;
+  height: 68px;
+
+  border-radius: 50%;
+
+  background: #daefe4;
+
+  color: #0a6b42;
+}
+
+
+.ku-card h2 {
+  margin: 5px 0 0;
+
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 44px;
+  letter-spacing: -0.01em;
+
+  color: #0a2e4d;
+}
+
+
+.ku-card-sub {
+  max-width: 450px;
+
+  margin: 3px 0 0;
+
+  font-size: 16.5px;
+  font-weight: 400;
+  line-height: 25px;
+
+  color: #3b7099;
+}
+
+
+/* ------------------------------------------------------------
+   FORM
+   ------------------------------------------------------------ */
+
+.ku-form {
+  margin-top: 28px;
+}
+
+
+.ku-field > label,
+.ku-field-title {
+  display: block;
+
+  margin: 0 0 9px;
+
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 24px;
+
+  color: #0a2a48;
+}
+
+.ku-field-location {
+  margin-top: 30px;
+}
+
+.ku-field-location .ku-field-title {
+  margin-bottom: 8px;
+}
+
+
+/* Name input (same look as the location selects) */
+
+.ku-input {
+  position: relative;
+
+  height: 51px;
+
+  border: 1px solid #d6e4ec;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.ku-input:hover {
+  border-color: #b9d2de;
+}
+
+.ku-input:focus-within {
+  border-color: #2e956b;
+
+  box-shadow: 0 0 0 3px rgba(46, 149, 107, 0.16);
+}
+
+.ku-input-icon {
+  position: absolute;
+
+  top: 50%;
+  left: 17px;
+
+  transform: translateY(-50%);
+
+  color: #566a7f;
+
+  pointer-events: none;
+}
+
+.ku-input:focus-within .ku-input-icon {
+  color: #0e7a4b;
+}
+
+.ku-input input {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  margin: 0;
+  padding: 0 16px 0 62px;
+
+  border: 0;
+  border-radius: 8px;
+
+  outline: none;
+
+  background: transparent;
+
+  font-family: inherit;
+  font-size: 16.5px;
+  font-weight: 400;
+
+  color: #0a2e4d;
+}
+
+.ku-input input::placeholder {
+  color: #8d9ead;
+
+  opacity: 1;
+}
+
+
+/* Error */
+
+.ku-error {
+  margin: 18px 0 0;
+  padding: 10px 14px;
+
+  border-radius: 8px;
+
+  background: #fbeaea;
+
+  font-size: 14px;
+  line-height: 1.4;
+
+  color: #b3261e;
+}
+
+
+/* Submit */
+
+.ku-submit {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+
+  width: 100%;
+  height: 56px;
+
+  margin: 33px 0 0;
+  padding: 0 20px;
+
+  border: 0;
+  border-radius: 6px;
+
+  background: #2e956b;
+
+  font-family: inherit;
+  font-size: 16.5px;
+  font-weight: 500;
+
+  color: #ffffff;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.05s ease;
+}
+
+.ku-submit:hover {
+  background: #278a61;
+
+  box-shadow: 0 6px 16px rgba(46, 149, 107, 0.28);
+}
+
+.ku-submit:active {
+  transform: translateY(1px);
+}
+
+.ku-submit:focus-visible {
+  outline: 3px solid rgba(46, 149, 107, 0.4);
+  outline-offset: 3px;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+/* Narrower laptops: tighten the hero column */
+@media (max-width: 1360px) {
+
+  .ku-main {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 560px);
+  }
+
+  .ku-hero {
+    padding-right: 16px;
+  }
+
+  .ku-lead {
+    font-size: 17.5px;
+    line-height: 27px;
+  }
+
+  .ku-features {
+    gap: 18px 20px;
+
+    margin-left: -6px;
+  }
+
+  .ku-feature {
+    min-width: 66px;
+  }
+
+  .ku-feature-icon {
+    width: 66px;
+    height: 66px;
+  }
+
+  .ku-feature-icon svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .ku-feature-label {
+    font-size: 13.5px;
+    line-height: 21px;
+  }
+
+  .ku-feature-note {
+    font-size: 12.5px;
+    line-height: 21px;
+  }
+
+  .ku-card {
+    padding: 32px 36px 34px 40px;
+  }
+
+}
+
+
+/* Tablet: stack hero above the card */
+@media (max-width: 1100px) {
+
+  .ku-main {
+    grid-template-columns: minmax(0, 1fr);
+
+    gap: 40px;
+  }
+
+  .ku-hero {
+    padding-right: 0;
+  }
+
+  .ku-card {
+    max-width: 622px;
+
+    margin: 0 auto;
+  }
+
+  .ku-landscape {
+    width: min(100vw, 900px);
+
+    opacity: 0.55;
+  }
+
+  .ku-shell {
+    padding-bottom: 72px;
+  }
+
+}
+
+
+/* Mobile */
+@media (max-width: 640px) {
+
+  .ku-shell {
+    padding-top: 24px;
+  }
+
+  .ku-tagline {
+    display: none;
+  }
+
+  .ku-brand {
+    gap: 14px;
+  }
+
+  .ku-brand-shield {
+    width: 48px;
+    height: 55px;
+  }
+
+  .ku-brand-name {
+    font-size: 27px;
+    line-height: 32px;
+  }
+
+  .ku-brand-sub {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .ku-main {
+    margin-top: 6px;
+    gap: 28px;
+  }
+
+  .ku-hero {
+    padding-top: 16px;
+  }
+
+  .ku-headline {
+    font-size: 34px;
+  }
+
+  .ku-lead {
+    font-size: 16px;
+  }
+
+  .ku-features {
+    display: grid;
+
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 18px 8px;
+
+    margin-left: 0;
+  }
+
+  .ku-feature-icon {
+    width: 64px;
+    height: 64px;
+  }
+
+  .ku-feature-icon svg {
+    width: 34px;
+    height: 34px;
+  }
+
+  .ku-feature-label {
+    font-size: 13.5px;
+    line-height: 19px;
+
+    white-space: normal;
+  }
+
+  .ku-feature-note {
+    font-size: 12px;
+    line-height: 17px;
+  }
+
+  .ku-card {
+    padding: 26px 22px 28px;
+
+    border-radius: 16px;
+  }
+
+  .ku-avatar {
+    width: 58px;
+    height: 58px;
+  }
+
+  .ku-card h2 {
+    font-size: 30px;
+  }
+
+  .ku-card-sub {
+    font-size: 15.5px;
+  }
+
+  .ku-field > label,
+  .ku-field-title {
+    font-size: 16px;
+  }
+
+  .ku-input input {
+    padding-left: 54px;
+
+    font-size: 16px;
+  }
+
+  .ku-input-icon {
+    left: 14px;
+  }
+
+  .ku-submit {
+    font-size: 16px;
+  }
+
+}

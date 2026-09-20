@@ -1,0 +1,190 @@
+/* ============================================================
+   LOCATION SELECTOR - "portal" variant
+   Used by the User Portal entry page (State / District / Taluk).
+   The default variant of LocationSelector is styled with Tailwind
+   and is not affected by anything in this file.
+   ============================================================ */
+
+.ls-portal,
+.ls-portal *,
+.ls-portal *::before,
+.ls-portal *::after {
+  box-sizing: border-box;
+}
+
+.ls-portal {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+
+/* ------------------------------------------------------------
+   FIELD
+   ------------------------------------------------------------ */
+
+.ls-portal-field label {
+  display: block;
+
+  margin: 0 0 7px;
+
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 22px;
+
+  color: #17406a;
+}
+
+
+/* ------------------------------------------------------------
+   CONTROL (icon + select + chevron)
+   ------------------------------------------------------------ */
+
+.ls-portal-control {
+  position: relative;
+
+  height: 51px;
+
+  border: 1px solid #d6e4ec;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.ls-portal-control:hover {
+  border-color: #b9d2de;
+}
+
+.ls-portal-control:focus-within {
+  border-color: #2e956b;
+
+  box-shadow: 0 0 0 3px rgba(46, 149, 107, 0.16);
+}
+
+
+.ls-portal-icon {
+  position: absolute;
+
+  top: 50%;
+  left: 16px;
+
+  display: flex;
+
+  width: 25px;
+  height: 25px;
+
+  transform: translateY(-50%);
+
+  color: #566a7f;
+
+  pointer-events: none;
+}
+
+.ls-portal-icon svg {
+  width: 25px;
+  height: 25px;
+}
+
+.ls-portal-control.has-value .ls-portal-icon {
+  color: #0e7a4b;
+}
+
+
+.ls-portal-control select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  margin: 0;
+  padding: 0 48px 0 62px;
+
+  border: 0;
+  border-radius: 8px;
+
+  outline: none;
+
+  background: transparent;
+
+  font-family: inherit;
+  font-size: 16.5px;
+  font-weight: 400;
+
+  color: #8d9ead;
+
+  cursor: pointer;
+
+  text-overflow: ellipsis;
+}
+
+.ls-portal-control.has-value select {
+  color: #0a2e4d;
+}
+
+.ls-portal-control select:disabled {
+  cursor: not-allowed;
+}
+
+/* Options inside the native dropdown list */
+.ls-portal-control select option {
+  color: #0a2e4d;
+}
+
+
+.ls-portal-chevron {
+  position: absolute;
+
+  top: 50%;
+  right: 17px;
+
+  transform: translateY(-50%);
+
+  color: #3f4f62;
+
+  pointer-events: none;
+}
+
+
+/* ------------------------------------------------------------
+   ERROR
+   ------------------------------------------------------------ */
+
+.ls-portal-error {
+  margin: -6px 0 0;
+
+  font-size: 13px;
+  line-height: 1.4;
+
+  color: #c62828;
+}
+
+
+/* ------------------------------------------------------------
+   SMALL SCREENS
+   ------------------------------------------------------------ */
+
+@media (max-width: 520px) {
+
+  .ls-portal {
+    gap: 16px;
+  }
+
+  .ls-portal-control select {
+    padding-left: 54px;
+
+    font-size: 16px;
+  }
+
+  .ls-portal-icon {
+    left: 14px;
+  }
+
+}

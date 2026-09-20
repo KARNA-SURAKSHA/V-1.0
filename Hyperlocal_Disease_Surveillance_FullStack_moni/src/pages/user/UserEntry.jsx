@@ -1,18 +1,77 @@
 import {
+  useRef,
   useState,
 } from "react";
 
 import {
-  ArrowLeft,
-  Users,
+  Eye,
+  User,
 } from "lucide-react";
 
 import LocationSelector from "../../components/LocationSelector";
+
+import {
+  AssistantIcon,
+  BrandShield,
+  CalendarIcon,
+  HomeReliefIcon,
+  MapPinIcon,
+  ShieldBellIcon,
+} from "./UserEntryIcons";
+
+import landscapeImage from "../../assets/ui/user-entry-landscape.png";
+
+import "./UserEntry.css";
+
+
+// ============================================================
+// FEATURE HIGHLIGHTS (row of five icons under the headline)
+// ============================================================
+
+const FEATURES = [
+  {
+    key: "weekly",
+    tone: "green",
+    Icon: CalendarIcon,
+    label: ["Weekly", "Health Updates"],
+  },
+  {
+    key: "map",
+    tone: "mint",
+    Icon: MapPinIcon,
+    label: ["Community", "Risk Map"],
+  },
+  {
+    key: "alerts",
+    tone: "violet",
+    Icon: ShieldBellIcon,
+    label: ["Precautions &", "Alerts"],
+  },
+  {
+    key: "assistant",
+    tone: "sky",
+    Icon: AssistantIcon,
+    label: ["Medical", "Assistant"],
+  },
+  {
+    key: "relief",
+    tone: "leaf",
+    Icon: HomeReliefIcon,
+    label: ["Home Relief"],
+    note: "(Quick Support)",
+  },
+];
+
+
+// ============================================================
+// USER ENTRY (User Portal login page)
+// ============================================================
 
 export default function UserEntry({
   onEnter,
   onBack,
 }) {
+
   const [username, setUsername] =
     useState("");
 
@@ -22,214 +81,337 @@ export default function UserEntry({
   const [error, setError] =
     useState("");
 
+  const nameRef = useRef(null);
+
+
+  // ==========================================================
+  // SUBMIT
+  // ==========================================================
 
   const handleSubmit = (event) => {
+
     event.preventDefault();
 
-    if (!username.trim()) {
+    const cleanName =
+      username.trim();
+
+
+    if (!cleanName) {
+
       setError(
         "Please enter your name."
       );
+
+      nameRef.current?.focus();
+
       return;
     }
 
+
     if (!location?.talukId) {
+
       setError(
         "Please select your State, District, and Taluk."
       );
+
       return;
     }
+
 
     setError("");
 
     onEnter({
-      username:
-        username.trim(),
-
-      defaultLocation:
-        location,
+      username: cleanName,
+      defaultLocation: location,
     });
   };
 
 
+  // Any edit clears a stale error message
+  const handleLocationChange = (next) => {
+
+    setLocation(next);
+
+    if (error) {
+      setError("");
+    }
+  };
+
+
+  // ==========================================================
+  // RENDER
+  // ==========================================================
+
   return (
-    <div className="min-h-screen bg-[#FCFAF6] flex items-center justify-center px-6 py-12">
 
-      <div className="w-full max-w-[520px]">
+    <div className="ku-page">
 
-        <button
-          onClick={onBack}
-          className="
-            flex
-            items-center
-            gap-1.5
-            text-[14px]
-            text-[#445064]
-            hover:text-[#0B6D2E]
-            mb-6
-            transition-colors
-          "
-        >
-          <ArrowLeft size={16} />
-          Back to home
-        </button>
+      {/* ====================================================
+          BACKGROUND LANDSCAPE
+      ==================================================== */}
+
+      <img
+        className="ku-landscape"
+        src={landscapeImage}
+        alt=""
+        aria-hidden="true"
+        draggable="false"
+      />
 
 
-        <div className="
-          bg-white
-          rounded-2xl
-          border
-          border-[#E8E2D8]
-          shadow-sm
-          p-8
-        ">
+      <div className="ku-shell">
 
-          <div className="
-            w-14
-            h-14
-            rounded-xl
-            bg-[#0B7A33]
-            flex
-            items-center
-            justify-center
-            mb-5
-          ">
-            <Users
-              size={28}
-              className="text-white"
-            />
-          </div>
+        {/* ==================================================
+            HEADER
+        ================================================== */}
 
+        <header className="ku-header">
 
-          <h2 className="
-            text-[24px]
-            font-semibold
-            text-[#1F3144]
-          ">
-            User Portal
-          </h2>
-
-
-          <p className="
-            text-[14px]
-            text-[#445064]
-            mt-1
-            mb-6
-          ">
-            Enter your name and select your
-            default location to view disease
-            surveillance data.
-          </p>
-
-
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-5"
+          <button
+            type="button"
+            className="ku-brand"
+            onClick={onBack}
+            aria-label="Karna Suraksha - back to home"
           >
 
-            {/* NAME */}
+            <BrandShield className="ku-brand-shield" />
 
-            <div>
+            <span className="ku-brand-text">
 
-              <label
-                className="
-                  block
-                  text-[13px]
-                  font-medium
-                  text-[#445064]
-                  mb-1
-                "
-              >
-                Your Name
-              </label>
+              <span className="ku-brand-name">
+                Karna Suraksha
+              </span>
 
-              <input
-                type="text"
-                value={username}
-                onChange={(event) =>
-                  setUsername(
-                    event.target.value
-                  )
-                }
-                className="
-                  w-full
-                  rounded-lg
-                  border
-                  border-[#E8E2D8]
-                  px-4
-                  py-2.5
-                  text-[15px]
-                  focus:outline-none
-                  focus:ring-2
-                  focus:ring-[#0B7A33]/30
-                "
-                placeholder="e.g. Ramesh Kumar"
-              />
+              <span className="ku-brand-sub">
+                Disease Surveillance Platform
+              </span>
 
-            </div>
+            </span>
+
+          </button>
 
 
-            {/* LOCATION */}
+          <p className="ku-tagline">
 
-            <div>
+            <span>Safer Communities</span>
 
-              <label className="
-                block
-                text-[13px]
-                font-medium
-                text-[#445064]
-                mb-2
-              ">
-                Your Default Location
-              </label>
+            <i aria-hidden="true" />
 
-              <LocationSelector
-                onChange={setLocation}
-              />
+            <span>Healthier Tomorrow</span>
 
-            </div>
+          </p>
+
+        </header>
 
 
-            {/* ERROR */}
+        {/* ==================================================
+            MAIN
+        ================================================== */}
 
-            {error && (
-              <p className="
-                text-[13px]
-                text-[#C62828]
-                bg-[#FBEAEA]
-                rounded-lg
-                px-3
-                py-2
-              ">
-                {error}
-              </p>
-            )}
+        <main className="ku-main">
 
 
-            {/* SUBMIT */}
+          {/* ----------------------------------------------
+              LEFT: MESSAGE + FEATURES
+          ---------------------------------------------- */}
 
-            <button
-              type="submit"
-              className="
-                w-full
-                rounded-lg
-                bg-gradient-to-r
-                from-[#07892F]
-                to-[#049437]
-                hover:from-[#067C2B]
-                hover:to-[#038A31]
-                text-white
-                font-semibold
-                py-3
-                transition-all
-              "
+          <section className="ku-hero">
+
+            <h1 className="ku-headline">
+              <span>Stay Informed.</span>
+              <span>Stay Protected.</span>
+              <span>Stay Healthy.</span>
+            </h1>
+
+
+            <p className="ku-lead">
+              Access local health updates,
+              community risk information,
+              precautions and alerts — all in one place.
+            </p>
+
+
+            <ul className="ku-features">
+
+              {FEATURES.map(
+                ({
+                  key,
+                  tone,
+                  Icon,
+                  label,
+                  note,
+                }) => (
+
+                  <li
+                    key={key}
+                    className="ku-feature"
+                  >
+
+                    <span
+                      className={`ku-feature-icon ku-tone-${tone}`}
+                    >
+                      <Icon />
+                    </span>
+
+                    <span className="ku-feature-label">
+
+                      {label.map((line) => (
+                        <span key={line}>
+                          {line}
+                        </span>
+                      ))}
+
+                      {note && (
+                        <span className="ku-feature-note">
+                          {note}
+                        </span>
+                      )}
+
+                    </span>
+
+                  </li>
+
+                )
+              )}
+
+            </ul>
+
+          </section>
+
+
+          {/* ----------------------------------------------
+              RIGHT: USER PORTAL CARD
+          ---------------------------------------------- */}
+
+          <section
+            className="ku-card"
+            aria-labelledby="ku-card-title"
+          >
+
+            <div
+              className="ku-avatar"
+              aria-hidden="true"
             >
-              View Disease Surveillance
-            </button>
+              <User
+                size={40}
+                strokeWidth={1.9}
+              />
+            </div>
 
-          </form>
 
-        </div>
+            <h2 id="ku-card-title">
+              User Portal
+            </h2>
+
+
+            <p className="ku-card-sub">
+              Enter your name and select your
+              default location to view disease
+              surveillance data.
+            </p>
+
+
+            <form
+              className="ku-form"
+              onSubmit={handleSubmit}
+              noValidate
+            >
+
+              {/* NAME */}
+
+              <div className="ku-field">
+
+                <label htmlFor="ku-name">
+                  Your Name
+                </label>
+
+                <div className="ku-input">
+
+                  <User
+                    className="ku-input-icon"
+                    size={25}
+                    strokeWidth={1.6}
+                    aria-hidden="true"
+                  />
+
+                  <input
+                    id="ku-name"
+                    ref={nameRef}
+                    type="text"
+                    value={username}
+                    onChange={(event) => {
+
+                      setUsername(
+                        event.target.value
+                      );
+
+                      if (error) {
+                        setError("");
+                      }
+
+                    }}
+                    placeholder="e.g. Ramesh Kumar"
+                    autoComplete="name"
+                    maxLength={60}
+                  />
+
+                </div>
+
+              </div>
+
+
+              {/* LOCATION */}
+
+              <div className="ku-field ku-field-location">
+
+                <span className="ku-field-title">
+                  Your Default Location
+                </span>
+
+                <LocationSelector
+                  variant="portal"
+                  onChange={handleLocationChange}
+                />
+
+              </div>
+
+
+              {/* ERROR */}
+
+              {error && (
+
+                <p
+                  className="ku-error"
+                  role="alert"
+                >
+                  {error}
+                </p>
+
+              )}
+
+
+              {/* SUBMIT */}
+
+              <button
+                type="submit"
+                className="ku-submit"
+              >
+
+                <Eye
+                  size={26}
+                  strokeWidth={1.8}
+                  aria-hidden="true"
+                />
+
+                View Disease Surveillance
+
+              </button>
+
+            </form>
+
+          </section>
+
+        </main>
 
       </div>
 

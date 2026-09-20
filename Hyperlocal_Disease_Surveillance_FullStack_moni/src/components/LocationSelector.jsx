@@ -3,12 +3,23 @@ import {
   useState,
 } from "react";
 
+import {
+  Building2,
+  ChevronDown,
+  MapPin,
+} from "lucide-react";
+
 import { api } from "../api";
+
+import { DistrictIcon } from "../pages/user/UserEntryIcons";
+
+import "./LocationSelector.css";
 
 
 export default function LocationSelector({
   value = null,
   onChange,
+  variant = "default",
 }) {
 
   const [
@@ -483,6 +494,162 @@ export default function LocationSelector({
     disabled:text-[#9A9489]
   `;
 
+
+  // ==========================================================
+  // PORTAL VARIANT (User Portal entry page)
+  //
+  // Icon + select + chevron, styled by LocationSelector.css.
+  // All behaviour is identical to the default variant.
+  // ==========================================================
+
+  if (variant === "portal") {
+
+    const fields = [
+
+      {
+        id: "location-state",
+        label: "State",
+        icon: <MapPin size={25} strokeWidth={1.6} />,
+        value: selectedState,
+        onChange: handleStateChange,
+        disabled: loadingStates,
+        placeholder: loadingStates
+          ? "Loading States..."
+          : "Select State",
+        options: states,
+      },
+
+      {
+        id: "location-district",
+        label: "District",
+        icon: <DistrictIcon />,
+        value: selectedDistrict,
+        onChange: handleDistrictChange,
+        disabled:
+          !selectedState ||
+          loadingDistricts,
+        placeholder: loadingDistricts
+          ? "Loading Districts..."
+          : !selectedState
+            ? "Select State First"
+            : "Select District",
+        options: districts,
+      },
+
+      {
+        id: "location-taluk",
+        label: "Taluk",
+        icon: <Building2 size={25} strokeWidth={1.6} />,
+        value: selectedTaluk,
+        onChange: handleTalukChange,
+        disabled:
+          !selectedDistrict ||
+          loadingTaluks,
+        placeholder: loadingTaluks
+          ? "Loading Taluks..."
+          : !selectedDistrict
+            ? "Select District First"
+            : "Select Taluk",
+        options: taluks,
+      },
+
+    ];
+
+
+    return (
+
+      <div className="ls-portal">
+
+        {fields.map((field) => (
+
+          <div
+            className="ls-portal-field"
+            key={field.id}
+          >
+
+            <label htmlFor={field.id}>
+              {field.label}
+            </label>
+
+
+            <div
+              className={`ls-portal-control${
+                field.value
+                  ? " has-value"
+                  : ""
+              }`}
+            >
+
+              <span
+                className="ls-portal-icon"
+                aria-hidden="true"
+              >
+                {field.icon}
+              </span>
+
+
+              <select
+                id={field.id}
+                value={field.value}
+                onChange={field.onChange}
+                disabled={field.disabled}
+              >
+
+                <option value="">
+                  {field.placeholder}
+                </option>
+
+                {field.options.map(
+                  (option) => (
+
+                    <option
+                      key={option.id}
+                      value={option.id}
+                    >
+                      {option.name}
+                    </option>
+
+                  )
+                )}
+
+              </select>
+
+
+              <ChevronDown
+                className="ls-portal-chevron"
+                size={20}
+                strokeWidth={2.1}
+                aria-hidden="true"
+              />
+
+            </div>
+
+          </div>
+
+        ))}
+
+
+        {error && (
+
+          <p
+            className="ls-portal-error"
+            role="alert"
+          >
+            {error}
+          </p>
+
+        )}
+
+      </div>
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // DEFAULT VARIANT (unchanged)
+  // ==========================================================
 
   return (
 
