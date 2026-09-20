@@ -12,11 +12,15 @@ import {
   ShieldPlus,
   Stethoscope,
   User,
+  UsersRound,
 } from "lucide-react";
 
 import { useAuth } from "../context/AuthContext";
 
 import "./AdminLogin.css";
+import "./AgentLogin.css";
+
+import agentLoginImage from "../assets/ui/agent-login-left-reference.png";
 
 
 // ============================================================
@@ -55,20 +59,36 @@ export default function Login({
 }) {
 
   /*
-   * Admin gets the new reference design.
+   * Admin remains completely separate.
    *
-   * Agent and Medical Supervisor continue to use
-   * the existing simple login design.
+   * Agent has its own dedicated login page.
+   *
+   * Medical Supervisor continues using StandardLogin.
    */
 
   if (role === "admin") {
+
     return (
       <AdminLogin
         onSuccess={onSuccess}
         onBack={onBack}
       />
     );
+
   }
+
+
+  if (role === "agent") {
+
+    return (
+      <AgentLogin
+        onSuccess={onSuccess}
+        onBack={onBack}
+      />
+    );
+
+  }
+
 
   return (
     <StandardLogin
@@ -81,44 +101,35 @@ export default function Login({
 
 
 // ============================================================
-// ADMIN LOGIN
+// AGENT LOGIN
 // ============================================================
 
-function AdminLogin({
+function AgentLogin({
   onSuccess,
   onBack,
 }) {
 
   const { login } = useAuth();
 
-
-  // ----------------------------------------------------------
-  // STATE
-  // ----------------------------------------------------------
-
   const [
     username,
     setUsername,
   ] = useState("");
-
 
   const [
     password,
     setPassword,
   ] = useState("");
 
-
   const [
     showPassword,
     setShowPassword,
   ] = useState(false);
 
-
   const [
     error,
     setError,
   ] = useState("");
-
 
   const [
     loading,
@@ -126,9 +137,9 @@ function AdminLogin({
   ] = useState(false);
 
 
-  // ----------------------------------------------------------
-  // SUBMIT
-  // ----------------------------------------------------------
+  // ==========================================================
+  // LOGIN
+  // ==========================================================
 
   const handleSubmit = async (event) => {
 
@@ -172,18 +183,515 @@ function AdminLogin({
       /*
        * IMPORTANT:
        *
-       * We are NOT replacing your authentication system.
-       *
-       * This still uses:
-       *
-       * Firebase Authentication
-       *        ↓
-       * Firebase ID Token
-       *        ↓
-       * FastAPI /auth/me
-       *        ↓
-       * Database role verification
+       * Existing authentication flow is unchanged.
        */
+
+      const session =
+        await login(
+          cleanUsername,
+          password,
+          "agent"
+        );
+
+
+      onSuccess(session);
+
+    } catch (err) {
+
+      setError(
+        err?.message ||
+        "Unable to log in. Please check your credentials and try again."
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+  };
+
+
+  // ==========================================================
+  // RENDER
+  // ==========================================================
+
+  return (
+
+    <div className="agent-login-page">
+
+      {/* ======================================================
+          LEFT REFERENCE ARTWORK
+      ====================================================== */}
+
+      <div
+        className="agent-login-background"
+        aria-hidden="true"
+      >
+
+        <img
+          src={agentLoginImage}
+          alt=""
+          className="agent-login-background-image"
+        />
+
+      </div>
+
+
+      {/* ======================================================
+          SOFT TRANSITION INTO LOGIN AREA
+      ====================================================== */}
+
+      <div
+        className="agent-login-background-fade"
+        aria-hidden="true"
+      />
+
+
+      {/* ======================================================
+          TOP RIGHT DECORATION
+      ====================================================== */}
+
+      <div
+        className="agent-login-top-shape"
+        aria-hidden="true"
+      >
+
+        <div className="agent-login-dots">
+
+          {Array.from({
+            length: 15,
+          }).map((_, index) => (
+
+            <span
+              key={index}
+            />
+
+          ))}
+
+        </div>
+
+      </div>
+
+
+      {/* ======================================================
+          BOTTOM RIGHT DECORATION
+      ====================================================== */}
+
+      <div
+        className="agent-login-bottom-shape"
+        aria-hidden="true"
+      />
+
+
+      {/* ======================================================
+          LOGIN CONTENT
+      ====================================================== */}
+
+      <main className="agent-login-content">
+
+        <section className="agent-login-card">
+
+
+          {/* ==================================================
+              AGENT ICON
+          ================================================== */}
+
+          <div
+            className="agent-login-icon"
+            aria-hidden="true"
+          >
+
+            <UsersRound
+              size={39}
+              strokeWidth={2}
+            />
+
+          </div>
+
+
+          {/* ==================================================
+              HEADING
+          ================================================== */}
+
+          <div className="agent-login-heading">
+
+            <h1>
+              Agent Portal
+            </h1>
+
+            <p>
+              Submit your taluk's weekly disease report.
+            </p>
+
+          </div>
+
+
+          {/* ==================================================
+              LOGIN FORM
+          ================================================== */}
+
+          <form
+            className="agent-login-form"
+            onSubmit={handleSubmit}
+            noValidate
+          >
+
+
+            {/* =================================================
+                USERNAME
+            ================================================= */}
+
+            <div className="agent-login-field">
+
+              <label htmlFor="agent-username">
+                Username
+              </label>
+
+
+              <div className="agent-login-input-wrapper">
+
+                <User
+                  className="agent-login-input-icon"
+                  size={22}
+                  strokeWidth={1.9}
+                  aria-hidden="true"
+                />
+
+
+                <input
+                  id="agent-username"
+                  type="text"
+                  value={username}
+                  onChange={(event) => {
+
+                    setUsername(
+                      event.target.value
+                    );
+
+                    if (error) {
+                      setError("");
+                    }
+
+                  }}
+                  placeholder="agent_virajpet"
+                  autoComplete="username"
+                  disabled={loading}
+                  required
+                />
+
+              </div>
+
+            </div>
+
+
+            {/* =================================================
+                PASSWORD
+            ================================================= */}
+
+            <div className="agent-login-field">
+
+              <label htmlFor="agent-password">
+                Password
+              </label>
+
+
+              <div className="agent-login-input-wrapper">
+
+                <LockKeyhole
+                  className="agent-login-input-icon"
+                  size={22}
+                  strokeWidth={1.9}
+                  aria-hidden="true"
+                />
+
+
+                <input
+                  id="agent-password"
+                  type={
+                    showPassword
+                      ? "text"
+                      : "password"
+                  }
+                  value={password}
+                  onChange={(event) => {
+
+                    setPassword(
+                      event.target.value
+                    );
+
+                    if (error) {
+                      setError("");
+                    }
+
+                  }}
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  disabled={loading}
+                  required
+                />
+
+
+                <button
+                  type="button"
+                  className="agent-login-password-toggle"
+                  onClick={() =>
+                    setShowPassword(
+                      (previous) =>
+                        !previous
+                    )
+                  }
+                  disabled={loading}
+                  aria-label={
+                    showPassword
+                      ? "Hide password"
+                      : "Show password"
+                  }
+                >
+
+                  {showPassword ? (
+
+                    <EyeOff
+                      size={20}
+                      strokeWidth={1.9}
+                    />
+
+                  ) : (
+
+                    <Eye
+                      size={20}
+                      strokeWidth={1.9}
+                    />
+
+                  )}
+
+                </button>
+
+              </div>
+
+            </div>
+
+
+            {/* =================================================
+                ERROR
+            ================================================= */}
+
+            {error && (
+
+              <div
+                className="agent-login-error"
+                role="alert"
+              >
+
+                {error}
+
+              </div>
+
+            )}
+
+
+            {/* =================================================
+                LOGIN BUTTON
+            ================================================= */}
+
+            <button
+              type="submit"
+              className="agent-login-submit"
+              disabled={loading}
+            >
+
+              {loading ? (
+
+                <>
+
+                  <Loader2
+                    size={21}
+                    className="agent-login-spinner"
+                    aria-hidden="true"
+                  />
+
+                  <span>
+                    Logging in...
+                  </span>
+
+                </>
+
+              ) : (
+
+                <>
+
+                  <LogIn
+                    size={22}
+                    strokeWidth={2.4}
+                    aria-hidden="true"
+                  />
+
+                  <span>
+                    Log in
+                  </span>
+
+                </>
+
+              )}
+
+            </button>
+
+          </form>
+
+
+          {/* ==================================================
+              DIVIDER
+          ================================================== */}
+
+          <div className="agent-login-divider" />
+
+
+          {/* ==================================================
+              DEMO CREDENTIALS
+          ================================================== */}
+
+          <div className="agent-login-demo">
+
+            <p>
+              Demo credentials (after running the backend seed script):
+            </p>
+
+            <strong>
+              agent_virajpet / agent123
+            </strong>
+
+            <span>
+              (or any seeded agent username)
+            </span>
+
+          </div>
+
+
+          {/* ==================================================
+              BACK TO HOME
+          ================================================== */}
+
+          <button
+            type="button"
+            className="agent-login-back"
+            onClick={onBack}
+            disabled={loading}
+          >
+
+            <ArrowLeft
+              size={16}
+              strokeWidth={1.9}
+              aria-hidden="true"
+            />
+
+            <span>
+              Back to home
+            </span>
+
+          </button>
+
+
+        </section>
+
+      </main>
+
+    </div>
+  );
+}
+
+
+// ============================================================
+// ADMIN LOGIN
+//
+// EXISTING ADMIN LOGIN
+// ============================================================
+
+function AdminLogin({
+  onSuccess,
+  onBack,
+}) {
+
+  const { login } = useAuth();
+
+
+  // ==========================================================
+  // STATE
+  // ==========================================================
+
+  const [
+    username,
+    setUsername,
+  ] = useState("");
+
+
+  const [
+    password,
+    setPassword,
+  ] = useState("");
+
+
+  const [
+    showPassword,
+    setShowPassword,
+  ] = useState(false);
+
+
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
+
+
+  // ==========================================================
+  // SUBMIT
+  // ==========================================================
+
+  const handleSubmit = async (event) => {
+
+    event.preventDefault();
+
+
+    if (loading) {
+      return;
+    }
+
+
+    setError("");
+
+
+    const cleanUsername =
+      username.trim();
+
+
+    if (!cleanUsername) {
+
+      setError(
+        "Please enter your username."
+      );
+
+      return;
+    }
+
+
+    if (!password) {
+
+      setError(
+        "Please enter your password."
+      );
+
+      return;
+    }
+
+
+    setLoading(true);
+
+
+    try {
 
       const session =
         await login(
@@ -210,13 +718,14 @@ function AdminLogin({
   };
 
 
-  // ----------------------------------------------------------
+  // ==========================================================
   // RENDER
-  // ----------------------------------------------------------
+  // ==========================================================
 
   return (
 
     <div className="admin-login-page">
+
 
       {/* ======================================================
           LEFT SIDE
@@ -238,6 +747,7 @@ function AdminLogin({
 
       <section className="admin-login-panel">
 
+
         {/* Decorative shapes */}
 
         <div
@@ -257,9 +767,8 @@ function AdminLogin({
 
         <div className="admin-login-card">
 
-          {/* --------------------------------------------------
-              SHIELD
-          -------------------------------------------------- */}
+
+          {/* SHIELD */}
 
           <div className="admin-login-icon">
 
@@ -271,9 +780,7 @@ function AdminLogin({
           </div>
 
 
-          {/* --------------------------------------------------
-              TITLE
-          -------------------------------------------------- */}
+          {/* TITLE */}
 
           <div className="admin-login-heading">
 
@@ -299,9 +806,8 @@ function AdminLogin({
             onSubmit={handleSubmit}
           >
 
-            {/* ------------------------------------------------
-                USERNAME
-            ------------------------------------------------ */}
+
+            {/* USERNAME */}
 
             <div className="admin-login-field">
 
@@ -337,9 +843,7 @@ function AdminLogin({
             </div>
 
 
-            {/* ------------------------------------------------
-                PASSWORD
-            ------------------------------------------------ */}
+            {/* PASSWORD */}
 
             <div className="admin-login-field">
 
@@ -415,9 +919,7 @@ function AdminLogin({
             </div>
 
 
-            {/* ------------------------------------------------
-                ERROR
-            ------------------------------------------------ */}
+            {/* ERROR */}
 
             {error && (
 
@@ -433,9 +935,7 @@ function AdminLogin({
             )}
 
 
-            {/* ------------------------------------------------
-                LOGIN BUTTON
-            ------------------------------------------------ */}
+            {/* LOGIN BUTTON */}
 
             <button
               type="submit"
@@ -480,16 +980,12 @@ function AdminLogin({
           </form>
 
 
-          {/* ==================================================
-              DIVIDER
-          ================================================== */}
+          {/* DIVIDER */}
 
           <div className="admin-login-divider" />
 
 
-          {/* ==================================================
-              DEMO CREDENTIALS
-          ================================================== */}
+          {/* DEMO */}
 
           <div className="admin-login-demo">
 
@@ -505,9 +1001,7 @@ function AdminLogin({
           </div>
 
 
-          {/* ==================================================
-              BACK
-          ================================================== */}
+          {/* BACK */}
 
           <button
             type="button"
@@ -538,7 +1032,7 @@ function AdminLogin({
 // ============================================================
 // STANDARD LOGIN
 //
-// Agent + Medical Supervisor retain the existing design.
+// MEDICAL SUPERVISOR
 // ============================================================
 
 function StandardLogin({
@@ -578,9 +1072,9 @@ function StandardLogin({
     ROLE_META[role];
 
 
-  // ----------------------------------------------------------
+  // ==========================================================
   // INVALID ROLE
-  // ----------------------------------------------------------
+  // ==========================================================
 
   if (!meta) {
 
@@ -625,9 +1119,9 @@ function StandardLogin({
     meta.icon;
 
 
-  // ----------------------------------------------------------
+  // ==========================================================
   // SUBMIT
-  // ----------------------------------------------------------
+  // ==========================================================
 
   const handleSubmit = async (event) => {
 
@@ -646,6 +1140,7 @@ function StandardLogin({
           role
         );
 
+
       onSuccess(session);
 
     } catch (err) {
@@ -663,15 +1158,16 @@ function StandardLogin({
   };
 
 
-  // ----------------------------------------------------------
+  // ==========================================================
   // RENDER
-  // ----------------------------------------------------------
+  // ==========================================================
 
   return (
 
     <div className="min-h-screen bg-[#FCFAF6] flex items-center justify-center px-6">
 
       <div className="w-full max-w-[440px]">
+
 
         <button
           onClick={onBack}
@@ -687,6 +1183,7 @@ function StandardLogin({
 
         <div className="bg-white rounded-2xl border border-[#E8E2D8] shadow-sm p-8">
 
+
           <div className="w-14 h-14 rounded-xl bg-[#0B7A33] flex items-center justify-center mb-5">
 
             <Icon
@@ -698,12 +1195,16 @@ function StandardLogin({
 
 
           <h2 className="text-[24px] font-semibold text-[#1F3144]">
+
             {meta.label}
+
           </h2>
 
 
           <p className="text-[14px] text-[#445064] mt-1 mb-6">
+
             {meta.hint}
+
           </p>
 
 
@@ -711,6 +1212,7 @@ function StandardLogin({
             onSubmit={handleSubmit}
             className="space-y-4"
           >
+
 
             <div>
 
@@ -786,21 +1288,16 @@ function StandardLogin({
 
             Demo credentials (after running the backend seed script):{" "}
 
-            {role === "admin" && (
-              <>
-                <b>admin</b> / admin123
-              </>
-            )}
-
-            {role === "agent" && (
-              <>
-                <b>agent_virajpet</b> / agent123
-              </>
-            )}
 
             {role === "medical_supervisor" && (
               <>
-                <b>medical_supervisor</b> / supervisor123
+
+                <b>
+                  medical_supervisor
+                </b>{" "}
+
+                / supervisor123
+
               </>
             )}
 
