@@ -9,6 +9,7 @@ import {
   ChevronDown,
   MapPin,
   Menu,
+  LogOut,
 } from "lucide-react";
 
 
@@ -48,6 +49,7 @@ function getCurrentDate() {
 
 export default function AdminHeader({
   onOpenLocation,
+  onExit,
 }) {
 
   const [
@@ -57,6 +59,12 @@ export default function AdminHeader({
     useState(
       getCurrentDate()
     );
+
+  const [
+    profileOpen,
+    setProfileOpen,
+  ] =
+    useState(false);
 
 
   useEffect(() => {
@@ -189,35 +197,88 @@ export default function AdminHeader({
 
         {/* PROFILE */}
 
-        <button
-          type="button"
-          className="admin-header-profile"
-        >
+        <div className="admin-header-profile-wrapper">
 
-          <div className="admin-profile-avatar">
-            MA
-          </div>
+          <button
+            type="button"
+            className="admin-header-profile"
+            onClick={() =>
+              setProfileOpen(
+                (prev) => !prev
+              )
+            }
+          >
 
-
-          <div className="admin-profile-details">
-
-            <strong>
-              Monish Ayyappa
-            </strong>
-
-            <span>
-              System Administrator
-            </span>
-
-          </div>
+            <div className="admin-profile-avatar">
+              MA
+            </div>
 
 
-          <ChevronDown
-            size={16}
-            strokeWidth={1.7}
-          />
+            <div className="admin-profile-details">
 
-        </button>
+              <strong>
+                Monish Ayyappa
+              </strong>
+
+              <span>
+                System Administrator
+              </span>
+
+            </div>
+
+
+            <ChevronDown
+              size={16}
+              strokeWidth={1.7}
+            />
+
+          </button>
+
+
+          {profileOpen && (
+
+            <>
+
+              <button
+                type="button"
+                aria-label="Close profile menu"
+                className="admin-header-profile-overlay"
+                onClick={() =>
+                  setProfileOpen(false)
+                }
+              />
+
+              <div className="admin-header-profile-dropdown">
+
+                <button
+                  type="button"
+                  className="admin-header-profile-logout"
+                  onClick={() => {
+                    setProfileOpen(false);
+                    if (typeof onExit === "function") {
+                      onExit();
+                    }
+                  }}
+                >
+
+                  <LogOut
+                    size={17}
+                    strokeWidth={1.8}
+                  />
+
+                  <span>
+                    Logout
+                  </span>
+
+                </button>
+
+              </div>
+
+            </>
+
+          )}
+
+        </div>
 
       </div>
 

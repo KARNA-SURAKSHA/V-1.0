@@ -14,7 +14,7 @@ import {
   Gauge,
   Bell,
   Clock3,
-  LogOut,
+  //LogOut,
 } from "lucide-react";
 
 import {
@@ -221,10 +221,9 @@ export default function AdminSidebar({
       <aside
         className={`
           admin-sidebar-v2
-          ${
-            open
-              ? "admin-sidebar-v2-open"
-              : ""
+          ${open
+            ? "admin-sidebar-v2-open"
+            : ""
           }
         `}
       >
@@ -308,10 +307,9 @@ export default function AdminSidebar({
                     }
                     className={`
                       admin-sidebar-v2-group
-                      ${
-                        groupIndex > 0
-                          ? "admin-sidebar-v2-group-spaced"
-                          : ""
+                      ${groupIndex > 0
+                        ? "admin-sidebar-v2-group-spaced"
+                        : ""
                       }
                     `}
                   >
@@ -363,10 +361,9 @@ export default function AdminSidebar({
                               }
                               className={`
                                 admin-sidebar-v2-item
-                                ${
-                                  isActive
-                                    ? "active"
-                                    : ""
+                                ${isActive
+                                  ? "active"
+                                  : ""
                                 }
                               `}
                             >
@@ -397,13 +394,13 @@ export default function AdminSidebar({
                               {item.key ===
                                 "notifications" && (
 
-                                <span className="admin-sidebar-v2-badge">
+                                  <span className="admin-sidebar-v2-badge">
 
-                                  7
+                                    7
 
-                                </span>
+                                  </span>
 
-                              )}
+                                )}
 
                             </button>
 
@@ -438,10 +435,10 @@ export default function AdminSidebar({
             onClick={onExit}
           >
 
-            <LogOut
+            {/*<LogOut
               size={18}
               strokeWidth={1.8}
-            />
+            />*/}
 
             <span>
               Logout

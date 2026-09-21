@@ -52,6 +52,7 @@ export default function AdminLayout({
           onOpenLocation={() =>
             setLocationOpen(true)
           }
+          onExit={onExit}
         />
 
 
