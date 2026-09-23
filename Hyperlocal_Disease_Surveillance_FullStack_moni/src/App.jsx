@@ -1,9 +1,11 @@
 import {
   useState,
+  useEffect,
 } from "react";
 
 import {
   AuthProvider,
+  useAuth,
 } from "./context/AuthContext";
 
 import Navbar from "./components/Navbar";
@@ -23,19 +25,57 @@ import MedicalSupervisorPortal from "./pages/medical/MedicalSupervisorPortal";
 
 function AppContent() {
 
+  const { session, logout } = useAuth();
+
+  const getInitialView = () => {
+    if (session?.role) {
+      return session.role;
+    }
+
+    const storedUser = sessionStorage.getItem(
+      "kt_user_default_location"
+    );
+
+    if (storedUser) {
+      return "user";
+    }
+
+    return "landing";
+  };
+
   const [view, setView] =
-    useState("landing");
+    useState(getInitialView);
 
   const [pendingRole, setPendingRole] =
     useState(null);
 
   const [userInfo, setUserInfo] =
-    useState(null);
+    useState(() => {
+      const storedLocation = sessionStorage.getItem(
+        "kt_user_default_location"
+      );
+
+      if (storedLocation) {
+        try {
+          return {
+            username: null,
+            defaultLocation: JSON.parse(storedLocation),
+          };
+        } catch {
+          return null;
+        }
+      }
+
+      return null;
+    });
 
 
-  // ==========================================================
-  // ROLE NAVIGATION
-  // ==========================================================
+  useEffect(() => {
+    if (!session && view !== "landing" && view !== "login" && view !== "user-entry" && view !== "user") {
+      setView("landing");
+    }
+  }, [session]);
+
 
   const goToLogin = (role) => {
 
@@ -49,10 +89,6 @@ function AppContent() {
   };
 
 
-  // ==========================================================
-  // USER ENTRY
-  // ==========================================================
-
   const handleUserEntry = ({
     username,
     defaultLocation,
@@ -65,13 +101,6 @@ function AppContent() {
 
     setUserInfo(userData);
 
-    /*
-     * Store the default location for the current
-     * browser session.
-     *
-     * This is NOT a database user profile yet.
-     * Phase 1 user portal is still public/read-only.
-     */
     sessionStorage.setItem(
       "kt_user_default_location",
       JSON.stringify(
@@ -83,10 +112,6 @@ function AppContent() {
   };
 
 
-  // ==========================================================
-  // LOGIN
-  // ==========================================================
-
   const handleLoginSuccess = (
     session
   ) => {
@@ -96,10 +121,13 @@ function AppContent() {
 
 
   // ==========================================================
-  // HOME
+  // HOME / EXIT — now ALSO logs out of Firebase, so a stale
+  // session can never survive a reload after exiting a portal.
   // ==========================================================
 
   const goHome = () => {
+
+    logout();
 
     setView("landing");
 
@@ -113,10 +141,6 @@ function AppContent() {
   };
 
 
-  // ==========================================================
-  // USER ENTRY
-  // ==========================================================
-
   if (view === "user-entry") {
 
     return (
@@ -127,10 +151,6 @@ function AppContent() {
     );
   }
 
-
-  // ==========================================================
-  // LOGIN
-  // ==========================================================
 
   if (view === "login") {
 
@@ -143,10 +163,6 @@ function AppContent() {
     );
   }
 
-
-  // ==========================================================
-  // USER PORTAL
-  // ==========================================================
 
   if (
     view === "user" &&
@@ -167,10 +183,6 @@ function AppContent() {
   }
 
 
-  // ==========================================================
-  // AGENT
-  // ==========================================================
-
   if (view === "agent") {
 
     return (
@@ -180,10 +192,6 @@ function AppContent() {
     );
   }
 
-
-  // ==========================================================
-  // MEDICAL SUPERVISOR
-  // ==========================================================
 
   if (view === "medical_supervisor") {
 
@@ -195,10 +203,6 @@ function AppContent() {
   }
 
 
-  // ==========================================================
-  // ADMIN
-  // ==========================================================
-
   if (view === "admin") {
 
     return (
@@ -208,10 +212,6 @@ function AppContent() {
     );
   }
 
-
-  // ==========================================================
-  // LANDING
-  // ==========================================================
 
   return (
     <>
