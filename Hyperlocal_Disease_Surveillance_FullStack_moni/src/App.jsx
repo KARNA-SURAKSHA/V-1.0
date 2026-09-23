@@ -58,7 +58,7 @@ function AppContent() {
       if (storedLocation) {
         try {
           return {
-            username: null,
+            username: sessionStorage.getItem("kt_user_username") || null,
             defaultLocation: JSON.parse(storedLocation),
           };
         } catch {
@@ -108,6 +108,11 @@ function AppContent() {
       )
     );
 
+    sessionStorage.setItem(
+      "kt_user_username",
+      username
+    );
+
     setView("user");
   };
 
@@ -137,6 +142,10 @@ function AppContent() {
 
     sessionStorage.removeItem(
       "kt_user_default_location"
+    );
+
+    sessionStorage.removeItem(
+      "kt_user_username"
     );
   };
 
