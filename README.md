@@ -68,7 +68,7 @@ npm run dev
 
 - **Login**:  
   - Admin → `admin / ChangeMe123!`
-  - Citizen → `citizen / citizen123`
+  - Agent → `Agent_place / ChangeMe123!`
 - Explore dashboards, maps, disease reports, etc.
 
 ### 5. Production Build (optional)
