@@ -14,7 +14,6 @@ import {
   Gauge,
   Bell,
   Clock3,
-  //LogOut,
 } from "lucide-react";
 
 import {
@@ -425,8 +424,8 @@ export default function AdminSidebar({
 
         {/* ====================================================
             SIDEBAR FOOTER
-        ==================================================== */}
-
+        ====================================================*/}
+        {/*
         <div className="admin-sidebar-v2-footer">
 
           <button
@@ -435,10 +434,10 @@ export default function AdminSidebar({
             onClick={onExit}
           >
 
-            {/*<LogOut
+            <LogOut
               size={18}
               strokeWidth={1.8}
-            />*/}
+            />
 
             <span>
               Logout
@@ -447,7 +446,7 @@ export default function AdminSidebar({
           </button>
 
         </div>
-
+        */}
       </aside>
 
     </>
