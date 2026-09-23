@@ -11,7 +11,7 @@ This is a full‑stack Web application that lets public health officials and cit
 - **Node.js ≥ 18** (required for the front‑end)
 - **Python ≥ 3.10**
 - **pip** (Python package installer)
-- **Git** (optional – for cloning the repo)
+- **Git** (required – for cloning the repo)
 
 ## Quick Start
 
