@@ -257,7 +257,6 @@ export default function UserPortal({
       "risk-map",
       "analytics",
       "precautions",
-      "alerts",
       "notifications",
       "medical-chat",
       "home-relief",
@@ -878,37 +877,6 @@ export default function UserPortal({
 
 
         {/* ===================================================
-            EMERGENCY ALERTS
-        =================================================== */}
-
-        {activePage ===
-          "alerts" && (
-
-          <PageContainer>
-
-            {talukId ? (
-
-              <NotificationsTab
-                talukId={
-                  talukId
-                }
-                filterType="
-                  Emergency Alert
-                "
-              />
-
-            ) : (
-
-              <NoLocation />
-
-            )}
-
-          </PageContainer>
-
-        )}
-
-
-        {/* ===================================================
             NOTIFICATIONS
         =================================================== */}
 
@@ -920,8 +888,8 @@ export default function UserPortal({
             {talukId ? (
 
               <NotificationsTab
-                talukId={
-                  talukId
+                selectedLocation={
+                  selectedLocation
                 }
               />
 
@@ -991,4 +959,4 @@ export default function UserPortal({
 
   );
 
-}
+} 

@@ -12,7 +12,6 @@ import {
   MapPin,
   Menu,
   ShieldCheck,
-  Siren,
   X,
 } from "lucide-react";
 
@@ -88,12 +87,6 @@ export default function UserSidebar({
           label: "Precautionary Measures",
           icon: ShieldCheck,
         },
-
-        {
-          key: "alerts",
-          label: "Emergency Alerts",
-          icon: Siren,
-        },
       ],
     },
 
@@ -124,7 +117,9 @@ export default function UserSidebar({
 
   return (
     <>
-      {/* MOBILE MENU */}
+      {/* =====================================================
+          MOBILE MENU
+      ===================================================== */}
 
       <button
         type="button"
@@ -172,7 +167,9 @@ export default function UserSidebar({
       )}
 
 
-      {/* SIDEBAR */}
+      {/* =====================================================
+          SIDEBAR
+      ===================================================== */}
 
       <aside
         className={`
@@ -232,7 +229,6 @@ export default function UserSidebar({
               "
             />
 
-            {/* Re-colour subtitle to match reference */}
             <span className="
               absolute
               bottom-0
