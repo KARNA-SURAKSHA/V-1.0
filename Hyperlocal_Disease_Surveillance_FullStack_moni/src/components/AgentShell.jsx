@@ -14,6 +14,7 @@ import {
 
 import { api } from "../api";
 import { useAuth } from "../context/AuthContext";
+import NotificationManager from "./notifications/NotificationManager";
 
 import "./AgentShell.css";
 
@@ -546,7 +547,11 @@ export default function AgentShell({
 
         <div className="agent-main-inner">
 
-          {children}
+          {activeTab === "notifications" ? (
+            <NotificationManager mode="agent" />
+          ) : (
+            children
+          )}
 
         </div>
 

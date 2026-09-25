@@ -11,7 +11,6 @@ import {
 
 import api from "../../api";
 
-
 // ============================================================
 // MEDICAL SUPERVISOR COMPONENTS
 // ============================================================
@@ -360,6 +359,7 @@ function buildActivityLogs(
 export default function MedicalSupervisorPortal({
   onExit,
 }) {
+
   // ==========================================================
   // ACTIVE TAB
   // ==========================================================
@@ -383,14 +383,12 @@ export default function MedicalSupervisorPortal({
     true
   );
 
-
   const [
     refreshing,
     setRefreshing,
   ] = useState(
     false
   );
-
 
 
   // ==========================================================
@@ -403,7 +401,6 @@ export default function MedicalSupervisorPortal({
   ] = useState(
     ""
   );
-
 
 
   // ==========================================================
@@ -419,7 +416,6 @@ export default function MedicalSupervisorPortal({
 
     reports:
       [],
-
 
     analytics:
       null,
@@ -442,7 +438,7 @@ export default function MedicalSupervisorPortal({
 
 
   // ==========================================================
-  // FULL PAGE LOAD
+  // LOAD MEDICAL SUPERVISOR DATA
   // ==========================================================
 
   const load =
@@ -450,7 +446,9 @@ export default function MedicalSupervisorPortal({
       async (
         showSpinner = true
       ) => {
+
         try {
+
           setError("");
 
           if (
@@ -463,17 +461,8 @@ export default function MedicalSupervisorPortal({
 
 
           // ==================================================
-          // LOAD ALL DISEASE REPORTS
+          // DISEASE REPORTS
           // ==================================================
-
-          /*
-           * Reports are also used by:
-           *
-           * - Agent Oversight
-           * - Activity Logs
-           * - Weekly reporting history
-           * - Compliance calculations
-           */
 
           const reports =
             await api.getMedicalReports(
@@ -493,7 +482,7 @@ export default function MedicalSupervisorPortal({
 
 
           // ==================================================
-          // LOAD REMAINING MEDICAL SUPERVISOR DATA
+          // REMAINING MEDICAL SUPERVISOR DATA
           // ==================================================
 
           const [
@@ -521,7 +510,6 @@ export default function MedicalSupervisorPortal({
               api.getSupervisorAgentIssues(),
 
               api.getMedicalDiseases(),
-
             ]);
 
 
@@ -572,9 +560,11 @@ export default function MedicalSupervisorPortal({
                 ? diseases
                 : [],
           });
+
         } catch (
           e
         ) {
+
           console.error(
             "Medical Supervisor portal load error:",
             e
@@ -584,7 +574,9 @@ export default function MedicalSupervisorPortal({
             e?.message ||
               "Unable to load Medical Supervisor data."
           );
+
         } finally {
+
           setLoading(
             false
           );
@@ -608,7 +600,7 @@ export default function MedicalSupervisorPortal({
         true
       );
     },
-    []
+    [load]
   );
 
 
@@ -620,6 +612,7 @@ export default function MedicalSupervisorPortal({
     async (
       payload
     ) => {
+
       await api.submitAgentIssue(
         payload
       );
@@ -646,6 +639,7 @@ export default function MedicalSupervisorPortal({
       notes,
       extra = {}
     ) => {
+
       await api.reviewEmergingDisease(
         id,
         {
@@ -658,7 +652,6 @@ export default function MedicalSupervisorPortal({
           ...extra,
         }
       );
-
 
       await load(
         false
@@ -675,6 +668,7 @@ export default function MedicalSupervisorPortal({
       (
         destination
       ) => {
+
         setTab(
           destination
         );
@@ -754,6 +748,11 @@ export default function MedicalSupervisorPortal({
     "Dr. Monish";
 
 
+  // Prevent unused-variable warnings in configurations
+  // that perform strict checking.
+  void supervisorName;
+
+
   // ==========================================================
   // ACTIVITY LOGS
   // ==========================================================
@@ -766,29 +765,53 @@ export default function MedicalSupervisorPortal({
 
 
   // ==========================================================
+  // AVAILABLE WEEKS
+  // ==========================================================
+
+  const availableWeeks =
+    buildAvailableWeeks(
+      data.reports
+    );
+
+  /*
+   * The current dashboard components can calculate their
+   * own reporting periods. We keep this helper available
+   * for compatibility with the existing project structure.
+   */
+
+  void availableWeeks;
+
+
+  // ==========================================================
   // LOADING SCREEN
   // ==========================================================
 
   if (
     loading
   ) {
+
     return (
       <MedicalSupervisorLayout
         activeTab={
           tab
         }
+
         onTabChange={
           setTab
         }
+
         onExit={
           onExit
         }
+
         alertCount={
           0
         }
+
         districtName={
           districtName
         }
+
         locationName={
           locationName
         }
@@ -832,9 +855,7 @@ export default function MedicalSupervisorPortal({
         locationName
       }
 
-
     >
-
 
       {/* ====================================================
           ERROR MESSAGE
@@ -842,9 +863,31 @@ export default function MedicalSupervisorPortal({
 
       {
         error && (
-          <div className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-[#F0CACA] bg-[#FFF5F5] px-4 py-3 text-[11px] text-[#C62828]">
+          <div
+            className="
+              mb-5
+              flex
+              items-center
+              justify-between
+              gap-3
+              rounded-xl
+              border
+              border-[#F0CACA]
+              bg-[#FFF5F5]
+              px-4
+              py-3
+              text-[11px]
+              text-[#C62828]
+            "
+          >
 
-            <div className="flex items-center gap-2">
+            <div
+              className="
+                flex
+                items-center
+                gap-2
+              "
+            >
 
               <AlertCircle
                 size={
@@ -871,7 +914,22 @@ export default function MedicalSupervisorPortal({
               disabled={
                 refreshing
               }
-              className="inline-flex items-center gap-2 rounded-lg border border-[#F0CACA] bg-white px-3 py-2 font-semibold transition hover:bg-[#FFF9F9] disabled:cursor-not-allowed disabled:opacity-60"
+              className="
+                inline-flex
+                items-center
+                gap-2
+                rounded-lg
+                border
+                border-[#F0CACA]
+                bg-white
+                px-3
+                py-2
+                font-semibold
+                transition
+                hover:bg-[#FFF9F9]
+                disabled:cursor-not-allowed
+                disabled:opacity-60
+              "
             >
 
               <RefreshCw
@@ -1037,8 +1095,23 @@ export default function MedicalSupervisorPortal({
 
 
       {/* ====================================================
-          ALERTS
-          ==================================================== */}
+          NOTIFICATIONS / ALERTS
+          ====================================================
+
+          IMPORTANT:
+
+          MedicalSupervisorLayout now intercepts the
+          "alerts" tab and renders:
+
+              <NotificationManager mode="supervisor" />
+
+          Therefore this old Alerts component is retained
+          only for compatibility with the existing portal
+          structure.
+
+          The actual notification screen is controlled by
+          MedicalSupervisorLayout.
+      ==================================================== */}
 
       {
         tab ===
@@ -1106,7 +1179,6 @@ export default function MedicalSupervisorPortal({
 
         )
       }
-
 
     </MedicalSupervisorLayout>
   );

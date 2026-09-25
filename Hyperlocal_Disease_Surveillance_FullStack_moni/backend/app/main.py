@@ -1,51 +1,77 @@
 from dotenv import load_dotenv
+
 load_dotenv()
 
+
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+
+from fastapi.middleware.cors import (
+    CORSMiddleware,
+)
+
 
 from .database import (
     engine,
     ensure_schema_compatibility,
 )
 
+
 from . import models
+
 
 from .feature_init import (
     initialize_feature,
 )
 
+
 from .routers.auth_router import (
     router as auth_router,
 )
+
 
 from .routers.locations import (
     router as locations_router,
 )
 
+
+# ============================================================
+# NOTIFICATION MANAGEMENT
+# ============================================================
+
+from .routers.notification_management import (
+    router as notification_management_router,
+)
+
+
 from .routers.dashboard import (
     router as dashboard_router,
 )
+
 
 from .routers.agent import (
     router as agent_router,
 )
 
+
 from .routers.admin import (
     router as admin_router,
 )
+
 
 from .routers.medical_chat import (
     router as medical_chat_router,
 )
 
+
 from .routers.medical import (
     router as medical_router,
 )
 
+
 from .routers.medical_supervisor import (
     router as medical_supervisor_router,
 )
+
 
 from .routers.home_relief import (
     router as home_relief_router,
@@ -57,13 +83,19 @@ from .routers.emerging import (
 )
 
 
-# Medical Supervisor Management
+# ============================================================
+# ADMIN MEDICAL SUPERVISOR MANAGEMENT
+# ============================================================
+
 from .routers.admin_supervisors import (
     router as admin_supervisors_router,
 )
 
 
-# Admin Report Management
+# ============================================================
+# ADMIN REPORT MANAGEMENT
+# ============================================================
+
 from .routers.admin_report_management import (
     router as admin_report_management_router,
 )
@@ -152,21 +184,52 @@ app.include_router(
 )
 
 
-# User Dashboard
+# ============================================================
+# NOTIFICATION MANAGEMENT
+# ============================================================
+#
+# IMPORTANT:
+#
+# This router is registered BEFORE the legacy dashboard/admin
+# notification routes.
+#
+# Therefore:
+#
+#     /notifications/{taluk_id}
+#     /admin/notifications
+#
+# are handled by the new role-scoped notification system.
+#
+# The older endpoints remain in the existing files for
+# backward compatibility but are shadowed by these routes.
+# ============================================================
+
+app.include_router(
+    notification_management_router
+)
+
+
+# ============================================================
+# USER DASHBOARD
+# ============================================================
 
 app.include_router(
     dashboard_router
 )
 
 
-# Agent
+# ============================================================
+# AGENT
+# ============================================================
 
 app.include_router(
     agent_router
 )
 
 
-# Admin
+# ============================================================
+# ADMIN
+# ============================================================
 
 app.include_router(
     admin_router
@@ -227,7 +290,9 @@ app.include_router(
 )
 
 
-# Emerging Disease Surveillance
+# ============================================================
+# EMERGING DISEASE SURVEILLANCE
+# ============================================================
 
 app.include_router(
     emerging_router
@@ -245,8 +310,7 @@ app.include_router(
 def health():
 
     return {
-        "ok":
-            True,
+        "ok": True,
 
         "service":
             "Hyperlocal Disease Surveillance API",

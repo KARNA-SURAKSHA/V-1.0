@@ -1,22 +1,24 @@
 import {
   useEffect,
-  useMemo,
   useState,
 } from "react";
 
+
 import {
+  Bell,
   Megaphone,
   Siren,
   Stethoscope,
-  Bell,
+  UserRound,
 } from "lucide-react";
 
-import {
-  api,
-} from "../../api";
+
+import notificationApi
+  from "../../api/notificationApi";
 
 
 const TYPE_ICON = {
+
   "Health Camp":
     Stethoscope,
 
@@ -25,10 +27,12 @@ const TYPE_ICON = {
 
   "Emergency Alert":
     Siren,
+
 };
 
 
 const TYPE_COLOR = {
+
   "Health Camp":
     "#3FA9F5",
 
@@ -37,22 +41,98 @@ const TYPE_COLOR = {
 
   "Emergency Alert":
     "#C62828",
+
 };
 
 
-function notificationKey(
-  notification
+function sourceIcon(
+  sourceRole
 ) {
-  return String(
-    notification?.id ??
-      `${notification?.title || ""}-${notification?.created_at || ""}-${notification?.message || ""}`
+
+  if (
+    sourceRole ===
+    "Medical Supervisor"
+  ) {
+
+    return Stethoscope;
+
+  }
+
+
+  if (
+    sourceRole ===
+    "Agent"
+  ) {
+
+    return UserRound;
+
+  }
+
+
+  return Megaphone;
+
+}
+
+
+function formatDate(
+  value
+) {
+
+  if (!value) {
+    return "";
+  }
+
+
+  const date =
+    new Date(value);
+
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+
+    return "";
+
+  }
+
+
+  return date.toLocaleString(
+    "en-IN",
+    {
+      day:
+        "2-digit",
+
+      month:
+        "short",
+
+      year:
+        "numeric",
+
+      hour:
+        "2-digit",
+
+      minute:
+        "2-digit",
+    }
   );
+
 }
 
 
 export default function NotificationsTab({
+
   selectedLocation,
+
+  talukId,
+
 }) {
+
+  const resolvedTalukId =
+    selectedLocation?.talukId ??
+    talukId;
+
 
   const [
     notes,
@@ -72,294 +152,114 @@ export default function NotificationsTab({
   ] = useState(true);
 
 
-  const talukId =
-    selectedLocation?.talukId;
+  useEffect(
+    () => {
+
+      let cancelled =
+        false;
 
 
-  const districtId =
-    selectedLocation?.districtId;
+      async function load() {
+
+        if (
+          !resolvedTalukId
+        ) {
+
+          setNotes([]);
+
+          setError("");
+
+          setLoading(
+            false
+          );
+
+          return;
+
+        }
 
 
-  useEffect(() => {
+        try {
 
-    let cancelled = false;
+          setLoading(
+            true
+          );
 
-
-    async function loadNotifications() {
-
-      if (!talukId) {
-
-        setNotes([]);
-        setError("");
-        setLoading(false);
-
-        return;
-
-      }
+          setError("");
 
 
-      setLoading(true);
-      setError("");
-
-
-      try {
-
-        /*
-         * ======================================================
-         * USER NOTIFICATION SCOPE
-         * ======================================================
-         *
-         * The existing backend notification API supports:
-         *
-         *     /notifications/{talukId}
-         *
-         * and returns:
-         *
-         *   1. Notifications for that taluk.
-         *   2. Statewide notifications.
-         *
-         * A citizen, however, must see notifications relevant
-         * to the complete district as well.
-         *
-         * Therefore:
-         *
-         *   - Always request the citizen's own taluk.
-         *   - Find every taluk belonging to the citizen's
-         *     selected district.
-         *   - Request notifications for every taluk.
-         *   - Merge and remove duplicate notifications.
-         *
-         * This means the notification page receives:
-         *
-         *   ADMIN / STATEWIDE
-         *        +
-         *   MEDICAL SUPERVISOR / DISTRICT
-         *        +
-         *   AGENT / CITIZEN'S TALUK
-         *
-         * without requiring a database migration.
-         * ======================================================
-         */
-
-
-        const targetTalukIds =
-          new Set([
-            Number(talukId),
-          ]);
-
-
-        /*
-         * ======================================================
-         * LOAD ALL TALUKS OF THE SELECTED DISTRICT
-         * ======================================================
-         */
-
-        if (districtId) {
-
-          const districtTaluks =
-            await api.getTaluks(
-              Number(districtId)
-            );
+          const result =
+            await notificationApi
+              .getCitizenNotifications(
+                resolvedTalukId
+              );
 
 
           if (
-            Array.isArray(
-              districtTaluks
-            )
+            !cancelled
           ) {
 
-            districtTaluks.forEach(
-              (taluk) => {
+            setNotes(
 
-                const id =
-                  Number(
-                    taluk?.id
-                  );
+              Array.isArray(
+                result
+              )
+                ? result
+                : []
 
+            );
 
-                if (
-                  Number.isFinite(
-                    id
-                  ) &&
-                  id > 0
-                ) {
+          }
 
-                  targetTalukIds.add(
-                    id
-                  );
+        } catch (e) {
 
-                }
+          if (
+            !cancelled
+          ) {
 
-              }
+            setError(
+
+              e?.message
+              ||
+              "Unable to load notifications."
+
+            );
+
+          }
+
+        } finally {
+
+          if (
+            !cancelled
+          ) {
+
+            setLoading(
+              false
             );
 
           }
 
         }
 
-
-        /*
-         * ======================================================
-         * FETCH NOTIFICATIONS
-         * ======================================================
-         */
-
-        const results =
-          await Promise.all(
-            Array.from(
-              targetTalukIds
-            ).map(
-              (id) =>
-                api.getNotifications(
-                  id
-                )
-            )
-          );
-
-
-        if (
-          cancelled
-        ) {
-          return;
-        }
-
-
-        /*
-         * ======================================================
-         * REMOVE DUPLICATES
-         * ======================================================
-         *
-         * Statewide notifications are returned by every taluk
-         * request, so without deduplication the same notification
-         * would appear multiple times.
-         */
-
-        const unique =
-          new Map();
-
-
-        results
-          .flatMap(
-            (result) =>
-              Array.isArray(result)
-                ? result
-                : []
-          )
-          .forEach(
-            (notification) => {
-
-              unique.set(
-                notificationKey(
-                  notification
-                ),
-                notification
-              );
-
-            }
-          );
-
-
-        /*
-         * ======================================================
-         * SORT NEWEST FIRST
-         * ======================================================
-         */
-
-        const sorted =
-          Array.from(
-            unique.values()
-          ).sort(
-            (
-              a,
-              b
-            ) => {
-
-              const aTime =
-                new Date(
-                  a?.created_at ||
-                    0
-                ).getTime();
-
-
-              const bTime =
-                new Date(
-                  b?.created_at ||
-                    0
-                ).getTime();
-
-
-              return (
-                bTime -
-                aTime
-              );
-
-            }
-          );
-
-
-        setNotes(
-          sorted
-        );
-
-      } catch (e) {
-
-        if (
-          !cancelled
-        ) {
-
-          setNotes([]);
-
-          setError(
-            e?.message ||
-              "Unable to load notifications."
-          );
-
-        }
-
-      } finally {
-
-        if (
-          !cancelled
-        ) {
-
-          setLoading(
-            false
-          );
-
-        }
-
       }
 
-    }
+
+      load();
 
 
-    loadNotifications();
+      return () => {
 
+        cancelled =
+          true;
 
-    return () => {
+      };
 
-      cancelled = true;
+    },
 
-    };
+    [
+      resolvedTalukId,
+    ]
+  );
 
-  }, [
-    talukId,
-    districtId,
-  ]);
-
-
-  const visibleNotes =
-    useMemo(
-      () => notes,
-      [notes]
-    );
-
-
-  /*
-   * ==========================================================
-   * LOADING
-   * ==========================================================
-   */
 
   if (
     loading
@@ -371,19 +271,15 @@ export default function NotificationsTab({
         text-[14px]
         text-[#7A8598]
       ">
+
         Loading notifications...
+
       </p>
 
     );
 
   }
 
-
-  /*
-   * ==========================================================
-   * ERROR
-   * ==========================================================
-   */
 
   if (
     error
@@ -392,24 +288,17 @@ export default function NotificationsTab({
     return (
 
       <div className="
-        space-y-2
+        rounded-xl
+        border
+        border-red-200
+        bg-red-50
+        px-4
+        py-3
+        text-[13px]
+        text-[#C62828]
       ">
 
-        <p className="
-          text-[14px]
-          text-[#C62828]
-        ">
-          {error}
-        </p>
-
-
-        <p className="
-          text-[12px]
-          text-[#7A8598]
-        ">
-          Please try opening Notifications again
-          after confirming that the backend is running.
-        </p>
+        {error}
 
       </div>
 
@@ -418,258 +307,355 @@ export default function NotificationsTab({
   }
 
 
-  /*
-   * ==========================================================
-   * PAGE
-   * ==========================================================
-   */
-
   return (
 
     <div className="
       w-full
-      max-w-[760px]
+      max-w-[820px]
       space-y-5
     ">
 
-      {/* =====================================================
+      {/* ===================================================
           HEADER
-      ===================================================== */}
+      =================================================== */}
 
       <div>
 
-        <h2 className="
-          text-[22px]
-          font-semibold
-          text-[#1F3144]
-        ">
-          Notifications
-        </h2>
-
-
-        <p className="
-          mt-1
-          text-[13px]
-          leading-5
-          text-[#7A8598]
-        ">
-          Health communications for your selected
-          taluk and district, including statewide updates.
-        </p>
-
-      </div>
-
-
-      {/* =====================================================
-          EMPTY STATE
-      ===================================================== */}
-
-      {visibleNotes.length === 0 && (
-
         <div className="
-          rounded-xl
-          border
-          border-[#E8E2D8]
-          bg-white
-          p-6
+          flex
+          items-center
+          gap-3
         ">
 
           <div className="
             flex
+            h-10
+            w-10
             items-center
-            gap-3
+            justify-center
+            rounded-xl
+            bg-[#E8F4EA]
+            text-[#087A32]
           ">
 
-            <div className="
-              flex
-              h-10
-              w-10
-              items-center
-              justify-center
-              rounded-lg
-              bg-[#EAF6EE]
-              text-[#0B7A33]
-            ">
-
-              <Bell
-                size={19}
-              />
-
-            </div>
-
-
-            <div>
-
-              <p className="
-                text-[14px]
-                font-semibold
-                text-[#1F3144]
-              ">
-                No notifications yet
-              </p>
-
-
-              <p className="
-                mt-1
-                text-[12px]
-                text-[#7A8598]
-              ">
-                New health communications will appear
-                here when they are published for your area.
-              </p>
-
-            </div>
+            <Bell
+              size={19}
+            />
 
           </div>
+
+
+          <div>
+
+            <h2 className="
+              text-[21px]
+              font-semibold
+              text-[#1F3144]
+            ">
+
+              Notifications
+
+            </h2>
+
+
+            <p className="
+              mt-1
+              text-[12px]
+              leading-5
+              text-[#7A8598]
+            ">
+
+              Health updates from Administration,
+              your Medical Supervisor, and the Agent
+              assigned to your taluk.
+
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* ===================================================
+          EMPTY
+      =================================================== */}
+
+      {notes.length ===
+        0 && (
+
+        <div className="
+          rounded-2xl
+          border
+          border-[#E8E2D8]
+          bg-white
+          p-8
+          text-center
+        ">
+
+          <div className="
+            mx-auto
+            flex
+            h-11
+            w-11
+            items-center
+            justify-center
+            rounded-xl
+            bg-[#F1F7F3]
+            text-[#6D8E78]
+          ">
+
+            <Bell
+              size={20}
+            />
+
+          </div>
+
+
+          <p className="
+            mt-3
+            text-[14px]
+            font-semibold
+            text-[#344054]
+          ">
+
+            No notifications yet
+
+          </p>
+
+
+          <p className="
+            mt-1
+            text-[12px]
+            text-[#98A1AC]
+          ">
+
+            New district and taluk
+            health communications
+            will appear here.
+
+          </p>
 
         </div>
 
       )}
 
 
-      {/* =====================================================
-          NOTIFICATION LIST
-      ===================================================== */}
+      {/* ===================================================
+          NOTIFICATIONS
+      =================================================== */}
 
-      {visibleNotes.map(
+      {notes.map(
         (
-          notification
+          note
         ) => {
 
-          const Icon =
+          const TypeIcon =
             TYPE_ICON[
-              notification?.type
+              note.type
             ] ||
             Megaphone;
 
 
+          const SourceIcon =
+            sourceIcon(
+              note.source_role
+            );
+
+
           const color =
             TYPE_COLOR[
-              notification?.type
+              note.type
             ] ||
             "#0B7A33";
 
 
-          const scope =
-            notification?.taluk_name ||
-            "Statewide";
-
-
           return (
 
-            <div
+            <article
               key={
-                notificationKey(
-                  notification
-                )
+                note.id
               }
               className="
-                flex
-                gap-4
-                rounded-xl
+                rounded-2xl
                 border
                 border-[#E8E2D8]
                 bg-white
                 p-5
-                shadow-[0_1px_2px_rgba(31,49,68,0.03)]
+                shadow-[0_1px_3px_rgba(31,49,68,0.03)]
               "
             >
 
-              {/* ICON */}
-
-              <div
-                className="
-                  flex
-                  h-10
-                  w-10
-                  flex-shrink-0
-                  items-center
-                  justify-center
-                  rounded-lg
-                "
-                style={{
-                  backgroundColor:
-                    color,
-                }}
-              >
-
-                <Icon
-                  size={20}
-                  className="
-                    text-white
-                  "
-                />
-
-              </div>
-
-
-              {/* CONTENT */}
-
               <div className="
-                min-w-0
-                flex-1
+                flex
+                gap-4
               ">
 
-                <div className="
-                  flex
-                  flex-wrap
-                  items-center
-                  gap-2
-                ">
+                <div
+                  className="
+                    flex
+                    h-11
+                    w-11
+                    shrink-0
+                    items-center
+                    justify-center
+                    rounded-xl
+                  "
+                  style={{
+                    backgroundColor:
+                      color,
+                  }}
+                >
 
-                  <h4 className="
-                    font-semibold
-                    text-[#1F3144]
-                  ">
-                    {
-                      notification?.title
-                    }
-                  </h4>
-
-
-                  <span className="
-                    rounded-full
-                    bg-[#F6F3ED]
-                    px-2
-                    py-0.5
-                    text-[11px]
-                    text-[#7A8598]
-                  ">
-                    {scope}
-                  </span>
+                  <TypeIcon
+                    size={20}
+                    className="
+                      text-white
+                    "
+                  />
 
                 </div>
 
 
-                <p className="
-                  mt-1
-                  text-[14px]
-                  leading-6
-                  text-[#445064]
+                <div className="
+                  min-w-0
+                  flex-1
                 ">
-                  {
-                    notification?.message
-                  }
-                </p>
+
+                  <div className="
+                    flex
+                    flex-wrap
+                    items-start
+                    justify-between
+                    gap-2
+                  ">
+
+                    <h4 className="
+                      text-[14px]
+                      font-semibold
+                      text-[#1F3144]
+                    ">
+
+                      {
+                        note.title
+                      }
+
+                    </h4>
 
 
-                {notification?.created_at && (
+                    {note.created_at && (
+
+                      <time className="
+                        text-[10.5px]
+                        text-[#9AA1AA]
+                      ">
+
+                        {
+                          formatDate(
+                            note.created_at
+                          )
+                        }
+
+                      </time>
+
+                    )}
+
+                  </div>
+
 
                   <p className="
-                    mt-2
-                    text-[11px]
-                    text-[#9AA1AA]
+                    mt-1.5
+                    text-[13px]
+                    leading-5
+                    text-[#536174]
                   ">
-                    {new Date(
-                      notification.created_at
-                    ).toLocaleString()}
+
+                    {
+                      note.message
+                    }
+
                   </p>
 
-                )}
+
+                  <div className="
+                    mt-3
+                    flex
+                    flex-wrap
+                    items-center
+                    gap-2
+                  ">
+
+                    <span className="
+                      inline-flex
+                      items-center
+                      gap-1.5
+                      rounded-full
+                      bg-[#F0F8F2]
+                      px-2.5
+                      py-1
+                      text-[10px]
+                      font-semibold
+                      text-[#2F7650]
+                    ">
+
+                      <SourceIcon
+                        size={12}
+                      />
+
+                      From:
+                      {" "}
+                      {
+                        note.source_role
+                        ||
+                        "Administration"
+                      }
+
+                    </span>
+
+
+                    <span className="
+                      rounded-full
+                      bg-[#F7F5F1]
+                      px-2.5
+                      py-1
+                      text-[10px]
+                      text-[#7A8598]
+                    ">
+
+                      {
+                        note.scope_label
+                        ||
+                        note.taluk_name
+                        ||
+                        "Statewide"
+                      }
+
+                    </span>
+
+
+                    {note.source_name && (
+
+                      <span className="
+                        text-[10px]
+                        text-[#98A1AC]
+                      ">
+
+                        {
+                          note.source_name
+                        }
+
+                      </span>
+
+                    )}
+
+                  </div>
+
+                </div>
 
               </div>
 
-            </div>
+            </article>
 
           );
 
