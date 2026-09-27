@@ -42,7 +42,7 @@ Open the URL Vite prints (usually http://localhost:5173).
 From the landing page:
 - **"User Portal"** button (Hero section) -> citizen login -> demo user `citizen` / `citizen123`
 - **Portal dropdown (top right)** -> **Admin Portal** -> `admin` / `admin123`
-- **Portal dropdown (top right)** -> **Agent Portal** -> e.g. `agent_virajpet` / `agent123`
+- **Portal dropdown (top right)** -> **Agent Portal** -> e.g. `agent_virajpet` / `ChangeMe123!`
   (see the seed script output for all six seeded agent usernames -- one per taluk)
 
 **Suggested demo flow** (matches the original design doc's presentation order):

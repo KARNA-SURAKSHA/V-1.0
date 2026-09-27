@@ -10,7 +10,21 @@ router = APIRouter(prefix="/locations", tags=["locations"])
 
 @router.get("/states", response_model=List[schemas.StateOut])
 def list_states(db: Session = Depends(get_db)):
-    return db.query(models.State).order_by(models.State.name).all()
+    from ..firestore_db import db as firestore_db
+
+    docs = (
+        firestore_db.collection("states")
+        .order_by("name")
+        .stream()
+    )
+
+    return [
+        {
+            "id": doc.to_dict().get("id"),
+            "name": doc.to_dict().get("name"),
+        }
+        for doc in docs
+    ]
 
 
 @router.get("/districts/{state_id}", response_model=List[schemas.DistrictOut])
