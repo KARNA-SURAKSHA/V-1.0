@@ -43,7 +43,12 @@ def supervisor_district(
 
     Older supervisor accounts that do not yet have a district assigned
     fall back to Kodagu for backward compatibility.
+
+    Returns a plain dict (Firestore document data), not a SQLAlchemy
+    object, since District now lives in Firestore.
     """
+
+    from ..firestore_db import db as firestore_db
 
     district_id = getattr(
         user,
@@ -52,26 +57,27 @@ def supervisor_district(
     )
 
     if district_id:
-        district = (
-            db.query(models.District)
-            .filter(models.District.id == district_id)
-            .first()
+        district_doc = (
+            firestore_db.collection("districts")
+            .document(str(district_id))
+            .get()
         )
 
-        if district:
-            return district
+        if district_doc.exists:
+            return district_doc.to_dict()
 
     # Backward-compatible fallback
-    district = (
-        db.query(models.District)
-        .filter(
-            models.District.name.ilike("Kodagu")
-        )
-        .first()
+    kodagu_docs = firestore_db.collection("districts").stream()
+    kodagu_doc = next(
+        (
+            doc for doc in kodagu_docs
+            if doc.to_dict().get("name", "").lower() == "kodagu"
+        ),
+        None,
     )
 
-    if district:
-        return district
+    if kodagu_doc:
+        return kodagu_doc.to_dict()
 
     raise HTTPException(
         status_code=403,
@@ -91,33 +97,16 @@ def district_taluk_ids(
         user,
     )
 
+    # Taluk is still SQLite-backed for now, so we query it directly
+    # by district id rather than via a relationship on `district`.
     taluk_ids = [
         taluk.id
-        for taluk in district.taluks
+        for taluk in db.query(models.Taluk)
+        .filter(models.Taluk.district_id == district.get("id"))
+        .all()
     ]
 
     return district, taluk_ids
-
-
-def report_query(
-    db: Session,
-    user: models.User,
-):
-    district, taluk_ids = district_taluk_ids(
-        db,
-        user,
-    )
-
-    query = (
-        db.query(models.DiseaseReport)
-        .filter(
-            models.DiseaseReport.taluk_id.in_(
-                taluk_ids or [-1]
-            )
-        )
-    )
-
-    return district, query
 
 
 # ============================================================
