@@ -319,7 +319,7 @@ const request = async (
     if (response.status === 403) {
       throw new Error(
         message ||
-          "You do not have permission to access this resource."
+        "You do not have permission to access this resource."
       );
     }
 
@@ -532,11 +532,11 @@ const api = {
       {
         params:
           talukId !== undefined &&
-          talukId !== null &&
-          talukId !== ""
+            talukId !== null &&
+            talukId !== ""
             ? {
-                taluk_id: talukId,
-              }
+              taluk_id: talukId,
+            }
             : undefined,
       }
     );
@@ -726,8 +726,8 @@ const api = {
       {
         params: disease
           ? {
-              disease,
-            }
+            disease,
+          }
           : undefined,
       }
     );
@@ -741,8 +741,8 @@ const api = {
       {
         params: disease
           ? {
-              disease,
-            }
+            disease,
+          }
           : undefined,
       }
     );
@@ -870,7 +870,7 @@ const api = {
   // ==========================================================
   // AGENT
   // ==========================================================
-    
+
   getAgentStatus: async () => {
     return request(
       "/agent/status"
@@ -889,7 +889,7 @@ const api = {
     );
   },
 
-      submitWeeklyReport: async (reports, weekNumber, year) => {
+  submitWeeklyReport: async (reports, weekNumber, year) => {
     return request(
       "/agent/reports",
       {
@@ -1068,8 +1068,8 @@ const api = {
       {
         params: condition
           ? {
-              condition,
-            }
+            condition,
+          }
           : undefined,
       }
     );
@@ -1084,8 +1084,8 @@ const api = {
       {
         params: condition
           ? {
-              condition,
-            }
+            condition,
+          }
           : undefined,
       }
     );
@@ -1343,7 +1343,7 @@ const api = {
     ) => {
       if (
         supervisorId ===
-          undefined ||
+        undefined ||
         supervisorId === null ||
         supervisorId === ""
       ) {
@@ -1353,7 +1353,7 @@ const api = {
       }
 
       return request(
-        `/admin/supervisors/${supervisorId}/details`
+        `/admin/supervisors/${supervisorId}`
       );
     },
 
@@ -1377,7 +1377,7 @@ const api = {
     ) => {
       if (
         supervisorId ===
-          undefined ||
+        undefined ||
         supervisorId === null ||
         supervisorId === ""
       ) {
@@ -1402,7 +1402,7 @@ const api = {
     ) => {
       if (
         supervisorId ===
-          undefined ||
+        undefined ||
         supervisorId === null ||
         supervisorId === ""
       ) {
@@ -1429,7 +1429,7 @@ const api = {
     ) => {
       if (
         supervisorId ===
-          undefined ||
+        undefined ||
         supervisorId === null ||
         supervisorId === ""
       ) {

@@ -13,7 +13,6 @@ from .. import auth, models
 from ..database import get_db
 from ..utils import current_week_number
 
-
 # ============================================================
 # ROUTER
 # ============================================================
@@ -232,6 +231,19 @@ def get_last_activity(
         .scalar()
     )
 
+def _get_state_name(state_id):
+    if state_id is None:
+        return None
+
+    from ..firestore_db import db as firestore_db
+
+    state_doc = (
+        firestore_db.collection("states")
+        .document(str(state_id))
+        .get()
+    )
+
+    return state_doc.to_dict().get("name") if state_doc.exists else None
 
 def supervisor_to_dict(
     db: Session,
@@ -242,14 +254,15 @@ def supervisor_to_dict(
 
     if supervisor.supervisor_district_id:
 
-        district = (
-            db.query(models.District)
-            .filter(
-                models.District.id
-                == supervisor.supervisor_district_id
-            )
-            .first()
+        from ..firestore_db import db as firestore_db
+
+        district_doc = (
+            firestore_db.collection("districts")
+            .document(str(supervisor.supervisor_district_id))
+            .get()
         )
+
+        district = district_doc.to_dict() if district_doc.exists else None
 
     taluks = []
 
@@ -334,15 +347,14 @@ def supervisor_to_dict(
             supervisor.supervisor_district_id,
 
         "district_name":
-            district.name
+            district.get("name")
             if district
             else None,
 
         "state_name":
             (
-                district.state.name
+                _get_state_name(district.get("state_id"))
                 if district
-                and district.state
                 else None
             ),
 
@@ -751,16 +763,15 @@ def create_supervisor(
 
     if payload.district_id is not None:
 
-        district = (
-            db.query(models.District)
-            .filter(
-                models.District.id
-                == payload.district_id
-            )
-            .first()
+        from ..firestore_db import db as firestore_db
+
+        district_doc = (
+            firestore_db.collection("districts")
+            .document(str(payload.district_id))
+            .get()
         )
 
-        if not district:
+        if not district_doc.exists:
 
             raise HTTPException(
                 status_code=404,
@@ -770,14 +781,40 @@ def create_supervisor(
                 ),
             )
 
+    # --------------------------------------------------------
+    # CREATE FIREBASE ACCOUNT
+    #
+    # Authentication lives entirely in Firebase; the local User
+    # row (below) only stores role/profile/district assignment,
+    # keyed by firebase_uid. This happens automatically, on the
+    # server, the moment this endpoint is called — no manual
+    # Firebase Console step is ever needed.
+    # --------------------------------------------------------
+
+    from firebase_admin import auth as firebase_auth
+
+    email = f"{username}@yourdomain.com"
+
+    try:
+        firebase_user = firebase_auth.create_user(
+            email=email,
+            password=payload.password,
+            display_name=full_name,
+        )
+    except firebase_auth.EmailAlreadyExistsError:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "A Firebase account with this "
+                "username already exists."
+            ),
+        )
+
     supervisor = models.User(
 
         username=username,
 
-        password_hash=
-            auth.get_password_hash(
-                payload.password
-            ),
+        firebase_uid=firebase_user.uid,
 
         full_name=full_name,
 

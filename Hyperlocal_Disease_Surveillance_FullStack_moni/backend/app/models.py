@@ -51,7 +51,7 @@ class User(Base):
 
     password_hash = Column(
         String,
-        nullable=False,
+        nullable=True,  # no longer used — Firebase handles authentication
     )
 
     full_name = Column(
