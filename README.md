@@ -70,7 +70,7 @@ npm run dev
 
 ### 4. Use the Application
 
-- **Login**:  
+- **Login**: 
   - Admin → `admin / ChangeMe123!`
   - Agent → `Agent_place / ChangeMe123!`
 - Explore dashboards, maps, disease reports, etc.
