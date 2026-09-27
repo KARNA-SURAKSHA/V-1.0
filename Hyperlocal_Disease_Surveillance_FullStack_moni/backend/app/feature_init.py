@@ -82,10 +82,15 @@ def initialize_feature():
             if supervisor.full_name in {None, "", "Medical Supervisor"}:
                 supervisor.full_name = "Dr. Monish"
 
-        kodagu = db.query(models.District).filter(models.District.name.ilike("Kodagu")).first()
+        kodagu_docs = firestore_db.collection("districts").stream()
+        kodagu_doc = next(
+            (doc for doc in kodagu_docs if doc.to_dict().get("name", "").lower() == "kodagu"),
+            None,
+        )
+
         supervisor = db.query(models.User).filter(models.User.firebase_uid == firebase_uid).first()
-        if supervisor and kodagu:
-            supervisor.supervisor_district_id = kodagu.id
+        if supervisor and kodagu_doc:
+            supervisor.supervisor_district_id = kodagu_doc.to_dict().get("id")
 
         db.commit()
     finally:
