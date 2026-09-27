@@ -1629,14 +1629,35 @@ def medical_agent_issues(
     db: Session = Depends(get_db),
     user: models.User = Depends(supervisor_only),
 ):
+    from ..firestore_db import db as firestore_db
+
     district_id = getattr(user, "supervisor_district_id", None)
-    district = (
-        db.query(models.District).filter(models.District.id == district_id).first()
-        if district_id else None
-    )
+
+    district = None
+    if district_id:
+        district_doc = firestore_db.collection("districts").document(str(district_id)).get()
+        district = district_doc.to_dict() if district_doc.exists else None
+
     if district is None:
-        district = db.query(models.District).filter(models.District.name.ilike("Kodagu")).first()
-    taluk_ids = [t.id for t in district.taluks] if district else []
+        kodagu_docs = firestore_db.collection("districts").stream()
+        kodagu_doc = next(
+            (doc for doc in kodagu_docs if doc.to_dict().get("name", "").lower() == "kodagu"),
+            None,
+        )
+        district = kodagu_doc.to_dict() if kodagu_doc else None
+
+    # Taluk is still SQLite-backed for now, so we query it directly
+    # by district_id rather than via a relationship on `district`.
+    taluk_ids = (
+        [
+            t.id
+            for t in db.query(models.Taluk)
+            .filter(models.Taluk.district_id == district.get("id"))
+            .all()
+        ]
+        if district
+        else []
+    )
 
     query = (
         db.query(models.AgentIssueReport)
