@@ -1,25 +1,7 @@
 from datetime import datetime
-from firebase_admin import auth as firebase_auth
 
 from . import models
-from .database import SessionLocal
 from .firestore_db import db as firestore_db
-
-
-SUPERVISOR_EMAIL = "medical_supervisor@yourdomain.com"
-SUPERVISOR_PASSWORD = "ChangeMe123!"
-
-
-def _ensure_firebase_supervisor() -> str:
-    try:
-        user = firebase_auth.get_user_by_email(SUPERVISOR_EMAIL)
-    except firebase_auth.UserNotFoundError:
-        user = firebase_auth.create_user(
-            email=SUPERVISOR_EMAIL,
-            password=SUPERVISOR_PASSWORD,
-            display_name="Dr. Monish",
-        )
-    return user.uid
 
 
 def _seed_diseases_firestore():
@@ -55,43 +37,10 @@ def _seed_diseases_firestore():
 
 
 def initialize_feature():
-    db = SessionLocal()
-    try:
-        _seed_diseases_firestore()
+    """Ensure the official disease registry exists in Firestore.
 
-        firebase_uid = _ensure_firebase_supervisor()
-
-        supervisor = db.query(models.User).filter(models.User.firebase_uid == firebase_uid).first()
-        if not supervisor:
-            existing_by_username = db.query(models.User).filter(models.User.username == "medical_supervisor").first()
-            if existing_by_username:
-                existing_by_username.firebase_uid = firebase_uid
-                existing_by_username.role = "medical_supervisor"
-                existing_by_username.is_active = True
-            else:
-                db.add(models.User(
-                    firebase_uid=firebase_uid,
-                    username="medical_supervisor",
-                    full_name="Dr. Monish",
-                    role="medical_supervisor",
-                    is_active=True,
-                ))
-        else:
-            supervisor.role = "medical_supervisor"
-            supervisor.is_active = True
-            if supervisor.full_name in {None, "", "Medical Supervisor"}:
-                supervisor.full_name = "Dr. Monish"
-
-        kodagu_docs = firestore_db.collection("districts").stream()
-        kodagu_doc = next(
-            (doc for doc in kodagu_docs if doc.to_dict().get("name", "").lower() == "kodagu"),
-            None,
-        )
-
-        supervisor = db.query(models.User).filter(models.User.firebase_uid == firebase_uid).first()
-        if supervisor and kodagu_doc:
-            supervisor.supervisor_district_id = kodagu_doc.to_dict().get("id")
-
-        db.commit()
-    finally:
-        db.close()
+    Medical Supervisor accounts are no longer seeded here. They are
+    created and managed from the Admin portal (Medical Supervisor
+    Management).
+    """
+    _seed_diseases_firestore()

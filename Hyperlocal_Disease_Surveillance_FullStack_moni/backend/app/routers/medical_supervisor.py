@@ -507,7 +507,7 @@ def overview(
                     "for timely reporting."
                 ),
                 "created_at": now,
-                "taluk_name": district.name,
+                "taluk_name": district.get("name"),
                 "disease": None,
             }
         )
@@ -528,7 +528,7 @@ def overview(
                     "Supervisor review."
                 ),
                 "created_at": now,
-                "taluk_name": district.name,
+                "taluk_name": district.get("name"),
                 "disease": None,
             }
         )
@@ -674,13 +674,13 @@ def overview(
         "supervisor_name": user.full_name,
 
         "supervisor_district": {
-            "id": district.id,
-            "name": district.name,
+            "id": district.get("id"),
+            "name": district.get("name"),
         },
 
         "district": {
-            "id": district.id,
-            "name": district.name,
+            "id": district.get("id"),
+            "name": district.get("name"),
         },
 
         "total_agents": active_agents,
@@ -744,13 +744,15 @@ def overview(
             {
                 "taluk_id": taluk.id,
                 "taluk_name": taluk.name,
-                "district_name": district.name,
+                "district_name": district.get("name"),
                 "label": (
                     f"{taluk.name}, "
-                    f"{district.name}"
+                    f"{district.get('name')}"
                 ),
             }
-            for taluk in district.taluks
+            for taluk in db.query(models.Taluk)
+            .filter(models.Taluk.district_id == district.get("id"))
+            .all()
         ],
 
         "selected_location": None,
@@ -991,8 +993,8 @@ def reports(
                 "taluk_id": report.taluk_id,
                 "taluk_name": taluk_name,
 
-                "district_id": district.id,
-                "district_name": district.name,
+                "district_id": district.get("id"),
+                "district_name": district.get("name"),
 
                 "disease": report.disease,
                 "cases": cases,

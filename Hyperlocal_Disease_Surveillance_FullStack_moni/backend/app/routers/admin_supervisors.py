@@ -871,6 +871,8 @@ def update_supervisor(
     ),
 ):
 
+    from firebase_admin import auth as firebase_auth
+
     supervisor = (
         db.query(models.User)
         .filter(
@@ -891,6 +893,11 @@ def update_supervisor(
                 "not found."
             ),
         )
+
+    # Firebase changes are collected here and applied only after all
+    # validation has passed, so a rejected request never leaves the
+    # Firebase account half-updated.
+    firebase_changes = {}
 
     if payload.username is not None:
 
@@ -919,35 +926,40 @@ def update_supervisor(
                 ),
             )
 
+        if username != supervisor.username:
+            firebase_changes["email"] = (
+                f"{username}@yourdomain.com"
+            )
+
         supervisor.username = username
 
     if payload.full_name is not None:
 
-        supervisor.full_name = (
+        full_name = (
             payload.full_name
             .strip()
         )
 
+        if full_name != supervisor.full_name:
+            firebase_changes["display_name"] = full_name
+
+        supervisor.full_name = full_name
+
     if payload.password:
 
-        supervisor.password_hash = (
-            auth.get_password_hash(
-                payload.password
-            )
-        )
+        firebase_changes["password"] = payload.password
 
     if payload.district_id is not None:
 
-        district = (
-            db.query(models.District)
-            .filter(
-                models.District.id
-                == payload.district_id
-            )
-            .first()
+        from ..firestore_db import db as firestore_db
+
+        district_doc = (
+            firestore_db.collection("districts")
+            .document(str(payload.district_id))
+            .get()
         )
 
-        if not district:
+        if not district_doc.exists:
 
             raise HTTPException(
                 status_code=404,
@@ -960,6 +972,46 @@ def update_supervisor(
         supervisor.supervisor_district_id = (
             payload.district_id
         )
+
+    if firebase_changes:
+
+        if not supervisor.firebase_uid:
+
+            raise HTTPException(
+                status_code=409,
+                detail=(
+                    "This supervisor has no "
+                    "linked Firebase account."
+                ),
+            )
+
+        try:
+            firebase_auth.update_user(
+                supervisor.firebase_uid,
+                **firebase_changes,
+            )
+        except firebase_auth.EmailAlreadyExistsError:
+            raise HTTPException(
+                status_code=409,
+                detail=(
+                    "A Firebase account with this "
+                    "username already exists."
+                ),
+            )
+        except firebase_auth.UserNotFoundError:
+            raise HTTPException(
+                status_code=404,
+                detail=(
+                    "The linked Firebase account "
+                    "no longer exists."
+                ),
+            )
+        except ValueError as exc:
+            # e.g. password shorter than 6 characters
+            raise HTTPException(
+                status_code=400,
+                detail=str(exc),
+            )
 
     db.add(
         models.ActivityLog(
@@ -1100,6 +1152,20 @@ def delete_supervisor(
         )
 
     username = supervisor.username
+
+    # Remove the Firebase login first. If the local delete fails
+    # afterwards, retrying is safe because an already-missing Firebase
+    # user is ignored below.
+    if supervisor.firebase_uid:
+
+        from firebase_admin import auth as firebase_auth
+
+        try:
+            firebase_auth.delete_user(
+                supervisor.firebase_uid
+            )
+        except firebase_auth.UserNotFoundError:
+            pass
 
     db.add(
         models.ActivityLog(
