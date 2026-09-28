@@ -111,15 +111,25 @@ def list_agents(
     db: Session = Depends(get_db),
     user: models.User = Depends(admin_only),
 ):
+    from ..firestore_db import db as firestore_db
+
     week = current_week_number()
-    agents = db.query(models.Agent).join(models.User).join(models.Taluk).join(models.District).all()
+    agents = db.query(models.Agent).join(models.User).join(models.Taluk).all()
+
+    # District now lives in Firestore. Load all districts once (about 31
+    # small documents) instead of querying once per agent.
+    district_map = {
+        int(doc.id): doc.to_dict()
+        for doc in firestore_db.collection("districts").stream()
+        if doc.id.isdigit()
+    }
 
     rows = []
     for a in agents:
-        district = a.taluk.district if a.taluk else None
-        state = district.state if district else None
-        if state_id and (not state or state.id != state_id): continue
-        if district_id and (not district or district.id != district_id): continue
+        district = district_map.get(a.taluk.district_id) if a.taluk else None
+        agent_state_id = district.get("state_id") if district else None
+        if state_id and (not district or agent_state_id != state_id): continue
+        if district_id and (not district or district.get("id") != district_id): continue
         if taluk_id and a.taluk_id != taluk_id: continue
         if search:
             q = search.strip().lower()

@@ -45,10 +45,45 @@ router = APIRouter(
     tags=["notifications"],
 )
 
+# ============================================================
+# DISTRICT LOOKUP (FIRESTORE)
+# ============================================================
+
+_DISTRICT_CACHE = {}
+
+
+def _get_district(district_id):
+    """Return a district as a plain dict from Firestore, or None.
+
+    Districts are fixed reference data, so found districts are cached
+    in memory to avoid one Firestore read per notification.
+    """
+
+    if not district_id:
+        return None
+
+    if district_id in _DISTRICT_CACHE:
+        return _DISTRICT_CACHE[district_id]
+
+    from ..firestore_db import db as firestore_db
+
+    doc = (
+        firestore_db.collection("districts")
+        .document(str(district_id))
+        .get()
+    )
+
+    if not doc.exists:
+        return None
+
+    _DISTRICT_CACHE[district_id] = doc.to_dict()
+
+    return _DISTRICT_CACHE[district_id]
 
 # ============================================================
 # NOTIFICATION PUBLICATION METADATA
 # ============================================================
+#
 #
 # Existing notifications table already stores:
 #
@@ -217,8 +252,8 @@ def _notification_dict(
 
         if taluk:
 
-            district = (
-                taluk.district
+            district = _get_district(
+                taluk.district_id
             )
 
 
@@ -260,15 +295,8 @@ def _notification_dict(
         and publication.district_id
     ):
 
-        district = (
-            db.query(
-                models.District
-            )
-            .filter(
-                models.District.id
-                == publication.district_id
-            )
-            .first()
+        district = _get_district(
+            publication.district_id
         )
 
 
@@ -340,7 +368,7 @@ def _notification_dict(
             scope_label = (
 
                 f"District · "
-                f"{district.name}"
+                f"{district.get('name')}"
 
                 if district
 
@@ -397,12 +425,12 @@ def _notification_dict(
             else None,
 
         "district_id":
-            district.id
+            district.get("id")
             if district
             else None,
 
         "district_name":
-            district.name
+            district.get("name")
             if district
             else None,
 
@@ -496,46 +524,29 @@ def _get_supervisor_district(
         None,
     )
 
-
-    if district_id:
-
-        district = (
-            db.query(
-                models.District
-            )
-            .filter(
-                models.District.id
-                == district_id
-            )
-            .first()
-        )
-
-
-        if district:
-
-            return district
-
-
-    # Existing project fallback
-    # for older supervisor accounts.
-
-    district = (
-        db.query(
-            models.District
-        )
-        .filter(
-            models.District.name.ilike(
-                "Kodagu"
-            )
-        )
-        .first()
-    )
-
+    district = _get_district(district_id)
 
     if district:
 
         return district
 
+    # Existing project fallback
+    # for older supervisor accounts.
+
+    from ..firestore_db import db as firestore_db
+
+    kodagu_doc = next(
+        (
+            doc
+            for doc in firestore_db.collection("districts").stream()
+            if doc.to_dict().get("name", "").lower() == "kodagu"
+        ),
+        None,
+    )
+
+    if kodagu_doc:
+
+        return kodagu_doc.to_dict()
 
     raise HTTPException(
         status_code=403,
@@ -1069,7 +1080,7 @@ def create_supervisor_notification(
         ),
 
         district_id=
-            district.id,
+            district.get("id"),
 
         taluk_id=None,
 
